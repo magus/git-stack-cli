@@ -18,7 +18,8 @@ async function cli(command: string): Promise<string> {
       } else if (stderr) {
         reject(new Error(stderr));
       } else {
-        resolve(stdout);
+        let output = stdout.trimEnd();
+        resolve(output);
       }
     });
   });
