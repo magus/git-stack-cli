@@ -1,10 +1,18 @@
 # git-multi-diff
 
+## install
+
+```bash
+npm i -g git-multi-diff
+
+git multi-diff
+```
+
 ## development
 
 ```bash
 npm link
-git-multi-diff
+git multi-diff
 ```
 
 
