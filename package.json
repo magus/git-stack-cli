@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "tsx index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tsc"
   },
   "dependencies": {
     "uuid": "^9.0.1"
