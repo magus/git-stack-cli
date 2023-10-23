@@ -43,6 +43,14 @@ async function main() {
         metadata.id = uuid_v4();
         await write_metadata({ metadata, message });
       }
+
+      const pr_branch = get_pr_branch(branch_name, metadata);
+
+      // TODO get PR status relative to local commit
+      // TODO print clean metadata
+
+      // TODO push to origin only if necessary
+      await cli(`git push -f origin HEAD:${pr_branch}`);
     }
 
     // after all commits have been cherry-picked and amended
@@ -72,7 +80,6 @@ const RE = {
 
 type Metadata = {
   id: null | string;
-  pr: null | number;
 };
 
 async function write_metadata(args: { metadata: Metadata; message: string }) {
@@ -92,7 +99,6 @@ async function read_metadata(message: string): Promise<Metadata> {
 
   const metadata: Metadata = {
     id: null,
-    pr: null,
   };
 
   if (!match?.groups) {
@@ -102,6 +108,10 @@ async function read_metadata(message: string): Promise<Metadata> {
   metadata.id = match.groups.id;
 
   return metadata;
+}
+
+function get_pr_branch(branch_name: string, metadata: Metadata) {
+  return `${branch_name}/${metadata.id}`;
 }
 
 async function commit_message(sha: string) {
