@@ -4,7 +4,7 @@ import child from "node:child_process";
 main();
 
 async function main() {
-  const [, , force] = process.argv;
+  const [, , flag] = process.argv;
 
   const head_sha = (await cli("git rev-parse HEAD")).stdout;
   const merge_base = (await cli("git merge-base HEAD master")).stdout;
@@ -35,7 +35,15 @@ async function main() {
 
   const needs_update = commit_metadata_list.some(commit_needs_update);
 
-  if (!force && !needs_update) {
+  const flag_check = flag.match(RE.flag_check);
+
+  if (flag_check) {
+    return process.exit(0);
+  }
+
+  const flag_force = flag.match(RE.flag_force);
+
+  if (!flag_force && !needs_update) {
     console.debug();
     console.debug("Everything up to date.");
     console.debug("Run with `--force` to force update all pull requests.");
@@ -179,6 +187,9 @@ const TEMPLATE = {
 };
 
 const RE = {
+  flag_check: /(--check|check|-c)/i,
+  flag_force: /(--force|force|-f)/i,
+
   all_double_quote: /"/g,
   all_newline: /\n/g,
 
