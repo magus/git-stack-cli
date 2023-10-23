@@ -2,6 +2,8 @@
   "name": "git-multi-diff",
   "version": "0.1.0",
   "description": "",
+  "author": "magus",
+  "license": "MIT",
   "main": "./src/index.ts",
   "bin": {
     "git-multi-diff": "./src/entry.sh"
@@ -10,10 +12,12 @@
     "dev": "tsx index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "MIT",
+  "dependencies": {
+    "uuid": "^9.0.1"
+  },
   "devDependencies": {
     "@types/node": "^20.8.7",
+    "@types/uuid": "^9.0.6",
     "tsx": "^3.14.0",
     "typescript": "^5.2.2"
   }
