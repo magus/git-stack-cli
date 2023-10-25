@@ -15,9 +15,11 @@
     "test": "tsc"
   },
   "dependencies": {
+    "chalk": "^5.3.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/chalk": "^2.2.0",
     "@types/node": "^20.8.7",
     "@types/uuid": "^9.0.6",
     "prettier": "^3.0.3",
