@@ -60,18 +60,30 @@ async function main() {
     // create temporary branch based on merge base
     await cli(`git checkout -b ${temp_branch_name} ${merge_base}`);
 
+    const picked_commit_metadata_list = [];
+
     // cherry-pick and amend commits one by one
     for (let i = 0; i < commit_metadata_list.length; i++) {
       const sha = commit_metadata_list[i].sha;
 
+      let base;
+      if (i === 0) {
+        base = "master";
+      } else {
+        base = picked_commit_metadata_list[i - 1].metadata.id;
+        invariant(base, `metadata must be set on previous commit [${i}]`);
+      }
+
       await cli(`git cherry-pick ${sha}`);
 
-      const args = await get_commit_metadata(sha);
+      const args = await get_commit_metadata(sha, base);
 
       if (!args.metadata.id) {
         args.metadata.id = uuid_v4();
         await write_metadata(args);
       }
+
+      picked_commit_metadata_list.push(args);
 
       // always push to origin since github requires commit shas to line up perfectly
       console.debug();
@@ -79,7 +91,10 @@ async function main() {
 
       await cli(`git push -f origin HEAD:${args.metadata.id}`);
 
-      if (!args.pr_exists) {
+      if (args.pr_exists) {
+        // ensure base matches pr in github
+        await github.pr_base(args.metadata.id, base);
+      } else {
         try {
           // delete metadata id branch if leftover
           await cli(`git branch -D ${args.metadata.id}`, {
@@ -90,7 +105,7 @@ async function main() {
           await cli(`git checkout -b ${args.metadata.id}`);
 
           // create pr in github
-          await github.pr_create(args.metadata.id);
+          await github.pr_create(args.metadata.id, base);
         } catch (err) {
           console.error("Moving back to temp branch...");
           console.error(err);
@@ -151,19 +166,18 @@ async function print_table_row(
   }
 
   // print clean metadata about this commit / branch
-  console.debug(
+  const parts = [
     icon,
-    "  ",
+    " ",
     col(status, 10, "left"),
     col(args.message, 80, "left"),
-  );
+  ];
 
-  if (args.pr_branch) {
-    const pr_url = get_pr_url(repo_path, args.pr_branch);
-    console.debug(" ".repeat(16), pr_url);
+  if (args.pr?.number) {
+    parts.push(` https://github.com/${repo_path}/pull/${args.pr.number}`);
   }
 
-  console.debug();
+  console.debug(...parts);
 }
 
 function commit_needs_update(
@@ -172,32 +186,38 @@ function commit_needs_update(
   return !meta.pr_exists || meta.pr_dirty;
 }
 
-async function get_commit_metadata(sha: string) {
+async function get_commit_metadata(sha: string, base: null | string) {
   const raw_message = await commit_message(sha);
   const metadata = await read_metadata(raw_message);
   const message = display_message(raw_message);
 
-  let pr_branch = null;
+  let pr = null;
   let pr_exists = false;
   let pr_dirty = false;
 
   if (metadata.id) {
-    pr_branch = get_pr_branch(metadata);
+    const pr_branch = get_pr_branch(metadata);
 
-    const pr = await github.pr_status(pr_branch);
+    pr = await github.pr_status(pr_branch);
 
-    if (pr) {
+    if (pr && pr.state === "OPEN") {
       pr_exists = true;
 
       const last_commit = pr.commits[pr.commits.length - 1];
       pr_dirty = last_commit.oid !== sha;
+
+      if (pr.baseRefName !== base) {
+        // requires base update
+        pr_dirty = true;
+      }
     }
   }
 
   return {
     sha,
+    base,
     message,
-    pr_branch,
+    pr,
     pr_exists,
     pr_dirty,
     metadata,
@@ -320,9 +340,21 @@ async function get_commit_metadata_list() {
 
   const sha_list = lines(log_result.stdout).reverse();
 
-  const commit_metadata_list = await Promise.all(
-    sha_list.map((sha) => get_commit_metadata(sha)),
-  );
+  const commit_metadata_list = [];
+
+  for (let i = 0; i < sha_list.length; i++) {
+    const sha = sha_list[i];
+
+    let base;
+    if (i === 0) {
+      base = "master";
+    } else {
+      base = commit_metadata_list[i - 1].metadata.id;
+    }
+
+    const commit_metadata = await get_commit_metadata(sha, base);
+    commit_metadata_list.push(commit_metadata);
+  }
 
   return commit_metadata_list;
 }

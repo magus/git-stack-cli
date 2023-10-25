@@ -18,27 +18,32 @@ type Commit = {
 
 type PullRequest = {
   number: number;
+  state: "OPEN" | "CLOSED";
+  baseRefName: string;
+  headRefName: string;
   commits: Array<Commit>;
 };
 
 export async function pr_status(branch: string): Promise<null | PullRequest> {
   const result = await cli(
-    `gh pr list --head "${branch}" --json number,commits`,
+    `gh pr view ${branch} --json number,state,baseRefName,headRefName,commits`,
+    {
+      ignoreExitCode: true,
+    },
   );
 
-  if (result.stdout === "[]") {
+  if (result.code !== 0) {
     return null;
   }
 
-  const pr_list: Array<PullRequest> = JSON.parse(result.stdout);
-  const [first_pr] = pr_list;
-  return first_pr;
+  const pr = JSON.parse(result.stdout);
+  return pr;
 }
 
-export async function pr_create(branch: string) {
-  const result = await cli(`gh pr create --fill --head "${branch}"`, {
-    stdio: "inherit",
-  });
+export async function pr_create(branch: string, base: string) {
+  await cli(`gh pr create --fill --head ${branch} --base ${base}`);
+}
 
-  return result;
+export async function pr_base(branch: string, base: string) {
+  await cli(`gh pr edit ${branch} --base ${base}`);
 }
