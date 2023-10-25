@@ -17,7 +17,7 @@ async function main() {
 
   // handle when there are no detected changes
   if (head_sha === merge_base) {
-    console.error("No changes detected.");
+    console.error(color.dim("No changes detected."));
     return exit(0);
   }
 
