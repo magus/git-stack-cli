@@ -1,5 +1,5 @@
 import { v4 as uuid_v4 } from "uuid";
-import child from "node:child_process";
+import * as child from "node:child_process";
 
 main();
 

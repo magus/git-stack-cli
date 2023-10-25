@@ -5,8 +5,9 @@
   "author": "magus",
   "license": "MIT",
   "main": "./src/index.ts",
+  "preferGlobal": true,
   "bin": {
-    "git-multi-diff": "./src/entry.sh"
+    "git-multi-diff": "./src/bin/entry.js"
   },
   "scripts": {
     "dev": "tsx index.ts",
