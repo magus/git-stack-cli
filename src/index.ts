@@ -5,6 +5,7 @@ import { invariant } from "./core/invariant";
 import { dependency_check } from "./core/dependency_check";
 import { exit } from "./core/exit";
 import { cli } from "./core/cli";
+
 main();
 
 async function main() {
