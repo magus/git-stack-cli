@@ -1,5 +1,7 @@
 import { v4 as uuid_v4 } from "uuid";
 
+import * as github from "./core/github";
+
 import { color } from "./core/color";
 import { invariant } from "./core/invariant";
 import { dependency_check } from "./core/dependency_check";
@@ -11,7 +13,9 @@ main();
 async function main() {
   await dependency_check();
 
-  const [, , flag] = process.argv;
+  const [, , maybe_flag] = process.argv;
+
+  const flag = maybe_flag || "";
 
   const head_sha = (await cli("git rev-parse HEAD")).stdout;
   const merge_base = (await cli("git merge-base HEAD master")).stdout;
@@ -29,16 +33,9 @@ async function main() {
   const origin_url = (await cli(`git config --get remote.origin.url`)).stdout;
   const repo_path = match_group(origin_url, RE.repo_path, "repo_path");
 
-  const sha_list = lines(
-    (await cli(`git log master..HEAD --oneline --format=%H --color=never`))
-      .stdout,
-  ).reverse();
+  const commit_metadata_list = await get_commit_metadata_list();
 
-  let commit_metadata_list = await Promise.all(
-    sha_list.map((sha) => get_commit_metadata(branch_name, sha)),
-  );
-
-  print_table(repo_path, branch_name, commit_metadata_list);
+  print_table(repo_path, commit_metadata_list);
 
   const needs_update = commit_metadata_list.some(commit_needs_update);
 
@@ -64,11 +61,12 @@ async function main() {
     await cli(`git checkout -b ${temp_branch_name} ${merge_base}`);
 
     // cherry-pick and amend commits one by one
-    for (let i = 0; i < sha_list.length; i++) {
-      const sha = sha_list[i];
+    for (let i = 0; i < commit_metadata_list.length; i++) {
+      const sha = commit_metadata_list[i].sha;
+
       await cli(`git cherry-pick ${sha}`);
 
-      const args = await get_commit_metadata(branch_name, sha);
+      const args = await get_commit_metadata(sha);
 
       if (!args.metadata.id) {
         args.metadata.id = uuid_v4();
@@ -77,33 +75,55 @@ async function main() {
 
       // always push to origin since github requires commit shas to line up perfectly
       console.debug();
-      console.debug(`Syncing [${args.pr_branch}] ...`);
-      await cli(`git push -f origin HEAD:${args.pr_branch}`);
+      console.debug(`Syncing [${args.metadata.id}] ...`);
+
+      await cli(`git push -f origin HEAD:${args.metadata.id}`);
+
+      if (!args.pr_exists) {
+        try {
+          // delete metadata id branch if leftover
+          await cli(`git branch -D ${args.metadata.id}`, {
+            ignoreExitCode: true,
+          });
+
+          // move to temporary branch for creating pr
+          await cli(`git checkout -b ${args.metadata.id}`);
+
+          // create pr in github
+          await github.pr_create(args.metadata.id);
+        } catch (err) {
+          console.error("Moving back to temp branch...");
+          console.error(err);
+        } finally {
+          // move back to temp branch
+          await cli(`git checkout ${temp_branch_name}`);
+
+          // delete metadata id branch if leftover
+          await cli(`git branch -D ${args.metadata.id}`, {
+            ignoreExitCode: true,
+          });
+        }
+      }
     }
 
     // after all commits have been cherry-picked and amended
     // move the branch pointer to the temporary branch (with the metadata)
     await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
   } catch (err) {
-    console.debug("Restoring original branch...");
+    console.error("Restoring original branch...");
     console.error(err);
   } finally {
     // always put self back in original branch
     await cli(`git checkout ${branch_name}`);
     // ...and cleanup temporary branch
-    await cli(`git branch -D ${temp_branch_name}`);
+    await cli(`git branch -D ${temp_branch_name}`, { ignoreExitCode: true });
   }
 
-  commit_metadata_list = await Promise.all(
-    sha_list.map((sha) => get_commit_metadata(branch_name, sha)),
-  );
-
-  print_table(repo_path, branch_name, commit_metadata_list);
+  print_table(repo_path, await get_commit_metadata_list());
 }
 
 async function print_table(
   repo_path: string,
-  branch_name: string,
   commit_metadata_list: Array<Awaited<ReturnType<typeof get_commit_metadata>>>,
 ) {
   console.debug();
@@ -152,33 +172,30 @@ function commit_needs_update(
   return !meta.pr_exists || meta.pr_dirty;
 }
 
-async function get_commit_metadata(branch_name: string, sha: string) {
+async function get_commit_metadata(sha: string) {
   const raw_message = await commit_message(sha);
   const metadata = await read_metadata(raw_message);
   const message = display_message(raw_message);
 
-  let pr_branch;
-  let pr_exists;
-  let pr_dirty;
+  let pr_branch = null;
+  let pr_exists = false;
+  let pr_dirty = false;
 
   if (metadata.id) {
-    pr_branch = get_pr_branch(branch_name, metadata);
+    pr_branch = get_pr_branch(metadata);
 
-    // get pr status relative to local commit
-    pr_exists = Boolean(
-      (await cli(`git ls-remote --heads origin ${pr_branch}`)).stdout,
-    );
+    const pr = await github.pr_status(pr_branch);
 
-    pr_dirty = Boolean(
-      (await cli(`git diff origin/${pr_branch}..${sha}`)).stdout,
-    );
-  } else {
-    pr_branch = null;
-    pr_exists = false;
-    pr_dirty = false;
+    if (pr) {
+      pr_exists = true;
+
+      const last_commit = pr.commits[pr.commits.length - 1];
+      pr_dirty = last_commit.oid !== sha;
+    }
   }
 
   return {
+    sha,
     message,
     pr_branch,
     pr_exists,
@@ -239,8 +256,8 @@ async function read_metadata(message: string): Promise<Metadata> {
   return metadata;
 }
 
-function get_pr_branch(branch_name: string, metadata: Metadata) {
-  return `${branch_name}/${metadata.id}`;
+function get_pr_branch(metadata: Metadata) {
+  return `${metadata.id}`;
 }
 
 // https://github.com/magus/git-multi-diff-playground/compare/dev/noah/a-test/e0f8182f-12c1-441a-81ad-20e0b58efa8d?expand=1
@@ -294,4 +311,18 @@ function match_group(value: string, re: RegExp, group: string) {
   const result = match?.groups[group];
   invariant(result, `match.groups must contain [${group}] ${debug}`);
   return result;
+}
+
+async function get_commit_metadata_list() {
+  const log_result = await cli(
+    `git log master..HEAD --oneline --format=%H --color=never`,
+  );
+
+  const sha_list = lines(log_result.stdout).reverse();
+
+  const commit_metadata_list = await Promise.all(
+    sha_list.map((sha) => get_commit_metadata(sha)),
+  );
+
+  return commit_metadata_list;
 }
