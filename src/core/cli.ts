@@ -1,6 +1,8 @@
 import * as child from "node:child_process";
 
-type Options = {
+type SpawnOptions = Parameters<typeof child.spawn>[2];
+
+type Options = SpawnOptions & {
   ignoreExitCode?: boolean;
 };
 
@@ -18,18 +20,18 @@ export async function cli(
   const options = Object.assign({}, unsafe_options);
 
   return new Promise((resolve, reject) => {
-    const childProcess = child.spawn("sh", ["-c", command]);
+    const childProcess = child.spawn("sh", ["-c", command], options);
 
     let stdout = "";
     let stderr = "";
     let output = "";
 
-    childProcess.stdout.on("data", (data: Buffer) => {
+    childProcess.stdout?.on("data", (data: Buffer) => {
       stdout += data.toString();
       output += data.toString();
     });
 
-    childProcess.stderr.on("data", (data: Buffer) => {
+    childProcess.stderr?.on("data", (data: Buffer) => {
       stderr += data.toString();
       output += data.toString();
     });
