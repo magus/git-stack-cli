@@ -1,14 +1,14 @@
 import { v4 as uuid_v4 } from "uuid";
-import * as child from "node:child_process";
 
 import { invariant } from "./core/invariant";
 import { dependency_check } from "./core/dependency_check";
 import { exit } from "./core/exit";
-
-dependency_check();
+import { cli } from "./core/cli";
 main();
 
 async function main() {
+  await dependency_check();
+
   const [, , flag] = process.argv;
 
   const head_sha = (await cli("git rev-parse HEAD")).stdout;
@@ -292,48 +292,4 @@ function match_group(value: string, re: RegExp, group: string) {
   const result = match?.groups[group];
   invariant(result, `match.groups must contain [${group}] ${debug}`);
   return result;
-}
-
-type CLIOutput = {
-  stdout: string;
-  stderr: string;
-  output: string;
-};
-
-async function cli(command: string): Promise<CLIOutput> {
-  return new Promise((resolve, reject) => {
-    const childProcess = child.spawn("sh", ["-c", command]);
-
-    let stdout = "";
-    let stderr = "";
-    let output = "";
-
-    childProcess.stdout.on("data", (data: Buffer) => {
-      // console.debug(String(data));
-
-      stdout += data.toString();
-      output += data.toString();
-    });
-
-    childProcess.stderr.on("data", (data: Buffer) => {
-      stderr += data.toString();
-      output += data.toString();
-    });
-
-    childProcess.on("close", (code) => {
-      if (code !== 0) {
-        reject(new Error(`[${command}] (${code})`));
-      } else {
-        resolve({
-          stdout: stdout.trimEnd(),
-          stderr: stderr.trimEnd(),
-          output: output.trimEnd(),
-        });
-      }
-    });
-
-    childProcess.on("error", (err) => {
-      reject(err);
-    });
-  });
 }
