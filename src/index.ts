@@ -1,6 +1,11 @@
 import { v4 as uuid_v4 } from "uuid";
 import * as child from "node:child_process";
 
+import { invariant } from "./core/invariant";
+import { dependency_check } from "./core/dependency_check";
+import { exit } from "./core/exit";
+
+dependency_check();
 main();
 
 async function main() {
@@ -289,12 +294,6 @@ function match_group(value: string, re: RegExp, group: string) {
   return result;
 }
 
-function invariant(condition: any, message: string): asserts condition {
-  if (!condition) {
-    throw new Error(message);
-  }
-}
-
 type CLIOutput = {
   stdout: string;
   stderr: string;
@@ -337,13 +336,4 @@ async function cli(command: string): Promise<CLIOutput> {
       reject(err);
     });
   });
-}
-
-function int(value: string) {
-  return parseInt(value, 10);
-}
-
-function exit(code: number): never {
-  process.exitCode = code;
-  process.exit();
 }
