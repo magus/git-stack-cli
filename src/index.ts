@@ -12,7 +12,7 @@ async function main() {
   // handle when there are no detected changes
   if (head_sha === merge_base) {
     console.error("No changes detected.");
-    return process.exit(400);
+    return exit(0);
   }
 
   const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
@@ -38,7 +38,7 @@ async function main() {
   const flag_check = flag.match(RE.flag_check);
 
   if (flag_check) {
-    return process.exit(0);
+    return exit(0);
   }
 
   const flag_force = flag.match(RE.flag_force);
@@ -47,7 +47,7 @@ async function main() {
     console.debug();
     console.debug("Everything up to date.");
     console.debug("Run with `--force` to force update all pull requests.");
-    return process.exit(0);
+    return exit(0);
   }
 
   const temp_branch_name = `${branch_name}_${uuid_v4()}`;
@@ -341,4 +341,9 @@ async function cli(command: string): Promise<CLIOutput> {
 
 function int(value: string) {
   return parseInt(value, 10);
+}
+
+function exit(code: number): never {
+  process.exitCode = code;
+  process.exit();
 }
