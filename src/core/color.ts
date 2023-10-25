@@ -1,22 +1,36 @@
 import chalk from "chalk";
 
-// test();
-
 type ChalkInstance = typeof chalk;
 
 interface ColorProxy extends ChalkInstance {
-  url(value: string): this;
-  cmd(value: string): this;
+  test(): void;
+  bracket(str: string): string;
+  url(str: string): this;
+  cmd(str: string): this;
+  branch(str: string): this;
 }
 
 function create_color_proxy(base: typeof chalk): ColorProxy {
   return new Proxy(chalk as any, {
     get(target, prop) {
       switch (prop) {
+        case "test":
+          return test;
+
+        case "bracket":
+          return (str: string) =>
+            [
+              target.bold.whiteBright("["),
+              str,
+              target.bold.whiteBright("]"),
+            ].join("");
+
         case "url":
           return target.bold.underline.blueBright;
         case "cmd":
           return target.bold.yellow;
+        case "branch":
+          return target.bold.green;
       }
 
       const target_prop = target[prop];
@@ -30,7 +44,7 @@ function create_color_proxy(base: typeof chalk): ColorProxy {
 }
 export const color = create_color_proxy(chalk);
 
-export function test() {
+function test() {
   const PROP_LIST = [
     "reset", // Reset the current style.
     "bold", // Make the text bold.
