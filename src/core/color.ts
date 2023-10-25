@@ -2,13 +2,33 @@ import chalk from "chalk";
 
 // test();
 
-export function url(value: string) {
-  return chalk.bold.underline.blueBright(value);
+type ChalkInstance = typeof chalk;
+
+interface ColorProxy extends ChalkInstance {
+  url(value: string): this;
+  cmd(value: string): this;
 }
 
-export function cmd(value: string) {
-  return chalk.bold.yellow(value);
+function create_color_proxy(base: typeof chalk): ColorProxy {
+  return new Proxy(chalk as any, {
+    get(target, prop) {
+      switch (prop) {
+        case "url":
+          return target.bold.underline.blueBright;
+        case "cmd":
+          return target.bold.yellow;
+      }
+
+      const target_prop = target[prop];
+
+      return target_prop;
+    },
+    apply(target, this_arg, arguments_list) {
+      return target(...arguments_list);
+    },
+  });
 }
+export const color = create_color_proxy(chalk);
 
 export function test() {
   const PROP_LIST = [

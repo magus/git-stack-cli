@@ -1,5 +1,6 @@
 import { v4 as uuid_v4 } from "uuid";
 
+import { color } from "./core/color";
 import { invariant } from "./core/invariant";
 import { dependency_check } from "./core/dependency_check";
 import { exit } from "./core/exit";
