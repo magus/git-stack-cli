@@ -11,6 +11,7 @@
     "customConditions": ["module"],
 
     "noEmit": true,
+    "noUnusedLocals": true,
     "allowImportingTsExtensions": true,
     "allowArbitraryExtensions": true,
     "verbatimModuleSyntax": true
