@@ -56,11 +56,13 @@ module.exports = {
 
         "@typescript-eslint/consistent-type-imports": [
           "error",
-          { prefer: "type-imports" },
+          { prefer: "type-imports", fixStyle: "separate-type-imports" },
         ],
-        "import/newline-after-import": ["error"],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-floating-promises": ["error"],
+
+        "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+        "import/newline-after-import": ["error"],
         "import/order": [
           "error",
           {
