@@ -5,7 +5,8 @@ import { Box, Text } from "ink";
 import { dependency_check } from "../core/dependency_check.js";
 // import { main } from "../main.js";
 
-// import { Counter } from "./Counter.js";
+import { Counter } from "./Counter.js";
+import { KeepAlive } from "./KeepAlive.js";
 
 import type { Argv } from "../command.js";
 import type { Instance as InkInstance } from "ink";
@@ -47,7 +48,8 @@ export function App(props: Props) {
 
   return (
     <React.Fragment>
-      {/* <Counter {...props} /> */}
+      <KeepAlive />
+      <Counter {...props} />
 
       <Box flexDirection="column">
         <Text>Ready</Text>
