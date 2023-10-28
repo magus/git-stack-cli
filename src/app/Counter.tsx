@@ -1,6 +1,6 @@
-import React from "react";
+import * as React from "react";
 
-import { Text } from "ink";
+import * as Ink from "ink";
 
 import type { Argv } from "../command.js";
 
@@ -22,8 +22,8 @@ export function Counter(props: Props) {
   }, []);
 
   return (
-    <Text color="green">
+    <Ink.Text color="green">
       {counter} tests passed (force: {String(props.argv.force)})
-    </Text>
+    </Ink.Text>
   );
 }

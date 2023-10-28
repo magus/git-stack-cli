@@ -1,6 +1,6 @@
-import React from "react";
+import * as React from "react";
 
-import { Box, Text } from "ink";
+import * as Ink from "ink";
 
 import { dependency_check } from "../core/dependency_check.js";
 // import { main } from "../main.js";
@@ -40,9 +40,9 @@ export function App(props: Props) {
 
   if (!dep_check) {
     return (
-      <Box>
-        <Text>Checking dependencies...</Text>
-      </Box>
+      <Ink.Box>
+        <Ink.Text>Checking dependencies...</Ink.Text>
+      </Ink.Box>
     );
   }
 
@@ -51,10 +51,10 @@ export function App(props: Props) {
       <KeepAlive />
       <Counter {...props} />
 
-      <Box flexDirection="column">
-        <Text>Ready</Text>
-        <Text>force={String(props.argv.force)}</Text>
-      </Box>
+      <Ink.Box flexDirection="column">
+        <Ink.Text>Ready</Ink.Text>
+        <Ink.Text>force={String(props.argv.force)}</Ink.Text>
+      </Ink.Box>
     </React.Fragment>
   );
 }
