@@ -1,21 +1,16 @@
 import { v4 as uuid_v4 } from "uuid";
 
-import * as github from "./core/github";
+import { cli } from "./core/cli.js";
+import { color } from "./core/color.js";
+import { dependency_check } from "./core/dependency_check.js";
+import { exit } from "./core/exit.js";
+import * as github from "./core/github.js";
+import { invariant } from "./core/invariant.js";
 
-import { color } from "./core/color";
-import { invariant } from "./core/invariant";
-import { dependency_check } from "./core/dependency_check";
-import { exit } from "./core/exit";
-import { cli } from "./core/cli";
+import type { Argv } from "./command.js";
 
-main();
-
-async function main() {
+export async function main(argv: Argv) {
   await dependency_check();
-
-  const [, , maybe_flag] = process.argv;
-
-  const flag = maybe_flag || "";
 
   const head_sha = (await cli("git rev-parse HEAD")).stdout;
   const merge_base = (await cli("git merge-base HEAD master")).stdout;
@@ -39,15 +34,11 @@ async function main() {
 
   const needs_update = commit_metadata_list.some(commit_needs_update);
 
-  const flag_check = flag.match(RE.flag_check);
-
-  if (flag_check) {
+  if (argv.check) {
     return exit(0);
   }
 
-  const flag_force = flag.match(RE.flag_force);
-
-  if (!flag_force && !needs_update) {
+  if (!argv.force && !needs_update) {
     console.debug();
     console.debug("Everything up to date.");
     console.debug("Run with `--force` to force update all pull requests.");
@@ -137,7 +128,7 @@ async function main() {
   print_table(repo_path, await get_commit_metadata_list());
 }
 
-async function print_table(
+function print_table(
   repo_path: string,
   commit_metadata_list: Array<Awaited<ReturnType<typeof get_commit_metadata>>>,
 ) {
@@ -147,7 +138,7 @@ async function print_table(
   }
 }
 
-async function print_table_row(
+function print_table_row(
   repo_path: string,
   args: Awaited<ReturnType<typeof get_commit_metadata>>,
 ) {
@@ -271,18 +262,16 @@ async function read_metadata(message: string): Promise<Metadata> {
     return metadata;
   }
 
-  metadata.id = match.groups.id;
+  const id = match.groups["id"];
+  invariant(id, "id must exist");
+
+  metadata.id = id;
 
   return metadata;
 }
 
 function get_pr_branch(metadata: Metadata) {
   return `${metadata.id}`;
-}
-
-// https://github.com/magus/git-multi-diff-playground/compare/dev/noah/a-test/e0f8182f-12c1-441a-81ad-20e0b58efa8d?expand=1
-function get_pr_url(repo_path: string, pr_branch: string) {
-  return `https://github.com/${repo_path}/compare/${pr_branch}?expand=1`;
 }
 
 async function commit_message(sha: string) {

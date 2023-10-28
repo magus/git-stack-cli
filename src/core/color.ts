@@ -11,8 +11,8 @@ interface ColorProxy extends ChalkInstance {
 }
 
 function create_color_proxy(base: typeof chalk): ColorProxy {
-  return new Proxy(chalk as any, {
-    get(target, prop) {
+  return new Proxy(base as ColorProxy, {
+    get(target, prop: keyof ColorProxy) {
       switch (prop) {
         case "test":
           return test;
@@ -37,7 +37,7 @@ function create_color_proxy(base: typeof chalk): ColorProxy {
 
       return target_prop;
     },
-    apply(target, this_arg, arguments_list) {
+    apply(target, _this_arg, arguments_list) {
       return target(...arguments_list);
     },
   });

@@ -4,24 +4,41 @@
   "description": "",
   "author": "magus",
   "license": "MIT",
-  "main": "./src/index.ts",
+  "type": "module",
   "preferGlobal": true,
   "bin": {
-    "git-multi-diff": "./src/bin/entry.js"
+    "git-multi-diff": "dist/cli.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "tsx index.ts",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint . --fix",
     "prettier": "prettier ./src --write",
-    "test": "tsc"
+    "test": "npm run prettier && npm run lint && npm run build"
   },
   "dependencies": {
     "chalk": "^5.3.0",
-    "uuid": "^9.0.1"
+    "ink": "^4.4.1",
+    "react": "^18.2.0",
+    "tsconfig-paths": "^4.2.0",
+    "uuid": "^9.0.1",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.0",
     "@types/node": "^20.8.7",
+    "@types/react": "^18.2.33",
     "@types/uuid": "^9.0.6",
+    "@types/yargs": "^17.0.29",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "eslint": "^8.52.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-react": "^7.33.2",
     "prettier": "^3.0.3",
     "tsx": "^3.14.0",
     "typescript": "^5.2.2"

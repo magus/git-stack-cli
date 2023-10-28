@@ -1,4 +1,4 @@
-import { cli } from "./cli";
+import { cli } from "./cli.js";
 
 type Commit = {
   authoredDate: string; // "2023-10-22T23:13:35Z"

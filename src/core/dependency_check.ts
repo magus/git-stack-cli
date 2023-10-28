@@ -1,7 +1,7 @@
-import { color } from "./color";
-import { is_command_available } from "./is_command_available";
-import { exit } from "./exit";
-import { cli } from "./cli";
+import { cli } from "./cli.js";
+import { color } from "./color.js";
+import { exit } from "./exit.js";
+import { is_command_available } from "./is_command_available.js";
 
 export async function dependency_check() {
   if (!is_command_available("git")) {

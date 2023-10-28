@@ -1,19 +1,39 @@
 {
-  "compilerOptions": {
-    "strict": true,
+  "include": ["src"],
 
-    "module": "ESNext",
+  "compilerOptions": {
+    "outDir": "dist",
+
+    "module": "node16",
+    "moduleResolution": "node16",
+    "moduleDetection": "force",
     "target": "ESNext",
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
 
-    "customConditions": ["module"],
+    // provide backwards compatibility
+    // nodejs allows you to import most commonjs packages with a default import
+    // this flag tells typescript that it's okay to use import on commonjs modules
+    "allowSyntheticDefaultImports": true,
 
-    "noEmit": true,
+    // esm doesn't yet support json modules
+    "resolveJsonModule": false,
+
+    "jsx": "react",
+    "declaration": true,
+    "pretty": true,
+    "newLine": "lf",
+    "stripInternal": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
     "noUnusedLocals": true,
-    "allowImportingTsExtensions": true,
-    "allowArbitraryExtensions": true,
-    "verbatimModuleSyntax": true
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    // "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noEmitOnError": true,
+    "useDefineForClassFields": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
   }
 }
