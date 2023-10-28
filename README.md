@@ -18,8 +18,16 @@ git multi-diff
 
 ## TODO
 
-- set PR title to commit subject (first line of message)
-  - similar to base being out of date
+- allow commits to be grouped
+  - list commits from base
+  - single key interactions
+  - enter, toggle group for commit
+  - g, group
+  - c, cycle group
+  - a, abort
+  - d, done
+
+- each group must match PR commits otherwise it's dirty, not just first commit
 
 - build comment table with each pr in stack
   - order based on local sha ordering
