@@ -1,12 +1,13 @@
 import { cli } from "./cli.js";
 import { color } from "./color.js";
-import { exit } from "./exit.js";
 import { is_command_available } from "./is_command_available.js";
 
 export async function dependency_check() {
   if (!is_command_available("git")) {
     console.error(`${color.cmd("git")} must be installed.`);
-    return exit(2);
+
+    process.exitCode = 2;
+    return false;
   }
 
   if (!is_command_available("gh")) {
@@ -15,7 +16,9 @@ export async function dependency_check() {
     console.error(
       `Visit ${color.url("https://cli.github.com/")} to install the github cli (${color.cmd("gh")})`,
     );
-    return exit(3);
+
+    process.exitCode = 3;
+    return false;
   }
 
   const gh_auth_status_cli = await cli(`gh auth status`, {
@@ -25,6 +28,10 @@ export async function dependency_check() {
   if (gh_auth_status_cli.code !== 0) {
     // prettier-ignore
     console.error(`${color.cmd('gh')} requires login, please run \`${color.cmd('gh auth login')}\`.`);
-    return exit(4);
+
+    process.exitCode = 4;
+    return false;
   }
+
+  return true;
 }

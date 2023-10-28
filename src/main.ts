@@ -2,23 +2,19 @@ import { v4 as uuid_v4 } from "uuid";
 
 import { cli } from "./core/cli.js";
 import { color } from "./core/color.js";
-import { dependency_check } from "./core/dependency_check.js";
-import { exit } from "./core/exit.js";
 import * as github from "./core/github.js";
 import { invariant } from "./core/invariant.js";
 
 import type { Argv } from "./command.js";
 
 export async function main(argv: Argv) {
-  await dependency_check();
-
   const head_sha = (await cli("git rev-parse HEAD")).stdout;
   const merge_base = (await cli("git merge-base HEAD master")).stdout;
 
   // handle when there are no detected changes
   if (head_sha === merge_base) {
     console.error(color.dim("No changes detected."));
-    return exit(0);
+    return process.exit();
   }
 
   const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
@@ -35,14 +31,14 @@ export async function main(argv: Argv) {
   const needs_update = commit_metadata_list.some(commit_needs_update);
 
   if (argv.check) {
-    return exit(0);
+    return process.exit();
   }
 
   if (!argv.force && !needs_update) {
     console.debug();
     console.debug("Everything up to date.");
     console.debug("Run with `--force` to force update all pull requests.");
-    return exit(0);
+    return process.exit();
   }
 
   const temp_branch_name = `${branch_name}_${uuid_v4()}`;
