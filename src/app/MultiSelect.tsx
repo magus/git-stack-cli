@@ -84,10 +84,12 @@ function Radio(props: RadioProps) {
   let color;
 
   if (props.selected) {
-    display = "✓";
+    // display = "✓";
+    display = "◉";
     color = "green";
   } else {
-    display = " ";
+    // display = " ";
+    display = "◯";
     color = "";
   }
 
@@ -118,11 +120,19 @@ function ItemRow(props: ItemRowProps) {
   }
 
   return (
-    <Ink.Box flexDirection="row" alignItems="center" gap={1}>
+    <Ink.Box flexDirection="row" gap={1}>
       <Radio selected={props.selected} />
-      <Ink.Text bold={props.selected} underline={underline} color={color}>
-        {props.label}
-      </Ink.Text>
+
+      <Ink.Box>
+        <Ink.Text
+          bold={props.selected}
+          underline={underline}
+          color={color}
+          wrap="truncate-end"
+        >
+          {props.label}
+        </Ink.Text>
+      </Ink.Box>
     </Ink.Box>
   );
 }
