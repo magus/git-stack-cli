@@ -1,3 +1,6 @@
+import * as React from "react";
+
+import * as Ink from "ink";
 import { v4 as uuid_v4 } from "uuid";
 
 import { cli } from "../core/cli.js";
@@ -6,22 +9,29 @@ import * as github from "../core/github.js";
 import { invariant } from "../core/invariant.js";
 import { match_group } from "../core/match_group.js";
 
+import { Exit } from "./Exit.js";
 import { Store } from "./Store.js";
 
 import type { Argv } from "../command.js";
+
+export function Main() {
+  return <Ink.Text>Main</Ink.Text>;
+}
 
 type Args = {
   argv: Argv;
 };
 
 export async function main(args: Args) {
+  const actions = Store.getState().actions;
+
   const head = (await cli("git rev-parse HEAD")).stdout;
   const merge_base = (await cli("git merge-base HEAD master")).stdout;
 
   // handle when there are no detected changes
   if (head === merge_base) {
-    console.error(color.dim("No changes detected."));
-    return process.exit();
+    actions.output(<Ink.Text color="gray">No changes detected.</Ink.Text>);
+    actions.output(<Exit clear code={0} />);
   }
 
   const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
@@ -139,7 +149,7 @@ export async function main(args: Args) {
 
 function print_table(
   repo_path: string,
-  commit_metadata_list: Array<Awaited<ReturnType<typeof get_commit_metadata>>>,
+  commit_metadata_list: Array<Awaited<ReturnType<typeof get_commit_metadata>>>
 ) {
   console.debug();
   for (const args of commit_metadata_list) {
@@ -149,7 +159,7 @@ function print_table(
 
 function print_table_row(
   repo_path: string,
-  args: Awaited<ReturnType<typeof get_commit_metadata>>,
+  args: Awaited<ReturnType<typeof get_commit_metadata>>
 ) {
   let icon;
   let status;
@@ -181,7 +191,7 @@ function print_table_row(
 }
 
 function commit_needs_update(
-  meta: Awaited<ReturnType<typeof get_commit_metadata>>,
+  meta: Awaited<ReturnType<typeof get_commit_metadata>>
 ) {
   return !meta.pr_exists || meta.pr_dirty;
 }
@@ -324,7 +334,7 @@ function col(value: string, length: number, align: "left" | "right") {
 
 async function get_commit_metadata_list() {
   const log_result = await cli(
-    `git log master..HEAD --oneline --format=%H --color=never`,
+    `git log master..HEAD --oneline --format=%H --color=never`
   );
 
   const sha_list = lines(log_result.stdout).reverse();
