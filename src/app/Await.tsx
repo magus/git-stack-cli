@@ -5,11 +5,19 @@ import { invariant } from "../core/invariant.js";
 
 type Cache = ReturnType<typeof cache>;
 
-type Props = {
-  fallback: React.SuspenseProps["fallback"];
+type BaseProps = {
   function: Parameters<typeof cache>[0];
-  children?: React.ReactNode;
 };
+
+type WithChildrenProps = BaseProps & {
+  fallback: React.SuspenseProps["fallback"];
+  children: React.ReactNode;
+  function: Parameters<typeof cache>[0];
+};
+
+type WithoutChildrenProps = BaseProps;
+
+type Props = WithChildrenProps | WithoutChildrenProps;
 
 export function Await(props: Props) {
   // const id = React.useId();
@@ -22,15 +30,20 @@ export function Await(props: Props) {
 
   invariant(cacheRef.current, "cache must exist");
 
-  return (
-    <React.Suspense fallback={props.fallback}>
-      <ReadCache {...props} cache={cacheRef.current} />
-    </React.Suspense>
-  );
+  if ("fallback" in props) {
+    return (
+      <React.Suspense fallback={props.fallback}>
+        <ReadCache {...props} cache={cacheRef.current} />
+      </React.Suspense>
+    );
+  }
+
+  return <ReadCache cache={cacheRef.current} />;
 }
 
-type ReadCacheProps = Props & {
+type ReadCacheProps = {
   cache: Cache;
+  children?: React.ReactNode;
 };
 
 function ReadCache(props: ReadCacheProps) {
