@@ -2,13 +2,9 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import type { Argv } from "../command.js";
+export function Counter() {
+  const { isFocused } = Ink.useFocus();
 
-type Props = {
-  argv: Argv;
-};
-
-export function Counter(props: Props) {
   const [counter, setCounter] = React.useState(0);
 
   React.useEffect(() => {
@@ -23,7 +19,7 @@ export function Counter(props: Props) {
 
   return (
     <Ink.Text color="green">
-      {counter} tests passed (force: {String(props.argv.force)})
+      {counter} tests passed (focus:{String(isFocused)})
     </Ink.Text>
   );
 }
