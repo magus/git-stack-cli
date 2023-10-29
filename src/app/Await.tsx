@@ -63,8 +63,7 @@ export function Await(props: Props) {
   if ("fallback" in props) {
     return (
       <React.Suspense fallback={!display_fallback ? null : props.fallback}>
-        <ReadCache {...props} cache={cacheRef.current} />
-        {props.children}
+        <ReadCache cache={cacheRef.current}>{props.children}</ReadCache>
       </React.Suspense>
     );
   }
@@ -79,5 +78,5 @@ type ReadCacheProps = {
 
 function ReadCache(props: ReadCacheProps) {
   props.cache.read();
-  return null;
+  return props.children;
 }
