@@ -1,5 +1,6 @@
 {
   "include": ["src"],
+  "exclude": ["node_modules"],
 
   "compilerOptions": {
     "outDir": "dist",
@@ -19,7 +20,6 @@
     "resolveJsonModule": false,
 
     "jsx": "react",
-    "declaration": true,
     "pretty": true,
     "newLine": "lf",
     "stripInternal": true,
