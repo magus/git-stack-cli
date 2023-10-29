@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { DependencyCheck } from "./DependencyCheck.js";
+import { GatherMetadata } from "./GatherMetadata.js";
 import { Main } from "./Main.js";
 import { Output } from "./Output.js";
 import { Store } from "./Store.js";
@@ -17,7 +18,9 @@ export function App() {
       <Output />
 
       <DependencyCheck>
-        <Main />
+        <GatherMetadata>
+          <Main />
+        </GatherMetadata>
       </DependencyCheck>
     </React.Fragment>
   );

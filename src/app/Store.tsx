@@ -1,7 +1,11 @@
+import * as React from "react";
+
+import * as Ink from "ink";
 import { createStore, useStore } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
 import type { Argv } from "../command.js";
+import type * as CommitMetadata from "../core/CommitMetadata.js";
 import type { Instance as InkInstance } from "ink";
 
 type Setter = (state: State) => void;
@@ -13,12 +17,16 @@ type State = {
   head: null | string;
   merge_base: null | string;
   branch_name: null | string;
+  repo_path: null | string;
+  commit_metadata_list: null | Array<CommitMetadata.Type>;
 
+  step: "loading" | "select-commit-ranges";
   output: Array<React.ReactNode>;
 
   actions: {
     clear(): void;
     exit(): void;
+    newline(): void;
     output(node: React.ReactNode): void;
     set(setter: Setter): void;
   };
@@ -32,7 +40,10 @@ const BaseStore = createStore<State>()(
     head: null,
     merge_base: null,
     branch_name: null,
+    repo_path: null,
+    commit_metadata_list: null,
 
+    step: "loading",
     output: [],
 
     actions: {
@@ -42,6 +53,12 @@ const BaseStore = createStore<State>()(
 
       exit() {
         get().ink?.unmount();
+      },
+
+      newline() {
+        set((state) => {
+          state.output.push(<Ink.Text>‎</Ink.Text>);
+        });
       },
 
       output(node: React.ReactNode) {
