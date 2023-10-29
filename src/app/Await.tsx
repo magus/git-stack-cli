@@ -12,7 +12,7 @@ type BaseProps = {
 type WithChildrenProps = BaseProps & {
   fallback: React.SuspenseProps["fallback"];
   children: React.ReactNode;
-  function: Parameters<typeof cache>[0];
+  delayFallbackMs?: number;
 };
 
 type WithoutChildrenProps = BaseProps;
@@ -20,6 +20,8 @@ type WithoutChildrenProps = BaseProps;
 type Props = WithChildrenProps | WithoutChildrenProps;
 
 export function Await(props: Props) {
+  const [display_fallback, set_display_fallback] = React.useState(false);
+
   // const id = React.useId();
   const cacheRef = React.useRef<null | Cache>(null);
 
@@ -28,11 +30,39 @@ export function Await(props: Props) {
     cacheRef.current = cache(props.function);
   }
 
+  let delayFallbackMs: number;
+  if ("delayFallbackMs" in props && typeof props.delayFallbackMs === "number") {
+    delayFallbackMs = props.delayFallbackMs;
+  } else {
+    delayFallbackMs = 1000;
+  }
+
+  React.useEffect(() => {
+    const cache = cacheRef.current;
+
+    if (!cache) {
+      return;
+    }
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    timeoutId = setTimeout(() => {
+      // only display fallback if we are still pending
+      if (cache.check() === "pending") {
+        set_display_fallback(true);
+      }
+    }, delayFallbackMs);
+
+    return function cleanup() {
+      clearTimeout(timeoutId);
+    };
+  }, [delayFallbackMs]);
+
   invariant(cacheRef.current, "cache must exist");
 
   if ("fallback" in props) {
     return (
-      <React.Suspense fallback={props.fallback}>
+      <React.Suspense fallback={!display_fallback ? null : props.fallback}>
         <ReadCache {...props} cache={cacheRef.current} />
       </React.Suspense>
     );
