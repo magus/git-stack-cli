@@ -11,6 +11,7 @@ git multi-diff
 ## development
 
 ```bash
+npm run dev
 npm link
 git multi-diff
 ```
