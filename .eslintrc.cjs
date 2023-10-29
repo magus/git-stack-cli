@@ -51,6 +51,7 @@ module.exports = {
       plugins: ["@typescript-eslint", "import", "react"],
 
       rules: {
+        "prefer-const": "off",
         "linebreak-style": ["error", "unix"],
         "no-unreachable": "error",
 
