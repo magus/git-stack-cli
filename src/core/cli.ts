@@ -15,7 +15,7 @@ type Return = {
 
 export async function cli(
   command: string,
-  unsafe_options?: Options,
+  unsafe_options?: Options
 ): Promise<Return> {
   const options = Object.assign({}, unsafe_options);
 

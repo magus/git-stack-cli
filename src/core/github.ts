@@ -29,7 +29,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
     `gh pr view ${branch} --json number,state,baseRefName,headRefName,commits`,
     {
       ignoreExitCode: true,
-    },
+    }
   );
 
   if (result.code !== 0) {

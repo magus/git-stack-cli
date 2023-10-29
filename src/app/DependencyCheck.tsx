@@ -31,7 +31,7 @@ export function DependencyCheck(props: Props) {
         actions.output(
           <Ink.Text>
             <Ink.Text color="yellow">git</Ink.Text> must be installed.
-          </Ink.Text>,
+          </Ink.Text>
         );
 
         actions.output(<Exit clear code={2} />);
@@ -51,7 +51,7 @@ export function DependencyCheck(props: Props) {
           actions.output(
             <Ink.Text>
               <Ink.Text color="yellow">gh</Ink.Text> must be installed.
-            </Ink.Text>,
+            </Ink.Text>
           );
 
           actions.output(
@@ -62,7 +62,7 @@ export function DependencyCheck(props: Props) {
               <Ink.Text>
                 (<Ink.Text color="yellow">gh</Ink.Text>)
               </Ink.Text>
-            </Ink.Box>,
+            </Ink.Box>
           );
 
           actions.output(<Exit clear code={3} />);
@@ -90,7 +90,7 @@ export function DependencyCheck(props: Props) {
                 <Ink.Text>
                   <Ink.Text color="yellow">gh auth login</Ink.Text>
                 </Ink.Text>
-              </Ink.Box>,
+              </Ink.Box>
             );
 
             actions.output(<Exit clear code={4} />);

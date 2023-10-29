@@ -126,7 +126,7 @@ export async function main(argv: Argv) {
 
 function print_table(
   repo_path: string,
-  commit_metadata_list: Array<Awaited<ReturnType<typeof get_commit_metadata>>>,
+  commit_metadata_list: Array<Awaited<ReturnType<typeof get_commit_metadata>>>
 ) {
   console.debug();
   for (const args of commit_metadata_list) {
@@ -136,7 +136,7 @@ function print_table(
 
 function print_table_row(
   repo_path: string,
-  args: Awaited<ReturnType<typeof get_commit_metadata>>,
+  args: Awaited<ReturnType<typeof get_commit_metadata>>
 ) {
   let icon;
   let status;
@@ -168,7 +168,7 @@ function print_table_row(
 }
 
 function commit_needs_update(
-  meta: Awaited<ReturnType<typeof get_commit_metadata>>,
+  meta: Awaited<ReturnType<typeof get_commit_metadata>>
 ) {
   return !meta.pr_exists || meta.pr_dirty;
 }
@@ -320,7 +320,7 @@ function match_group(value: string, re: RegExp, group: string) {
 
 async function get_commit_metadata_list() {
   const log_result = await cli(
-    `git log master..HEAD --oneline --format=%H --color=never`,
+    `git log master..HEAD --oneline --format=%H --color=never`
   );
 
   const sha_list = lines(log_result.stdout).reverse();

@@ -27,7 +27,7 @@ export function MultiSelect<T>(props: Props<T>) {
 
       return next;
     },
-    new Set<number>(),
+    new Set<number>()
   );
 
   // clamp index to keep in item range

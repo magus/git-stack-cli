@@ -56,7 +56,7 @@ const BaseStore = createStore<State>()(
         });
       },
     },
-  })),
+  }))
 );
 
 function useState<R>(selector: (state: State) => R): R {
