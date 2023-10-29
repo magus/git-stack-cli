@@ -1,28 +1,49 @@
 import { createStore, useStore } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
+import type { Argv } from "../command.js";
+import type { Instance as InkInstance } from "ink";
+
 type Setter = (state: State) => void;
 
 type State = {
+  argv: null | Argv;
+  ink: null | InkInstance;
+
   head: null | string;
   merge_base: null | string;
+  branch_name: null | string;
 
   output: Array<React.ReactNode>;
 
   actions: {
+    clear(): void;
+    exit(): void;
     output(node: React.ReactNode): void;
     set(setter: Setter): void;
   };
 };
 
 const BaseStore = createStore<State>()(
-  immer((set) => ({
+  immer((set, get) => ({
+    argv: null,
+    ink: null,
+
     head: null,
     merge_base: null,
+    branch_name: null,
 
     output: [],
 
     actions: {
+      clear() {
+        get().ink?.clear();
+      },
+
+      exit() {
+        get().ink?.unmount();
+      },
+
       output(node: React.ReactNode) {
         set((state) => {
           state.output.push(node);

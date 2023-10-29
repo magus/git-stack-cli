@@ -1,18 +1,25 @@
 import { v4 as uuid_v4 } from "uuid";
 
-import { cli } from "./core/cli.js";
-import { color } from "./core/color.js";
-import * as github from "./core/github.js";
-import { invariant } from "./core/invariant.js";
+import { cli } from "../core/cli.js";
+import { color } from "../core/color.js";
+import * as github from "../core/github.js";
+import { invariant } from "../core/invariant.js";
+import { match_group } from "../core/match_group.js";
 
-import type { Argv } from "./command.js";
+import { Store } from "./Store.js";
 
-export async function main(argv: Argv) {
-  const head_sha = (await cli("git rev-parse HEAD")).stdout;
+import type { Argv } from "../command.js";
+
+type Args = {
+  argv: Argv;
+};
+
+export async function main(args: Args) {
+  const head = (await cli("git rev-parse HEAD")).stdout;
   const merge_base = (await cli("git merge-base HEAD master")).stdout;
 
   // handle when there are no detected changes
-  if (head_sha === merge_base) {
+  if (head === merge_base) {
     console.error(color.dim("No changes detected."));
     return process.exit();
   }
@@ -24,17 +31,23 @@ export async function main(argv: Argv) {
   const origin_url = (await cli(`git config --get remote.origin.url`)).stdout;
   const repo_path = match_group(origin_url, RE.repo_path, "repo_path");
 
+  Store.setState((state) => {
+    state.head = head;
+    state.merge_base = merge_base;
+    state.branch_name = branch_name;
+  });
+
   const commit_metadata_list = await get_commit_metadata_list();
 
   print_table(repo_path, commit_metadata_list);
 
   const needs_update = commit_metadata_list.some(commit_needs_update);
 
-  if (argv.check) {
+  if (args.argv.check) {
     return process.exit();
   }
 
-  if (!argv.force && !needs_update) {
+  if (!args.argv.force && !needs_update) {
     console.debug();
     console.debug("Everything up to date.");
     console.debug("Run with `--force` to force update all pull requests.");
@@ -307,15 +320,6 @@ function col(value: string, length: number, align: "left" | "right") {
   column = trunc(column, length);
   column = pad(column, length, align);
   return column;
-}
-
-function match_group(value: string, re: RegExp, group: string) {
-  const match = value.match(re);
-  const debug = `[${value}.match(${re})]`;
-  invariant(match?.groups, `match.groups must exist ${debug}`);
-  const result = match?.groups[group];
-  invariant(result, `match.groups must contain [${group}] ${debug}`);
-  return result;
 }
 
 async function get_commit_metadata_list() {
