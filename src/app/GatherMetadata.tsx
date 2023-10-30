@@ -48,24 +48,25 @@ async function gather_metadata(args: Args) {
 
   const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
 
-  const commit_metadata_list = await CommitMetadata.all();
+  const commit_range = await CommitMetadata.range();
 
   Store.setState((state) => {
     state.head = head;
     state.merge_base = merge_base;
     state.branch_name = branch_name;
-    state.commit_metadata_list = commit_metadata_list;
+    state.commit_range = commit_range;
   });
 
   Store.getState().actions.output(<StatusTable />);
 
-  // TODO output table of commits
-  // print_table(repo_path, commit_metadata_list);
+  let needs_update = false;
 
-  // TODO this check will become more complex with commit ranges
-  const needs_update = commit_metadata_list.some(
-    (meta) => !meta.pr || meta.pr_dirty
-  );
+  for (const group of commit_range.group_map.values()) {
+    if (group.dirty) {
+      needs_update = true;
+      break;
+    }
+  }
 
   if (args.argv.check) {
     actions.output(<Exit clear code={0} />);

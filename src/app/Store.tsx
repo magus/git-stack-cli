@@ -17,7 +17,7 @@ export type State = {
   head: null | string;
   merge_base: null | string;
   branch_name: null | string;
-  commit_metadata_list: null | Array<CommitMetadata.Type>;
+  commit_range: null | CommitMetadata.CommitRange;
 
   step: "loading" | "select-commit-ranges";
   output: Array<React.ReactNode>;
@@ -39,7 +39,7 @@ const BaseStore = createStore<State>()(
     head: null,
     merge_base: null,
     branch_name: null,
-    commit_metadata_list: null,
+    commit_range: null,
 
     step: "loading",
     output: [],

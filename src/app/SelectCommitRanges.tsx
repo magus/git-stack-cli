@@ -8,13 +8,11 @@ import { MultiSelect } from "./MultiSelect.js";
 import { Store } from "./Store.js";
 
 export function SelectCommitRanges() {
-  const commit_metadata_list = Store.useState(
-    (state) => state.commit_metadata_list
-  );
+  const commit_range = Store.useState((state) => state.commit_range);
 
-  invariant(commit_metadata_list, "commit_metadata_list must exist");
+  invariant(commit_range, "commit_range must exist");
 
-  const items = commit_metadata_list.map((meta) => {
+  const items = commit_range.commit_list.map((meta) => {
     return {
       label: meta.message,
       value: meta,

@@ -8,20 +8,11 @@ import { invariant } from "../core/invariant.js";
 
 import { Store } from "./Store.js";
 
-import type { State } from "./Store.js";
-
-type CommitMetadataList = NonNullable<State["commit_metadata_list"]>;
-type CommitMetadata = CommitMetadataList[number];
-type PullRequest = NonNullable<CommitMetadata["pr"]>;
-
 export function StatusTable() {
-  const commit_metadata_list = Store.useState(
-    (state) => state.commit_metadata_list
-  );
+  const commit_range = Store.useState((state) => state.commit_range);
 
-  invariant(commit_metadata_list, "commit_metadata_list must exist");
+  invariant(commit_range, "commit_range must exist");
 
-  const commit_range = get_commit_range(commit_metadata_list);
   const data = [];
   const local = [];
 
@@ -35,27 +26,12 @@ export function StatusTable() {
     };
 
     if (group.pr) {
-      let dirty = false;
-
-      if (group.pr.commits.length !== group.commits.length) {
-        dirty = true;
-      } else {
-        for (let i = 0; i < group.pr.commits.length; i++) {
-          const pr_commit = group.pr.commits[i];
-          const local_commit = group.commits[i];
-
-          if (pr_commit.oid !== local_commit.sha) {
-            dirty = true;
-          }
-        }
-      }
-
-      if (dirty) {
-        row.icon = "✓";
-        row.status = "SYNCED";
-      } else {
-        row.icon = "↺";
+      if (group.dirty) {
+        row.icon = "!";
         row.status = "OUTDATED";
+      } else {
+        row.icon = "✔";
+        row.status = "SYNCED";
       }
 
       row.title = group.pr.title;
@@ -64,7 +40,7 @@ export function StatusTable() {
 
       data.push(row);
     } else {
-      row.icon = "★";
+      row.icon = "⭑";
       row.status = "NEW";
       row.title = capitalize(UNASSIGNED);
       row.count = `0/${group.commits.length}`;
@@ -97,7 +73,7 @@ export function StatusTable() {
 
   const { stdout } = Ink.useStdout();
   const available_width = stdout.columns;
-  const col_gap = 2;
+  const columnGap = 2;
   const breathing_room = 10;
 
   const max_title_width = Math.min(max_col_width.title, MAX_TITLE_LENGTH);
@@ -113,7 +89,7 @@ export function StatusTable() {
       // url
       max_col_width.url -
       // gap * col count
-      col_gap * col_list.length -
+      columnGap * col_list.length -
       // remove some extra space
       breathing_room,
     0,
@@ -135,7 +111,7 @@ export function StatusTable() {
             key={row.url}
             // borderStyle="round"
             flexDirection="row"
-            gap={col_gap}
+            columnGap={columnGap}
             width={available_width}
           >
             <Ink.Box width={max_col_width.icon}>
@@ -162,50 +138,6 @@ export function StatusTable() {
       })}
     </Ink.Box>
   );
-}
-
-type CommitGroup = {
-  id: string;
-  pr: null | PullRequest;
-  commits: Array<CommitMetadata>;
-};
-
-function get_commit_range(commit_metadata_list: CommitMetadataList) {
-  let invalid = false;
-  const group_map = new Map<string, CommitGroup>();
-
-  for (const commit of commit_metadata_list) {
-    let id = commit.metadata.id;
-    const pr = commit.pr;
-
-    if (!pr) {
-      // console.debug("INVALID", "MISSING PR", { commit });
-      invalid = true;
-    }
-
-    if (id) {
-      const group_key_list = Array.from(group_map.keys());
-      const last_key = group_key_list[group_key_list.length - 1];
-
-      if (group_map.has(id) && last_key !== id) {
-        // if we've seen this id before and it's not
-        // the last added key then we are out of order
-        console.debug("INVALID", "OUT OF ORDER", { commit });
-        invalid = true;
-      }
-    } else {
-      // console.debug("INVALID", "NEW COMMIT", { commit });
-      invalid = true;
-
-      id = UNASSIGNED;
-    }
-
-    const group = group_map.get(id) || { id, pr, commits: [] };
-    group.commits.push(commit);
-    group_map.set(id, group);
-  }
-
-  return { invalid, group_map };
 }
 
 const MAX_TITLE_LENGTH = 50;

@@ -2,9 +2,115 @@ import * as Metadata from "./Metadata.js";
 import { cli } from "./cli.js";
 import * as github from "./github.js";
 
-export type Type = Awaited<ReturnType<typeof commit>>;
+export type CommitMetadata = Awaited<ReturnType<typeof commit>>;
+export type CommitRange = Awaited<ReturnType<typeof range>>;
 
-export async function all() {
+type PullRequest = NonNullable<CommitMetadata["pr"]>;
+
+type CommitGroup = {
+  id: string;
+  pr: null | PullRequest;
+  base: null | string;
+  dirty: boolean;
+  commits: Array<CommitMetadata>;
+};
+
+export async function range() {
+  const commit_list = await get_commit_list();
+
+  let invalid = false;
+  const group_map = new Map<string, CommitGroup>();
+
+  for (const commit of commit_list) {
+    let id = commit.metadata.id;
+    const pr = commit.pr;
+
+    if (!pr) {
+      // console.debug("INVALID", "MISSING PR", commit.message);
+      invalid = true;
+    }
+
+    if (id) {
+      const group_key_list = Array.from(group_map.keys());
+      const last_key = group_key_list[group_key_list.length - 1];
+
+      if (group_map.has(id) && last_key !== id) {
+        // if we've seen this id before and it's not
+        // the last added key then we are out of order
+        // console.debug("INVALID", "OUT OF ORDER", commit.message, id);
+        invalid = true;
+      }
+    } else {
+      // console.debug("INVALID", "NEW COMMIT", { commit });
+      invalid = true;
+
+      id = UNASSIGNED;
+    }
+
+    const group = group_map.get(id) || {
+      id,
+      pr,
+      base: null,
+      dirty: false,
+      commits: [],
+    };
+
+    group.commits.push(commit);
+    group_map.set(id, group);
+  }
+
+  // check each group for dirty state and base
+  const group_value_list = Array.from(group_map.values());
+
+  for (let i = 0; i < group_value_list.length; i++) {
+    const group = group_value_list[i];
+
+    // console.debug("group", group.pr?.title.substring(0, 40));
+    // console.debug("  ", "id", group.id);
+
+    if (i === 0) {
+      group.base = "master";
+    } else {
+      const last_group = group_value_list[i - 1];
+      // console.debug("  ", "last_group", last_group.pr?.title.substring(0, 40));
+      // console.debug("  ", "last_group.id", last_group.id);
+
+      // null out base when unassigned and after unassigned
+      if (group.id === UNASSIGNED) {
+        group.base = null;
+      } else if (last_group.base === null) {
+        group.base = null;
+      } else {
+        group.base = last_group.id;
+      }
+
+      // console.debug("  ", "group.base", group.base);
+    }
+
+    if (!group.pr) {
+      group.dirty = true;
+    } else if (group.pr.commits.length !== group.commits.length) {
+      group.dirty = true;
+    } else if (group.pr.baseRefName !== group.base) {
+      group.dirty = true;
+    } else {
+      for (let i = 0; i < group.pr.commits.length; i++) {
+        const pr_commit = group.pr.commits[i];
+        const local_commit = group.commits[i];
+
+        if (pr_commit.oid !== local_commit.sha) {
+          group.dirty = true;
+        }
+      }
+    }
+
+    // console.debug("  ", "group.dirty", group.dirty);
+  }
+
+  return { invalid, group_map, commit_list };
+}
+
+async function get_commit_list() {
   const log_result = await cli(
     `git log master..HEAD --oneline --format=%H --color=never`
   );
@@ -15,28 +121,19 @@ export async function all() {
 
   for (let i = 0; i < sha_list.length; i++) {
     const sha = sha_list[i];
-
-    let base;
-    if (i === 0) {
-      base = "master";
-    } else {
-      base = commit_metadata_list[i - 1].metadata.id;
-    }
-
-    const commit_metadata = await commit(sha, base);
+    const commit_metadata = await commit(sha);
     commit_metadata_list.push(commit_metadata);
   }
 
   return commit_metadata_list;
 }
 
-export async function commit(sha: string, base: null | string) {
+export async function commit(sha: string) {
   const raw_message = (await cli(`git show -s --format=%B ${sha}`)).stdout;
   const metadata = await Metadata.read(raw_message);
   const message = display_message(raw_message);
 
   let pr = null;
-  let pr_dirty = false;
 
   if (metadata.id) {
     const pr_branch = metadata.id;
@@ -45,23 +142,14 @@ export async function commit(sha: string, base: null | string) {
 
     if (pr_result && pr_result.state === "OPEN") {
       pr = pr_result;
-
-      const last_commit = pr.commits[pr.commits.length - 1];
-      pr_dirty = last_commit.oid !== sha;
-
-      if (pr.baseRefName !== base) {
-        // requires base update
-        pr_dirty = true;
-      }
     }
   }
 
   return {
     sha,
-    base,
     message,
+    raw_message,
     pr,
-    pr_dirty,
     metadata,
   };
 }
@@ -83,3 +171,5 @@ function display_message(message: string) {
 function lines(value: string) {
   return value.split("\n");
 }
+
+const UNASSIGNED = "unassigned";
