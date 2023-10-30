@@ -8,6 +8,7 @@ import { invariant } from "../core/invariant.js";
 
 import { Await } from "./Await.js";
 import { Exit } from "./Exit.js";
+import { StatusTable } from "./StatusTable.js";
 import { Store } from "./Store.js";
 
 import type { Argv } from "../command.js";
@@ -55,6 +56,8 @@ async function gather_metadata(args: Args) {
     state.branch_name = branch_name;
     state.commit_metadata_list = commit_metadata_list;
   });
+
+  Store.getState().actions.output(<StatusTable />);
 
   // TODO output table of commits
   // print_table(repo_path, commit_metadata_list);
