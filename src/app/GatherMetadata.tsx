@@ -61,7 +61,7 @@ async function gather_metadata(args: Args) {
 
   // TODO this check will become more complex with commit ranges
   const needs_update = commit_metadata_list.some(
-    (meta) => !meta.pr_exists || meta.pr_dirty
+    (meta) => !meta.pr || meta.pr_dirty
   );
 
   if (args.argv.check) {

@@ -82,7 +82,7 @@ async function manual_rebase(args: ManualRebaseArgs) {
 
       await cli(`git push -f origin HEAD:${commit.metadata.id}`);
 
-      if (commit.pr_exists) {
+      if (commit.pr) {
         // ensure base matches pr in github
         await github.pr_base(commit.metadata.id, base);
       } else {

@@ -36,16 +36,15 @@ export async function commit(sha: string, base: null | string) {
   const message = display_message(raw_message);
 
   let pr = null;
-  let pr_exists = false;
   let pr_dirty = false;
 
   if (metadata.id) {
     const pr_branch = metadata.id;
 
-    pr = await github.pr_status(pr_branch);
+    const pr_result = await github.pr_status(pr_branch);
 
-    if (pr && pr.state === "OPEN") {
-      pr_exists = true;
+    if (pr_result && pr_result.state === "OPEN") {
+      pr = pr_result;
 
       const last_commit = pr.commits[pr.commits.length - 1];
       pr_dirty = last_commit.oid !== sha;
@@ -62,7 +61,6 @@ export async function commit(sha: string, base: null | string) {
     base,
     message,
     pr,
-    pr_exists,
     pr_dirty,
     metadata,
   };
