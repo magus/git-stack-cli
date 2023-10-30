@@ -35,9 +35,10 @@ git multi-diff
   ◯ remove num
   ◯ more remove
 
-  <-  #742 Title A ->
+  <-  (2/4) #742 Title A ->
   ```
 
+  - display `(2/4)` to indicate how many PR buckets and orient user
   - press left and right to select PR bucket (metadata.id)
   - multiselect with default selection state (commit metadata.id)
 
