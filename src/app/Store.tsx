@@ -10,7 +10,7 @@ import type { Instance as InkInstance } from "ink";
 
 type Setter = (state: State) => void;
 
-type State = {
+export type State = {
   argv: null | Argv;
   ink: null | InkInstance;
 
