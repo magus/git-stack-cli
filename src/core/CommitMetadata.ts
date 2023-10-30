@@ -67,11 +67,16 @@ export async function commit(sha: string, base: null | string) {
 }
 
 function display_message(message: string) {
+  const line_list = lines(message);
+  const first_line = line_list[0];
+
+  let result = first_line;
+
   // remove metadata
-  let result = message;
   result = result.replace(new RegExp(Metadata.id_regex(), "g"), "");
-  result = result.replace(/\n/g, " ");
+
   result = result.trimEnd();
+
   return result;
 }
 
