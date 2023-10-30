@@ -109,14 +109,17 @@ type ItemRowProps = {
 function ItemRow(props: ItemRowProps) {
   let color;
   let underline;
+  let dimColor;
 
   if (props.active) {
     color = "#38bdf8";
     underline = true;
   } else if (props.selected) {
-    color = "";
+    // color = "";
+    dimColor = false;
   } else {
-    color = "gray";
+    // color = "gray";
+    dimColor = true;
   }
 
   return (
@@ -128,6 +131,7 @@ function ItemRow(props: ItemRowProps) {
           bold={props.selected}
           underline={underline}
           color={color}
+          dimColor={dimColor}
           wrap="truncate-end"
         >
           {props.label}
