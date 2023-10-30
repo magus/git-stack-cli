@@ -5,7 +5,7 @@ import { cli } from "./cli.js";
 
 export async function pr_status(branch: string): Promise<null | PullRequest> {
   const result = await cli(
-    `gh pr view ${branch} --json number,state,baseRefName,headRefName,commits`,
+    `gh pr view ${branch} --json number,state,baseRefName,headRefName,commits,title,url`,
     {
       ignoreExitCode: true,
     }
@@ -91,4 +91,6 @@ type PullRequest = {
   baseRefName: string;
   headRefName: string;
   commits: Array<Commit>;
+  title: string;
+  url: string;
 };
