@@ -5,7 +5,6 @@ import * as Ink from "ink";
 import * as CommitMetadata from "../core/CommitMetadata.js";
 import { cli } from "../core/cli.js";
 import { invariant } from "../core/invariant.js";
-import { match_group } from "../core/match_group.js";
 
 import { Await } from "./Await.js";
 import { Exit } from "./Exit.js";
@@ -48,18 +47,12 @@ async function gather_metadata(args: Args) {
 
   const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
 
-  // git@github.com:magus/git-multi-diff-playground.git
-  // https://github.com/magus/git-multi-diff-playground.git
-  const origin_url = (await cli(`git config --get remote.origin.url`)).stdout;
-  const repo_path = match_group(origin_url, RE.repo_path, "repo_path");
-
   const commit_metadata_list = await CommitMetadata.all();
 
   Store.setState((state) => {
     state.head = head;
     state.merge_base = merge_base;
     state.branch_name = branch_name;
-    state.repo_path = repo_path;
     state.commit_metadata_list = commit_metadata_list;
   });
 
@@ -95,9 +88,3 @@ async function gather_metadata(args: Args) {
     state.step = "select-commit-ranges";
   });
 }
-
-const RE = {
-  // git@github.com:magus/git-multi-diff-playground.git
-  // https://github.com/magus/git-multi-diff-playground.git
-  repo_path: /(?<repo_path>[^:^/]+\/[^/]+)\.git/,
-};
