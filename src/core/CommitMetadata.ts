@@ -107,7 +107,7 @@ export async function range() {
     // console.debug("  ", "group.dirty", group.dirty);
   }
 
-  return { invalid, group_map, commit_list };
+  return { invalid, group_map, commit_list, UNASSIGNED };
 }
 
 async function get_commit_list() {
