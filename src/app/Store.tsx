@@ -14,6 +14,7 @@ export type State = {
   argv: null | Argv;
   ink: null | InkInstance;
 
+  cwd: null | string;
   head: null | string;
   merge_base: null | string;
   branch_name: null | string;
@@ -36,6 +37,7 @@ const BaseStore = createStore<State>()(
     argv: null,
     ink: null,
 
+    cwd: null,
     head: null,
     merge_base: null,
     branch_name: null,

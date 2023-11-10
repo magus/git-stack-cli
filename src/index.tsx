@@ -14,4 +14,5 @@ const ink = Ink.render(<App />);
 Store.setState((state) => {
   state.ink = ink;
   state.argv = argv;
+  state.cwd = process.cwd();
 });
