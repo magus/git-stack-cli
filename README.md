@@ -23,7 +23,6 @@ git multi-diff
 - select commit ranges
   gather all unique metadata id with active PR
   best effort to reselect based on commit metadata id (longest continuous range?)
-  allow create new PR from this ui
   display linear list of commits (same order as git log)
   select start and stop (continuous)
   manual rebase to re-label commits locally
@@ -39,6 +38,7 @@ git multi-diff
   ```
 
   - display `(2/4)` to indicate how many PR buckets and orient user
+  - `(4/4) Create new PR` to create a new metadata.id/PR if needed
   - press left and right to select PR bucket (metadata.id)
   - multiselect with default selection state (commit metadata.id)
 
@@ -64,7 +64,7 @@ git multi-diff
   -> display PR status table (new, outdated, etc.)
 
 
-- display PR status table
+- interactive PR status table
   - ▶ Unassigned (8 commits)
   - ▶ #764 Title B (2/3 commits)  https://github.com/...
   - ▶ #742 Title A (5/5 commits)  https://github.com/...
@@ -76,8 +76,6 @@ git multi-diff
   - when expanded
     - each commit should also show status, e.g. new commits should show with NEW
     - show actions, e.g. Shift+D -> Delete
-  - new commits can choose to create a new PR or go into an existing PR
-  - some ui to move commits between PR buckets
 
 - allow commits to be grouped
   - list commits from base
