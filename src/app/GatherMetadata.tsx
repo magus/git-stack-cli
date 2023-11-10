@@ -5,13 +5,11 @@ import * as Ink from "ink";
 import * as CommitMetadata from "../core/CommitMetadata.js";
 import { cli } from "../core/cli.js";
 import { invariant } from "../core/invariant.js";
+import * as json from "../core/json.js";
 
 import { Await } from "./Await.js";
 import { Exit } from "./Exit.js";
-import { StatusTable } from "./StatusTable.js";
 import { Store } from "./Store.js";
-
-import type { Argv } from "../command.js";
 
 type Props = {
   children: React.ReactNode;
@@ -21,18 +19,34 @@ export function GatherMetadata(props: Props) {
   const argv = Store.useState((state) => state.argv);
   invariant(argv, "argv must exist");
 
+  if (argv["mock-metadata"]) {
+    return (
+      <Await fallback={null} function={mock_metadata}>
+        {props.children}
+      </Await>
+    );
+  }
+
   return (
-    <Await fallback={null} function={() => gather_metadata({ argv })}>
+    <Await fallback={null} function={gather_metadata}>
       {props.children}
     </Await>
   );
 }
 
-type Args = {
-  argv: Argv;
-};
+async function mock_metadata() {
+  const module = await import("../__fixtures__/metadata.js");
 
-async function gather_metadata(args: Args) {
+  const deserialized = json.deserialize(module.METADATA);
+
+  Store.setState((state) => {
+    Object.assign(state, deserialized);
+
+    state.step = "status";
+  });
+}
+
+async function gather_metadata() {
   const actions = Store.getState().actions;
 
   const head = (await cli("git rev-parse HEAD")).stdout;
@@ -55,40 +69,7 @@ async function gather_metadata(args: Args) {
     state.merge_base = merge_base;
     state.branch_name = branch_name;
     state.commit_range = commit_range;
-  });
 
-  Store.getState().actions.output(<StatusTable />);
-
-  let needs_update = false;
-
-  for (const group of commit_range.group_map.values()) {
-    if (group.dirty) {
-      needs_update = true;
-      break;
-    }
-  }
-
-  if (args.argv.check) {
-    actions.output(<Exit clear code={0} />);
-    return;
-  }
-
-  if (!args.argv.force && !needs_update) {
-    actions.newline();
-    actions.output(<Ink.Text>✅ Everything up to date.</Ink.Text>);
-    actions.output(
-      <Ink.Text color="gray">
-        <Ink.Text>Run with</Ink.Text>
-        <Ink.Text bold color="yellow">
-          {` --force `}
-        </Ink.Text>
-        <Ink.Text>to force update all pull requests.</Ink.Text>
-      </Ink.Text>
-    );
-    actions.output(<Exit clear code={0} />);
-  }
-
-  Store.setState((state) => {
-    state.step = "select-commit-ranges";
+    state.step = "status";
   });
 }

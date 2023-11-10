@@ -20,5 +20,9 @@ export async function command() {
       description: "debug",
     })
 
+    .option("mock-metadata", {
+      type: "boolean",
+      description: "mock-metadata",
+    })
     .help().argv;
 }
