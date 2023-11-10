@@ -9,9 +9,16 @@ export async function command() {
       type: "boolean",
       description: "force",
     })
+
     .option("check", {
       type: "boolean",
       description: "check",
     })
+
+    .option("debug", {
+      type: "boolean",
+      description: "debug",
+    })
+
     .help().argv;
 }
