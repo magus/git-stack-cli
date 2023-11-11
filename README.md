@@ -19,28 +19,14 @@ git multi-diff
 
 ## TODO
 
+- prompt before beginning select commit ranges
+  "Some commits are new or outdated, would you like to select new commit ranges? (Y/N)"
+
 
 - select commit ranges
-  gather all unique metadata id with active PR
-  best effort to reselect based on commit metadata id (longest continuous range?)
-  display linear list of commits (same order as git log)
-  select start and stop (continuous)
-  manual rebase to re-label commits locally
 
-  ```bash
-  ◯ cantaloupe line2 changed line3 'abc' line4 line5 "hello world" Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim ven…
-  ◯ orange color
-  ◯ strawberry
-  ◯ remove num
-  ◯ more remove
-
-  <-  (2/4) #742 Title A ->
-  ```
-
-  - display `(2/4)` to indicate how many PR buckets and orient user
-  - `(4/4) Create new PR` to create a new metadata.id/PR if needed
-  - press left and right to select PR bucket (metadata.id)
-  - multiselect with default selection state (commit metadata.id)
+  - "(c)reate new PR", to create a new metadata.id/PR if needed and add to group list
+  - manual rebase to re-label commits locally
 
 - flow
 
