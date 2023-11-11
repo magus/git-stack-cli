@@ -47,7 +47,7 @@ function SelectCommitRangesInternal(props: Props) {
     ) => {
       map.set(args.key, args.value);
 
-      console.debug("update_commit_map", map, args);
+      // console.debug("update_commit_map", map, args);
       return map;
     },
     new Map(),

@@ -60,6 +60,6 @@ async function run(args: Args) {
   }
 
   Store.setState((state) => {
-    state.step = "select-commit-ranges";
+    state.step = "pre-select-commit-ranges";
   });
 }

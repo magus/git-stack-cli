@@ -19,10 +19,6 @@ git multi-diff
 
 ## TODO
 
-- prompt before beginning select commit ranges
-  "Some commits are new or outdated, would you like to select new commit ranges? (Y/N)"
-
-
 - select commit ranges
 
   - "(c)reate new PR", to create a new metadata.id/PR if needed and add to group list

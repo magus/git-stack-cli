@@ -20,7 +20,12 @@ export type State = {
   branch_name: null | string;
   commit_range: null | CommitMetadata.CommitRange;
 
-  step: "loading" | "status" | "select-commit-ranges";
+  step:
+    | "loading"
+    | "status"
+    | "pre-select-commit-ranges"
+    | "select-commit-ranges";
+
   output: Array<React.ReactNode>;
 
   actions: {
