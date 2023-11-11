@@ -174,7 +174,9 @@ function ItemRow(props: ItemRowProps) {
   }
 
   if (props.disabled) {
+    color = "";
     bold = false;
+    underline = false;
     dimColor = true;
   }
 
