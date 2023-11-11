@@ -495,4 +495,106 @@ export const METADATA = {
     ],
     "UNASSIGNED": "unassigned"
   },
+  "pr": {
+    "14e097a1-fa9b-45af-8f7d-b77df9d91fe6": {
+      "baseRefName": "master",
+      "commits": [
+        {
+          "authoredDate": "2023-10-22T23:13:20Z",
+          "authors": [
+            {
+              "email": "noah@iamnoah.com",
+              "id": "MDQ6VXNlcjI5MDA4NA==",
+              "login": "magus",
+              "name": "magus"
+            }
+          ],
+          "committedDate": "2023-10-28T19:16:29Z",
+          "messageBody": "git-multi-diff-id: 14e097a1-fa9b-45af-8f7d-b77df9d91fe6",
+          "messageHeadline": "more remove",
+          "oid": "a28f1ef080b56b56699bc420b200968e793702a9"
+        }
+      ],
+      "headRefName": "14e097a1-fa9b-45af-8f7d-b77df9d91fe6",
+      "number": 28,
+      "state": "OPEN",
+      "title": "more remove",
+      "url": "https://github.com/magus/git-multi-diff-playground/pull/28"
+    },
+    "3d1d890d-11c9-4569-83c3-e3aff6426e37": {
+      "baseRefName": "14e097a1-fa9b-45af-8f7d-b77df9d91fe6",
+      "commits": [
+        {
+          "authoredDate": "2023-10-22T23:13:14Z",
+          "authors": [
+            {
+              "email": "noah@iamnoah.com",
+              "id": "MDQ6VXNlcjI5MDA4NA==",
+              "login": "magus",
+              "name": "magus"
+            }
+          ],
+          "committedDate": "2023-10-28T19:16:33Z",
+          "messageBody": "git-multi-diff-id: 3d1d890d-11c9-4569-83c3-e3aff6426e37",
+          "messageHeadline": "remove num",
+          "oid": "7454ce81940f2a0964ff06c7a98c7fa1892f82bf"
+        }
+      ],
+      "headRefName": "3d1d890d-11c9-4569-83c3-e3aff6426e37",
+      "number": 27,
+      "state": "OPEN",
+      "title": "remove num",
+      "url": "https://github.com/magus/git-multi-diff-playground/pull/27"
+    },
+    "53d15f9a-2451-492c-a831-642d41ad3ef4": {
+      "baseRefName": "3d1d890d-11c9-4569-83c3-e3aff6426e37",
+      "commits": [
+        {
+          "authoredDate": "2023-10-25T09:29:30Z",
+          "authors": [
+            {
+              "email": "noah@iamnoah.com",
+              "id": "MDQ6VXNlcjI5MDA4NA==",
+              "login": "magus",
+              "name": "magus"
+            }
+          ],
+          "committedDate": "2023-10-28T19:16:37Z",
+          "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
+          "messageHeadline": "strawberry",
+          "oid": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0"
+        }
+      ],
+      "headRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+      "number": 30,
+      "state": "OPEN",
+      "title": "strawberry",
+      "url": "https://github.com/magus/git-multi-diff-playground/pull/30"
+    },
+    "398c0ead-77ad-41a4-af6e-280f99998c28": {
+      "baseRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+      "commits": [
+        {
+          "authoredDate": "2023-10-22T23:13:35Z",
+          "authors": [
+            {
+              "email": "noah@iamnoah.com",
+              "id": "MDQ6VXNlcjI5MDA4NA==",
+              "login": "magus",
+              "name": "magus"
+            }
+          ],
+          "committedDate": "2023-10-28T19:16:40Z",
+          "messageBody": "line2 changed\nline3 'abc'\nline4\nline5 \"hello world\"\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
+          "messageHeadline": "cantaloupe",
+          "oid": "86d0b3cf5dcbd94963f2839818734c3b0e13d2fc"
+        }
+      ],
+      "headRefName": "398c0ead-77ad-41a4-af6e-280f99998c28",
+      "number": 29,
+      "state": "OPEN",
+      "title": "cantaloupe line2 line3 'abc' line4 line5 \"hello world\" Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      "url": "https://github.com/magus/git-multi-diff-playground/pull/29"
+    }
+  },
 }
