@@ -119,10 +119,10 @@ function SelectCommitRangesInternal(props: Props) {
       const id = uuid_v4();
 
       actions.output(
-        <Ink.Text dimColor>
-          {"Created new group "}
+        <Ink.Box>
+          <Ink.Text dimColor>{"Created new group "}</Ink.Text>
           <Ink.Text color="blueBright">{id}</Ink.Text>
-        </Ink.Text>
+        </Ink.Box>
       );
 
       create_group(id);
@@ -149,8 +149,8 @@ function SelectCommitRangesInternal(props: Props) {
   const max_group_label_width = 64;
   let group_title_width = max_group_label_width;
 
-  const left_arrow = "← ";
-  const right_arrow = " →";
+  const left_arrow = `${SYMBOL.left} `;
+  const right_arrow = ` ${SYMBOL.right}`;
   const group_position = `(${current_index + 1}/${group_list.length}) `;
   const title = group.title || "Unassigned";
 
@@ -220,29 +220,27 @@ function SelectCommitRangesInternal(props: Props) {
 
       <Ink.Box height={1} />
 
-      <Ink.Text color="gray">
-        <Ink.Text color="#3b82f6" bold>
-          {unassigned_count}
-        </Ink.Text>
-        <Ink.Text>{"  unassigned commits"}</Ink.Text>
-
-        {!isUnassigned ? null : (
-          <Ink.Text color="gray">
-            <Ink.Text>{", press "}</Ink.Text>
-            <Ink.Text bold color="#22c55e">
-              c
-            </Ink.Text>
-            {" to "}
-            <Ink.Text bold color="#22c55e">
-              <Parens>c</Parens>reate
-            </Ink.Text>
-            {" a new group"}
-          </Ink.Text>
-        )}
-      </Ink.Text>
-
       {unassigned_count > 0 ? (
-        <Ink.Box height={1} />
+        <Ink.Text color="gray">
+          <Ink.Text color="#3b82f6" bold>
+            {unassigned_count}
+          </Ink.Text>
+          <Ink.Text>{"  unassigned commits"}</Ink.Text>
+
+          {!isUnassigned ? null : (
+            <Ink.Text color="gray">
+              <Ink.Text>{", press "}</Ink.Text>
+              <Ink.Text bold color="#22c55e">
+                c
+              </Ink.Text>
+              {" to "}
+              <Ink.Text bold color="#22c55e">
+                <Parens>c</Parens>reate
+              </Ink.Text>
+              {" a new group"}
+            </Ink.Text>
+          )}
+        </Ink.Text>
       ) : (
         <Ink.Text>
           {"🎉 Done! Press "}
@@ -256,6 +254,36 @@ function SelectCommitRangesInternal(props: Props) {
           {" the commits to Github"}
         </Ink.Text>
       )}
+
+      <Ink.Box>
+        <Ink.Text color="gray">
+          <Ink.Text>{"Press "}</Ink.Text>
+          <Ink.Text bold color="#22c55e">
+            {SYMBOL.left}
+          </Ink.Text>
+          {" and "}
+          <Ink.Text bold color="#22c55e">
+            {SYMBOL.right}
+          </Ink.Text>
+          {" to view PR groups"}
+        </Ink.Text>
+      </Ink.Box>
+
+      <Ink.Box>
+        <Ink.Text color="gray">
+          <Ink.Text>{"Press "}</Ink.Text>
+          <Ink.Text bold color="#22c55e">
+            {SYMBOL.enter}
+          </Ink.Text>
+          {" to toggle commit selection"}
+        </Ink.Text>
+      </Ink.Box>
     </Ink.Box>
   );
 }
+
+const SYMBOL = {
+  left: "←",
+  right: "→",
+  enter: "Enter",
+};
