@@ -22,6 +22,7 @@ git multi-diff
 - select commit ranges
 
   - manual rebase to re-label commits locally
+  - capture PR title when creating new group
 
 - flow
 
@@ -45,6 +46,16 @@ git multi-diff
   -> display PR status table (new, outdated, etc.)
 
 
+- build table of stacked PRs to add to each PR as comment
+  - order based on local sha ordering (i.e. group_list, which reflects PR order)
+  - delete and update comment in pr if necessary (use regex)
+
+- avoid updating commits which have not changed
+  - during first walk discover first dirty/new commit and start new branch from that sha
+  - this avoids the cherry pick which creates a new sha, meaning the sha will stay the same
+  - then we can add back the force functionality to forcefully push to remote overriding this optimization
+
+
 - interactive PR status table
   - ▶ Unassigned (8 commits)
   - ▶ #764 Title B (2/3 commits)  https://github.com/...
@@ -57,26 +68,6 @@ git multi-diff
   - when expanded
     - each commit should also show status, e.g. new commits should show with NEW
     - show actions, e.g. Shift+D -> Delete
-
-- allow commits to be grouped
-  - list commits from base
-  - single key interactions
-  - enter, toggle group for commit
-  - g, group
-  - c, cycle group
-  - a, abort
-  - d, done
-
-- each group must match PR commits otherwise it's dirty, not just first commit
-
-- build comment table with each pr in stack
-  - order based on local sha ordering
-  - delete and update comment in pr if necessary (use regex)
-
-- avoid updating commits which have not changed
-  - during first walk discover first dirty/new commit and start new branch from that sha
-  - this avoids the cherry pick which creates a new sha, meaning the sha will stay the same
-  - then we can add back the force functionality to forcefully push to remote overriding this optimization
 
 
 - multiselect with more items than terminal rows needs pagination
