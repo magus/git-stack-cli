@@ -213,20 +213,20 @@ function SelectCommitRangesInternal(props: Props) {
 
       <Ink.Box height={1} />
 
-      <Ink.Text dimColor>
-        <Ink.Text>
-          <Ink.Text bold color="#3b82f6">
-            {unassigned_count}
-          </Ink.Text>
-          {" unassigned commits"}
+      <Ink.Text color="gray">
+        <Ink.Text color="#3b82f6" bold>
+          {unassigned_count}
         </Ink.Text>
+        <Ink.Text>{"  unassigned commits"}</Ink.Text>
 
         {!isUnassigned ? null : (
-          <Ink.Text>
-            {", press "}
-            <Ink.Text color="#22c55e">c</Ink.Text>
+          <Ink.Text color="gray">
+            <Ink.Text>{", press "}</Ink.Text>
+            <Ink.Text bold color="#22c55e">
+              c
+            </Ink.Text>
             {" to "}
-            <Ink.Text color="#22c55e">
+            <Ink.Text bold color="#22c55e">
               <Parens>c</Parens>reate
             </Ink.Text>
             {" a new group"}
@@ -239,9 +239,11 @@ function SelectCommitRangesInternal(props: Props) {
       ) : (
         <Ink.Text>
           {"🎉 Done! Press "}
-          <Ink.Text color="#22c55e">s</Ink.Text>
+          <Ink.Text bold color="#22c55e">
+            s
+          </Ink.Text>
           {" to "}
-          <Ink.Text color="#22c55e">
+          <Ink.Text bold color="#22c55e">
             <Parens>s</Parens>ync
           </Ink.Text>
           {" the commits to Github"}
