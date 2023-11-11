@@ -23,7 +23,9 @@ type Props = {
 };
 
 function SelectCommitRangesInternal(props: Props) {
-  const group_list = Array.from(props.commit_range.group_map.values());
+  const group_list = Array.from(props.commit_range.group_map.values()).filter(
+    (group) => group.id !== "unassigned"
+  );
 
   const [index, set_index] = React.useReducer((_: unknown, value: number) => {
     return wrap_index(value, group_list);
@@ -39,16 +41,27 @@ function SelectCommitRangesInternal(props: Props) {
     }
   });
 
+  const [commit_map, update_commit_map] = React.useReducer(
+    (
+      map: Map<string, null | string>,
+      args: { key: string; value: null | string }
+    ) => {
+      map.set(args.key, args.value);
+
+      console.debug("update_commit_map", map, args);
+      return map;
+    },
+    new Map(),
+    (map) => {
+      for (const commit of props.commit_range.commit_list) {
+        map.set(commit.sha, commit.metadata.id);
+      }
+
+      return map;
+    }
+  );
+
   const group = group_list[index];
-
-  const items = props.commit_range.commit_list.map((meta) => {
-    return {
-      label: meta.message,
-      value: meta,
-    };
-  });
-
-  items.reverse();
 
   // <-  (2/4) #742 Title A ->
   const max_group_label_width = 32;
@@ -63,15 +76,43 @@ function SelectCommitRangesInternal(props: Props) {
   group_title_width -= left_arrow.length + right_arrow.length;
   group_title_width = Math.min(title.length, group_title_width);
 
+  const items = props.commit_range.commit_list.map((commit) => {
+    const commit_metadata_id = commit_map.get(commit.sha);
+
+    const selected = commit_metadata_id !== null;
+    const disabled = Boolean(selected && commit_metadata_id !== group.id);
+
+    return {
+      label: commit.message,
+      value: commit,
+      selected,
+      disabled,
+    };
+  });
+
+  items.reverse();
+
   // console.debug({ group, max_group_label_width, group_title_width });
 
   return (
     <Ink.Box flexDirection="column">
       <Ink.Box flexDirection="column" paddingLeft={left_arrow.length}>
         <MultiSelect
+          key={index}
           items={items}
-          onSelect={(item, state) => {
-            console.debug({ item, state });
+          onSelect={(args) => {
+            // console.debug("onSelect", args);
+
+            const key = args.item.sha;
+
+            let value;
+            if (args.selected) {
+              value = group.id;
+            } else {
+              value = null;
+            }
+
+            update_commit_map({ key, value });
           }}
         />
 

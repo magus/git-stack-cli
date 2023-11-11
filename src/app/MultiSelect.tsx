@@ -13,9 +13,9 @@ type Item<T> = {
 };
 
 type SelectArgs<T> = {
-  item: Item<T>;
+  item: T;
   selected: boolean;
-  state: Array<Item<T>>;
+  state: Array<T>;
 };
 
 type Props<T> = {
@@ -84,10 +84,10 @@ export function MultiSelect<T>(props: Props<T>) {
       return;
     }
 
-    const item = props.items[index];
+    const item = props.items[index].value;
     const selected_list = Array.from(selected_set);
     const selected = selected_set.has(index);
-    const state = selected_list.map((index) => props.items[index]);
+    const state = selected_list.map((index) => props.items[index].value);
 
     // console.debug({ item, selected, state });
     props.onSelect({ item, selected, state });
