@@ -2,6 +2,8 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { Parens } from "./Parens.js";
+
 type Props = {
   message: string;
   onYes(): void;
@@ -23,26 +25,22 @@ export function YesNoPrompt(props: Props) {
 
   return (
     <Ink.Box flexDirection="column">
-      <Ink.Box height={1} />
-
       <Ink.Box>
         <Ink.Text color="yellow">{props.message}</Ink.Text>
 
         <Ink.Text> </Ink.Text>
 
-        <Ink.Text color="blue">
-          (
+        <Parens>
           <Ink.Text color="gray">
-            <Ink.Text color="green" dimColor>
+            <Ink.Text color="#22c55e" dimColor>
               Y
             </Ink.Text>
             /
-            <Ink.Text color="red" dimColor>
+            <Ink.Text color="#ef4444" dimColor>
               n
             </Ink.Text>
           </Ink.Text>
-          )
-        </Ink.Text>
+        </Parens>
       </Ink.Box>
     </Ink.Box>
   );
