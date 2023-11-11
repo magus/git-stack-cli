@@ -127,6 +127,8 @@ export function StatusTable() {
           </Ink.Box>
         );
       })}
+
+      <Ink.Box height={1} />
     </Ink.Box>
   );
 }
