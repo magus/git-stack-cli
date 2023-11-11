@@ -19,6 +19,10 @@ export type State = {
   merge_base: null | string;
   branch_name: null | string;
   commit_range: null | CommitMetadata.CommitRange;
+  select_commit_ranges: null | {
+    order: Array<string>;
+    map: { [id: string]: Array<string> };
+  };
 
   step:
     | "loading"
@@ -48,6 +52,7 @@ const BaseStore = createStore<State>()(
     merge_base: null,
     branch_name: null,
     commit_range: null,
+    select_commit_ranges: null,
 
     step: "loading",
     output: [],
