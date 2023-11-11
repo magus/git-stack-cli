@@ -32,13 +32,10 @@ export function YesNoPrompt(props: Props) {
 
         <Parens>
           <Ink.Text color="gray">
-            <Ink.Text color="#22c55e" dimColor>
+            <Ink.Text bold color="#22c55e">
               Y
             </Ink.Text>
-            /
-            <Ink.Text color="#ef4444" dimColor>
-              n
-            </Ink.Text>
+            /<Ink.Text color="#ef4444">n</Ink.Text>
           </Ink.Text>
         </Parens>
       </Ink.Box>
