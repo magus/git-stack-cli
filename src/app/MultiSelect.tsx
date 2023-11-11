@@ -3,19 +3,28 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import { clamp } from "../core/clamp.js";
+import { wrap_index } from "../core/wrap_index.js";
 
 type Item<T> = {
   label: string;
   value: T;
+  selected?: ItemRowProps["selected"];
+  disabled?: ItemRowProps["disabled"];
+};
+
+type SelectArgs<T> = {
+  item: Item<T>;
+  selected: boolean;
+  state: Array<Item<T>>;
 };
 
 type Props<T> = {
   items: Array<Item<T>>;
-  onSelect(item: Item<T>, list: Array<Item<T>>): void;
+  onSelect(args: SelectArgs<T>): void;
 };
 
 export function MultiSelect<T>(props: Props<T>) {
-  const [selected, select] = React.useReducer(
+  const [selected_set, select] = React.useReducer(
     (state: Set<number>, value: number) => {
       const next = new Set(state);
 
@@ -27,33 +36,96 @@ export function MultiSelect<T>(props: Props<T>) {
 
       return next;
     },
-    new Set<number>()
+    new Set<number>(),
+    (set) => {
+      props.items.forEach((item, i) => {
+        if (item.selected) {
+          set.add(i);
+        }
+      });
+
+      return set;
+    }
   );
 
   // clamp index to keep in item range
-  const [index, set_index] = React.useReducer((_: any, value: number) => {
-    return clamp(value, 0, props.items.length - 1);
-  }, 0);
+  const [index, set_index] = React.useReducer(
+    (_: unknown, value: number) => {
+      return clamp(value, 0, props.items.length - 1);
+    },
+    0
+    // function find_initial_index() {
+    //   let firstEnabled;
+
+    //   for (let i = props.items.length - 1; i >= 0; i--) {
+    //     const item = props.items[i];
+    //     if (!item.disabled && firstEnabled === undefined) {
+    //       firstEnabled = i;
+    //     }
+
+    //     if (item.selected && !item.disabled) {
+    //       return i;
+    //     }
+    //   }
+
+    //   if (typeof firstEnabled === "number") {
+    //     return firstEnabled;
+    //   }
+
+    //   return 0;
+    // }
+  );
+
+  const selectRef = React.useRef(false);
 
   React.useEffect(() => {
-    const item = props.items[index];
+    if (!selectRef.current) {
+      // console.debug("[MultiSelect]", "skip onSelect before selectRef");
+      return;
+    }
 
-    const selected_list = Array.from(selected);
-    const list = selected_list.map((index) => props.items[index]);
-    props.onSelect(item, list);
-  }, [selected]);
+    const item = props.items[index];
+    const selected_list = Array.from(selected_set);
+    const selected = selected_set.has(index);
+    const state = selected_list.map((index) => props.items[index]);
+
+    // console.debug({ item, selected, state });
+    props.onSelect({ item, selected, state });
+  }, [selected_set]);
 
   Ink.useInput((_input, key) => {
     if (key.return) {
-      return select(index);
+      selectRef.current = true;
+      const item = props.items[index];
+      if (!item.disabled) {
+        return select(index);
+      }
     }
 
     if (key.upArrow) {
-      return set_index(index - 1);
+      let check = index;
+      for (let i = 0; i < props.items.length; i++) {
+        check = wrap_index(check - 1, props.items);
+        // console.debug("up", { check, i, index });
+
+        const item = props.items[check];
+        if (!item.disabled) {
+          return set_index(check);
+        }
+      }
     }
 
     if (key.downArrow) {
-      return set_index(index + 1);
+      let check = index;
+      for (let i = 0; i < props.items.length; i++) {
+        check = wrap_index(check + 1, props.items);
+        // console.debug("down", { check, i, index });
+
+        const item = props.items[check];
+        if (!item.disabled) {
+          return set_index(check);
+        }
+      }
     }
   });
 
@@ -61,13 +133,16 @@ export function MultiSelect<T>(props: Props<T>) {
     <Ink.Box flexDirection="column">
       {props.items.map((item, i) => {
         const active = i === index;
+        const selected = selected_set.has(i);
+        const disabled = item.disabled || false;
 
         return (
           <ItemRow
             key={item.label}
             label={item.label}
             active={active}
-            selected={selected.has(i)}
+            selected={selected}
+            disabled={disabled}
           />
         );
       })}
@@ -75,13 +150,62 @@ export function MultiSelect<T>(props: Props<T>) {
   );
 }
 
-type RadioProps = {
+type ItemRowProps = {
+  label: string;
+  active: boolean;
   selected: boolean;
+  disabled: boolean;
+};
+
+function ItemRow(props: ItemRowProps) {
+  let color;
+  let bold;
+  let underline;
+  let dimColor;
+
+  if (props.active) {
+    color = "#38bdf8";
+    underline = true;
+  }
+
+  if (props.selected) {
+    // color = "";
+    bold = true;
+  }
+
+  if (props.disabled) {
+    bold = false;
+    dimColor = true;
+  }
+
+  return (
+    <Ink.Box flexDirection="row" gap={1}>
+      <Radio selected={props.selected} disabled={props.disabled} />
+
+      <Ink.Box>
+        <Ink.Text
+          bold={bold}
+          underline={underline}
+          color={color}
+          dimColor={dimColor}
+          wrap="truncate-end"
+        >
+          {props.label}
+        </Ink.Text>
+      </Ink.Box>
+    </Ink.Box>
+  );
+}
+
+type RadioProps = {
+  selected: ItemRowProps["selected"];
+  disabled: ItemRowProps["disabled"];
 };
 
 function Radio(props: RadioProps) {
   let display;
   let color;
+  let dimColor;
 
   if (props.selected) {
     // display = "✓";
@@ -93,50 +217,14 @@ function Radio(props: RadioProps) {
     color = "";
   }
 
-  return (
-    <Ink.Text bold={props.selected} color={color}>
-      {display}
-    </Ink.Text>
-  );
-}
-
-type ItemRowProps = {
-  label: string;
-  active: boolean;
-  selected: boolean;
-};
-
-function ItemRow(props: ItemRowProps) {
-  let color;
-  let underline;
-  let dimColor;
-
-  if (props.active) {
-    color = "#38bdf8";
-    underline = true;
-  } else if (props.selected) {
-    // color = "";
-    dimColor = false;
-  } else {
-    // color = "gray";
+  if (props.disabled) {
+    color = "gray";
     dimColor = true;
   }
 
   return (
-    <Ink.Box flexDirection="row" gap={1}>
-      <Radio selected={props.selected} />
-
-      <Ink.Box>
-        <Ink.Text
-          bold={props.selected}
-          underline={underline}
-          color={color}
-          dimColor={dimColor}
-          wrap="truncate-end"
-        >
-          {props.label}
-        </Ink.Text>
-      </Ink.Box>
-    </Ink.Box>
+    <Ink.Text bold={props.selected} color={color} dimColor={dimColor}>
+      {display}
+    </Ink.Text>
   );
 }
