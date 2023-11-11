@@ -11,6 +11,8 @@ import type { Instance as InkInstance } from "ink";
 
 type Setter = (state: State) => void;
 
+type CommitMap = Parameters<typeof CommitMetadata.range>[0];
+
 export type State = {
   argv: null | Argv;
   ink: null | InkInstance;
@@ -20,10 +22,7 @@ export type State = {
   merge_base: null | string;
   branch_name: null | string;
   commit_range: null | CommitMetadata.CommitRange;
-  select_commit_ranges: null | {
-    order: Array<string>;
-    map: { [id: string]: Array<string> };
-  };
+  commit_map: null | CommitMap;
 
   step:
     | "loading"

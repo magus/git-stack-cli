@@ -15,7 +15,9 @@ type CommitGroup = {
   commits: Array<CommitMetadata>;
 };
 
-export async function range() {
+type CommitMap = { [id: string]: string };
+
+export async function range(commit_map?: CommitMap) {
   const commit_list = await get_commit_list();
 
   let invalid = false;
@@ -23,6 +25,12 @@ export async function range() {
 
   for (const commit of commit_list) {
     let id = commit.metadata.id;
+
+    // use commit map if provided (via select commit ranges)
+    if (commit_map) {
+      id = commit_map[commit.sha];
+    }
+
     const pr = commit.pr;
 
     if (!pr) {

@@ -101,22 +101,14 @@ function SelectCommitRangesInternal(props: Props) {
     const inputLower = input.toLowerCase();
 
     if (unassigned_count === 0 && inputLower === "s") {
-      const group_map = new Map<string, Array<string>>();
-      for (const commit of props.commit_range.commit_list) {
-        const group_id = commit_map.get(commit.sha);
-        invariant(group_id, `group_id must exist for commit [${commit.sha}]`);
-        const commit_list = group_map.get(group_id) || [];
-        commit_list.push(commit.sha);
-        group_map.set(group_id, commit_list);
-      }
-
-      const order = Array.from(group_map.keys()) as Array<string>;
-      const map = Object.fromEntries(group_map);
-      const select_commit_ranges = { order, map };
-      // console.debug("[SelectCommitRanges]", select_commit_ranges);
-
       actions.set((state) => {
-        state.select_commit_ranges = select_commit_ranges;
+        state.commit_map = {};
+        for (const [sha, id] of commit_map.entries()) {
+          if (id) {
+            state.commit_map[sha] = id;
+          }
+        }
+
         state.step = "manual-rebase";
       });
       return;
