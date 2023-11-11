@@ -3,6 +3,7 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import { invariant } from "../core/invariant.js";
+import { wrap_index } from "../core/wrap_index.js";
 
 import { MultiSelect } from "./MultiSelect.js";
 import { Store } from "./Store.js";
@@ -24,14 +25,8 @@ type Props = {
 function SelectCommitRangesInternal(props: Props) {
   const group_list = Array.from(props.commit_range.group_map.values());
 
-  const [index, set_index] = React.useReducer((_: any, value: number) => {
-    const max = group_list.length - 1;
-    if (value === -1) {
-      return max;
-    } else if (value > max) {
-      return 0;
-    }
-    return value;
+  const [index, set_index] = React.useReducer((_: unknown, value: number) => {
+    return wrap_index(value, group_list);
   }, 0);
 
   Ink.useInput((_input, key) => {
