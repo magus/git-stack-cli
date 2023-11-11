@@ -21,7 +21,6 @@ git multi-diff
 
 - select commit ranges
 
-  - "(c)reate new PR", to create a new metadata.id/PR if needed and add to group list
   - manual rebase to re-label commits locally
 
 - flow
