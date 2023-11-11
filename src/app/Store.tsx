@@ -6,6 +6,7 @@ import { immer } from "zustand/middleware/immer";
 
 import type { Argv } from "../command.js";
 import type * as CommitMetadata from "../core/CommitMetadata.js";
+import type { PullRequest } from "../core/github.js";
 import type { Instance as InkInstance } from "ink";
 
 type Setter = (state: State) => void;
@@ -33,11 +34,16 @@ export type State = {
 
   output: Array<React.ReactNode>;
 
+  pr: { [branch: string]: PullRequest };
+
   actions: {
     clear(): void;
     exit(): void;
     newline(): void;
     output(node: React.ReactNode): void;
+
+    reset_pr(): void;
+
     set(setter: Setter): void;
   };
 };
@@ -57,6 +63,8 @@ const BaseStore = createStore<State>()(
     step: "loading",
     output: [],
 
+    pr: {},
+
     actions: {
       clear() {
         get().ink?.clear();
@@ -75,6 +83,12 @@ const BaseStore = createStore<State>()(
       output(node: React.ReactNode) {
         set((state) => {
           state.output.push(node);
+        });
+      },
+
+      reset_pr() {
+        set((state) => {
+          state.pr = {};
         });
       },
 
