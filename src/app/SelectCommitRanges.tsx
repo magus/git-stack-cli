@@ -100,8 +100,14 @@ function SelectCommitRangesInternal(props: Props) {
   Ink.useInput((input, key) => {
     const inputLower = input.toLowerCase();
 
-    // TODO only allow create when on unassigned group
+    if (unassigned_count === 0 && inputLower === "s") {
+      actions.set((state) => {
+        state.step = "manual-rebase";
+      });
+      return;
+    }
 
+    // only allow create when on unassigned group
     if (isUnassigned && inputLower === "c") {
       const id = uuid_v4();
 
@@ -149,7 +155,13 @@ function SelectCommitRangesInternal(props: Props) {
     const commit_metadata_id = commit_map.get(commit.sha);
 
     const selected = commit_metadata_id !== null;
-    const disabled = Boolean(selected && commit_metadata_id !== group.id);
+
+    let disabled;
+    if (isUnassigned) {
+      disabled = true;
+    } else {
+      disabled = Boolean(selected && commit_metadata_id !== group.id);
+    }
 
     return {
       label: commit.message,
@@ -188,25 +200,6 @@ function SelectCommitRangesInternal(props: Props) {
 
       <Ink.Box height={1} />
 
-      {!isUnassigned ? (
-        <Ink.Box height={1} />
-      ) : (
-        <Ink.Box flexDirection="column">
-          <Ink.Text dimColor>
-            <Ink.Text bold color="#3b82f6">
-              {unassigned_count}
-            </Ink.Text>
-            {" unassigned commits, press "}
-            <Ink.Text color="#22c55e">c</Ink.Text>
-            {" to "}
-            <Ink.Text color="#22c55e">
-              <Parens>c</Parens>reate
-            </Ink.Text>
-            {" a new group"}
-          </Ink.Text>
-        </Ink.Box>
-      )}
-
       <Ink.Box width={max_group_label_width} flexDirection="row">
         <Ink.Text>{left_arrow}</Ink.Text>
         <Ink.Text>{group_position}</Ink.Text>
@@ -217,6 +210,43 @@ function SelectCommitRangesInternal(props: Props) {
 
         <Ink.Text>{right_arrow}</Ink.Text>
       </Ink.Box>
+
+      <Ink.Box height={1} />
+
+      <Ink.Text dimColor>
+        <Ink.Text>
+          <Ink.Text bold color="#3b82f6">
+            {unassigned_count}
+          </Ink.Text>
+          {" unassigned commits"}
+        </Ink.Text>
+
+        {!isUnassigned ? null : (
+          <Ink.Text>
+            {", press "}
+            <Ink.Text color="#22c55e">c</Ink.Text>
+            {" to "}
+            <Ink.Text color="#22c55e">
+              <Parens>c</Parens>reate
+            </Ink.Text>
+            {" a new group"}
+          </Ink.Text>
+        )}
+      </Ink.Text>
+
+      {unassigned_count > 0 ? (
+        <Ink.Box height={1} />
+      ) : (
+        <Ink.Text>
+          {"🎉 Done! Press "}
+          <Ink.Text color="#22c55e">s</Ink.Text>
+          {" to "}
+          <Ink.Text color="#22c55e">
+            <Parens>s</Parens>ync
+          </Ink.Text>
+          {" the commits to Github"}
+        </Ink.Text>
+      )}
     </Ink.Box>
   );
 }
