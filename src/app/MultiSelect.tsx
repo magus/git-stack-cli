@@ -53,27 +53,27 @@ export function MultiSelect<T>(props: Props<T>) {
     (_: unknown, value: number) => {
       return clamp(value, 0, props.items.length - 1);
     },
-    0
-    // function find_initial_index() {
-    //   let firstEnabled;
+    0,
+    function find_initial_index() {
+      let firstEnabled;
 
-    //   for (let i = props.items.length - 1; i >= 0; i--) {
-    //     const item = props.items[i];
-    //     if (!item.disabled && firstEnabled === undefined) {
-    //       firstEnabled = i;
-    //     }
+      for (let i = props.items.length - 1; i >= 0; i--) {
+        const item = props.items[i];
+        if (!item.disabled && firstEnabled === undefined) {
+          firstEnabled = i;
+        }
 
-    //     if (item.selected && !item.disabled) {
-    //       return i;
-    //     }
-    //   }
+        if (item.selected && !item.disabled) {
+          return i;
+        }
+      }
 
-    //   if (typeof firstEnabled === "number") {
-    //     return firstEnabled;
-    //   }
+      if (typeof firstEnabled === "number") {
+        return firstEnabled;
+      }
 
-    //   return 0;
-    // }
+      return 0;
+    }
   );
 
   const selectRef = React.useRef(false);
