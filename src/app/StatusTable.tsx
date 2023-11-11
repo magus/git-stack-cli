@@ -2,7 +2,6 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { capitalize } from "../core/capitalize.js";
 import { clamp } from "../core/clamp.js";
 import { invariant } from "../core/invariant.js";
 
@@ -13,10 +12,9 @@ export function StatusTable() {
 
   invariant(commit_range, "commit_range must exist");
 
-  const data = [];
-  const local = [];
+  const row_list = [];
 
-  for (const group of commit_range.group_map.values()) {
+  for (const group of commit_range.group_list) {
     const row = {
       icon: "",
       count: "",
@@ -25,7 +23,13 @@ export function StatusTable() {
       url: "",
     };
 
-    if (group.pr) {
+    if (!group.pr) {
+      row.icon = "⭑";
+      row.status = "NEW";
+      row.title = "Unassigned";
+      row.count = `0/${group.commits.length}`;
+      row.url = "";
+    } else {
       if (group.dirty) {
         row.icon = "!";
         row.status = "OUTDATED";
@@ -37,25 +41,17 @@ export function StatusTable() {
       row.title = group.pr.title;
       row.count = `${group.pr.commits.length}/${group.commits.length}`;
       row.url = group.pr.url;
-
-      data.push(row);
-    } else {
-      row.icon = "⭑";
-      row.status = "NEW";
-      row.title = capitalize(UNASSIGNED);
-      row.count = `0/${group.commits.length}`;
-      row.url = "";
-
-      local.push(row);
     }
+
+    row_list.push(row);
   }
 
-  if (!data.length) {
+  if (!row_list.length) {
     return <Ink.Text dimColor>No data found.</Ink.Text>;
   }
 
   // walk data and discover max width for each column
-  const sample_row = data[0];
+  const sample_row = row_list[0];
   type ColKey = keyof typeof sample_row;
   const col_list = Object.keys(sample_row) as Array<ColKey>;
   const max_col_width = {} as { [key in ColKey]: number };
@@ -64,7 +60,7 @@ export function StatusTable() {
     max_col_width[col] = 0;
   }
 
-  for (const row of data) {
+  for (const row of row_list) {
     for (const col of col_list) {
       const value = row[col];
       max_col_width[col] = Math.max(value.length, max_col_width[col]);
@@ -97,11 +93,6 @@ export function StatusTable() {
   );
 
   const title_width = remaining_space;
-
-  // reverse data to match git log
-  data.reverse();
-
-  const row_list = [...local, ...data];
 
   return (
     <Ink.Box flexDirection="column" width={available_width}>
@@ -141,4 +132,3 @@ export function StatusTable() {
 }
 
 const MAX_TITLE_LENGTH = 50;
-const UNASSIGNED = "unassigned";

@@ -23,9 +23,8 @@ type Props = {
 };
 
 function SelectCommitRangesInternal(props: Props) {
-  const group_list = Array.from(props.commit_range.group_map.values()).filter(
-    (group) => group.id !== "unassigned"
-  );
+  // const group_list = get_group_list(props);
+  const group_list = props.commit_range.group_list;
 
   const [index, set_index] = React.useReducer((_: unknown, value: number) => {
     return wrap_index(value, group_list);

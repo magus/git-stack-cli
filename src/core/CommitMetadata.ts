@@ -62,11 +62,20 @@ export async function range() {
   // check each group for dirty state and base
   const group_value_list = Array.from(group_map.values());
 
+  const group_list = [];
+  let unassigned_group;
+
   for (let i = 0; i < group_value_list.length; i++) {
     const group = group_value_list[i];
 
     // console.debug("group", group.pr?.title.substring(0, 40));
     // console.debug("  ", "id", group.id);
+
+    if (group.id === UNASSIGNED) {
+      unassigned_group = group;
+    } else {
+      group_list.push(group);
+    }
 
     if (i === 0) {
       group.base = "master";
@@ -107,7 +116,15 @@ export async function range() {
     // console.debug("  ", "group.dirty", group.dirty);
   }
 
-  return { invalid, group_map, commit_list, UNASSIGNED };
+  // reverse group_list to match git log
+  group_list.reverse();
+
+  // insert unassigned group at front
+  if (unassigned_group) {
+    group_list.unshift(unassigned_group);
+  }
+
+  return { invalid, group_list, commit_list, UNASSIGNED };
 }
 
 async function get_commit_list() {

@@ -32,7 +32,7 @@ async function run(args: Args) {
 
   let needs_update = false;
 
-  for (const group of commit_range.group_map.values()) {
+  for (const group of commit_range.group_list) {
     if (group.dirty) {
       needs_update = true;
       break;
