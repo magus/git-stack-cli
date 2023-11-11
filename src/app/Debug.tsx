@@ -11,8 +11,8 @@ import * as json from "../core/json.js";
 import { Store } from "./Store.js";
 
 export function Debug() {
-  const state = Store.useState((state) => state);
   const actions = Store.useActions();
+  const state = Store.useState((state) => state);
   const debug = Store.useState((state) => state.argv?.debug);
 
   React.useEffect(
