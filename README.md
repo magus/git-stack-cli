@@ -23,6 +23,7 @@ git multi-diff
 
   - manual rebase to re-label commits locally
   - capture PR title when creating new group
+  - set nice PR title and summary (diff stack table)
 
 - flow
 
