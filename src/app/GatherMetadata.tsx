@@ -4,8 +4,10 @@ import * as Ink from "ink";
 
 import * as CommitMetadata from "../core/CommitMetadata.js";
 import { cli } from "../core/cli.js";
+import * as github from "../core/github.js";
 import { invariant } from "../core/invariant.js";
 import * as json from "../core/json.js";
+import { match_group } from "../core/match_group.js";
 
 import { Await } from "./Await.js";
 import { Store } from "./Store.js";
@@ -63,17 +65,25 @@ async function gather_metadata() {
     return;
   }
 
+  // git@github.com:magus/git-multi-diff-playground.git
+  // https://github.com/magus/git-multi-diff-playground.git
+  const origin_url = (await cli(`git config --get remote.origin.url`)).stdout;
+  const repo_path = match_group(origin_url, RE.repo_path, "repo_path");
+
   const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
+
+  Store.setState((state) => {
+    state.repo_path = repo_path;
+    state.head = head;
+    state.merge_base = merge_base;
+    state.branch_name = branch_name;
+  });
 
   try {
     const commit_range = await CommitMetadata.range();
 
     Store.setState((state) => {
-      state.head = head;
-      state.merge_base = merge_base;
-      state.branch_name = branch_name;
       state.commit_range = commit_range;
-
       state.step = "status";
     });
   } catch (err) {
@@ -86,3 +96,9 @@ async function gather_metadata() {
     }
   }
 }
+
+const RE = {
+  // git@github.com:magus/git-multi-diff-playground.git
+  // https://github.com/magus/git-multi-diff-playground.git
+  repo_path: /(?<repo_path>[^:^/]+\/[^/]+)\.git/,
+};

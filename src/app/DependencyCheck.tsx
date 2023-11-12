@@ -4,6 +4,7 @@ import * as Ink from "ink";
 
 import { cli } from "../core/cli.js";
 import { is_command_available } from "../core/is_command_available.js";
+import { match_group } from "../core/match_group.js";
 
 import { Await } from "./Await.js";
 import { Store } from "./Store.js";
@@ -74,11 +75,21 @@ export function DependencyCheck(props: Props) {
             </Ink.Box>
           }
           function={async () => {
-            const gh_auth_status_cli = await cli(`gh auth status`, {
+            const auth_output = await cli(`gh auth status`, {
               ignoreExitCode: true,
             });
 
-            if (gh_auth_status_cli.code === 0) {
+            if (auth_output.code === 0) {
+              const username = match_group(
+                auth_output.stdout,
+                RE.auth_username,
+                "username"
+              );
+
+              actions.set((state) => {
+                state.username = username;
+              });
+
               return;
             }
 
@@ -101,3 +112,8 @@ export function DependencyCheck(props: Props) {
     </Await>
   );
 }
+
+const RE = {
+  // Logged in to github.com as magus
+  auth_username: /Logged in to github.com as (?<username>[^\s]+)/,
+};

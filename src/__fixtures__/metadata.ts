@@ -1,5 +1,7 @@
 // prettier-ignore
 export const METADATA = {
+  "username": "magus",
+  "repo_path": "magus/git-multi-diff-playground",
   "head": "1a50c5fe3cd129547c5c34a54d1611ec06ab213e",
   "merge_base": "9528176b12abf81c779bc5244afc7d760f6fa422",
   "branch_name": "dev/noah/a-test",

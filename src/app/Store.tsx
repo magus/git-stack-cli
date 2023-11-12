@@ -20,6 +20,8 @@ export type State = {
   ink: null | InkInstance;
 
   cwd: null | string;
+  username: null | string;
+  repo_path: null | string;
   head: null | string;
   merge_base: null | string;
   branch_name: null | string;
@@ -63,6 +65,8 @@ const BaseStore = createStore<State>()(
     ink: null,
 
     cwd: null,
+    username: null,
+    repo_path: null,
     head: null,
     merge_base: null,
     branch_name: null,
