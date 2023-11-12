@@ -22,6 +22,8 @@ git multi-diff
 
 ## TODO
 
+- point value for querying all pr for user vs individual pr status (current)?
+
 - select commit ranges
   - capture PR title when creating new group
 
