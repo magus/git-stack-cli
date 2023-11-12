@@ -14,11 +14,15 @@ export function Debug() {
   const actions = Store.useActions();
   const state = Store.useState((state) => state);
   const debug = Store.useState((state) => state.argv?.debug);
+  const argv = Store.useState((state) => state.argv);
 
   React.useEffect(
     function debugMessageOnce() {
       if (debug) {
         actions.output(<Ink.Text color="yellow">Debug mode enabled</Ink.Text>);
+        actions.output(
+          <Ink.Text dimColor>{JSON.stringify(argv, null, 2)}</Ink.Text>
+        );
       }
     },
     [debug]
