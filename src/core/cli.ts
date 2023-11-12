@@ -7,6 +7,7 @@ type Options = SpawnOptions & {
 };
 
 type Return = {
+  command: string;
   code: number;
   stdout: string;
   stderr: string;
@@ -41,6 +42,7 @@ export async function cli(
         reject(new Error(`[${command}] (${code})`));
       } else {
         const result = {
+          command,
           code: code || 0,
           stdout: stdout.trimEnd(),
           stderr: stderr.trimEnd(),
@@ -70,5 +72,5 @@ cli.sync = function cli_sync(
   const output = String(spawn_return.output);
   const code = spawn_return.status || 0;
 
-  return { code, stdout, stderr, output };
+  return { command, code, stdout, stderr, output };
 };
