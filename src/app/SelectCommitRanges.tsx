@@ -225,7 +225,7 @@ function SelectCommitRangesInternal(props: Props) {
           <Ink.Text color="#3b82f6" bold>
             {unassigned_count}
           </Ink.Text>
-          <Ink.Text>{"  unassigned commits"}</Ink.Text>
+          <Ink.Text>{" unassigned commits"}</Ink.Text>
 
           {!isUnassigned ? null : (
             <Ink.Text color="gray">
