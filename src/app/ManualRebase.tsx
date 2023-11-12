@@ -13,16 +13,20 @@ import { Await } from "./Await.js";
 import { Brackets } from "./Brackets.js";
 import { Store } from "./Store.js";
 
-export function ManualRebase() {
+type Props = {
+  skipSync?: boolean;
+};
+
+export function ManualRebase(props: Props) {
   return (
     <Await
       fallback={<Ink.Text color="yellow">Rebasing commits...</Ink.Text>}
-      function={run}
+      function={() => run(props)}
     />
   );
 }
 
-async function run() {
+async function run(props: Props) {
   const state = Store.getState();
   const actions = state.actions;
   const branch_name = state.branch_name;
@@ -90,24 +94,26 @@ async function run() {
         </Ink.Text>
       );
 
-      // push to origin since github requires commit shas to line up perfectly
-      await cli(`git push -f origin HEAD:${group.id}`);
+      if (!props.skipSync) {
+        // push to origin since github requires commit shas to line up perfectly
+        await cli(`git push -f origin HEAD:${group.id}`);
 
-      if (group.pr) {
-        // ensure base matches pr in github
-        await github.pr_base(group.id, group.base);
-      } else {
-        // delete local group branch if leftover
-        await cli(`git branch -D ${group.id}`, { ignoreExitCode: true });
+        if (group.pr) {
+          // ensure base matches pr in github
+          await github.pr_base(group.id, group.base);
+        } else {
+          // delete local group branch if leftover
+          await cli(`git branch -D ${group.id}`, { ignoreExitCode: true });
 
-        // move to temporary branch for creating pr
-        await cli(`git checkout -b ${group.id}`);
+          // move to temporary branch for creating pr
+          await cli(`git checkout -b ${group.id}`);
 
-        // create pr in github
-        await github.pr_create(group.id, group.base);
+          // create pr in github
+          await github.pr_create(group.id, group.base);
 
-        // move back to temp branch
-        await cli(`git checkout ${temp_branch_name}`);
+          // move back to temp branch
+          await cli(`git checkout ${temp_branch_name}`);
+        }
       }
     }
 

@@ -100,7 +100,7 @@ function SelectCommitRangesInternal(props: Props) {
   Ink.useInput((input, key) => {
     const inputLower = input.toLowerCase();
 
-    if (unassigned_count === 0 && inputLower === "s") {
+    if (unassigned_count === 0 && (inputLower === "r" || inputLower === "s")) {
       actions.set((state) => {
         state.commit_map = {};
         for (const [sha, id] of commit_map.entries()) {
@@ -109,7 +109,14 @@ function SelectCommitRangesInternal(props: Props) {
           }
         }
 
-        state.step = "manual-rebase";
+        switch (inputLower) {
+          case "s":
+            state.step = "manual-rebase";
+            break;
+
+          case "r":
+            state.step = "manual-rebase-no-sync";
+        }
       });
       return;
     }
@@ -242,17 +249,31 @@ function SelectCommitRangesInternal(props: Props) {
           )}
         </Ink.Text>
       ) : (
-        <Ink.Text>
-          {"🎉 Done! Press "}
-          <Ink.Text bold color="#22c55e">
-            s
+        <React.Fragment>
+          <Ink.Text>
+            {"🎉 Done! Press "}
+            <Ink.Text bold color="#22c55e">
+              s
+            </Ink.Text>
+            {" to "}
+            <Ink.Text bold color="#22c55e">
+              <Parens>s</Parens>ync
+            </Ink.Text>
+            {" the commits to Github"}
           </Ink.Text>
-          {" to "}
-          <Ink.Text bold color="#22c55e">
-            <Parens>s</Parens>ync
+
+          <Ink.Text color="gray">
+            <Ink.Text>{"Press "}</Ink.Text>
+            <Ink.Text bold color="#22c55e">
+              r
+            </Ink.Text>
+            {" to locally "}
+            <Ink.Text bold color="#22c55e">
+              <Parens>r</Parens>ebase
+            </Ink.Text>
+            {" only"}
           </Ink.Text>
-          {" the commits to Github"}
-        </Ink.Text>
+        </React.Fragment>
       )}
 
       <Ink.Box>

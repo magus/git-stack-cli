@@ -23,7 +23,7 @@ export function StatusTable() {
       url: "",
     };
 
-    if (!group.pr) {
+    if (group.id === commit_range.UNASSIGNED) {
       row.icon = "⭑";
       row.status = "NEW";
       row.title = "Unassigned";
@@ -38,9 +38,14 @@ export function StatusTable() {
         row.status = "SYNCED";
       }
 
-      row.title = group.pr.title;
-      row.count = `${group.pr.commits.length}/${group.commits.length}`;
-      row.url = group.pr.url;
+      if (group.pr) {
+        row.title = group.pr.title;
+        row.count = `${group.pr.commits.length}/${group.commits.length}`;
+        row.url = group.pr.url;
+      } else {
+        row.title = group.id;
+        row.count = `0/${group.commits.length}`;
+      }
     }
 
     row_list.push(row);
