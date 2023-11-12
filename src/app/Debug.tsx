@@ -13,26 +13,25 @@ import { Store } from "./Store.js";
 export function Debug() {
   const actions = Store.useActions();
   const state = Store.useState((state) => state);
-  const debug = Store.useState((state) => state.argv?.debug);
   const argv = Store.useState((state) => state.argv);
 
   React.useEffect(
     function debugMessageOnce() {
-      if (debug) {
-        actions.output(<Ink.Text color="yellow">Debug mode enabled</Ink.Text>);
-        actions.output(
+      actions.debug(<Ink.Text color="yellow">Debug mode enabled</Ink.Text>);
+      if (argv?.verbose) {
+        actions.debug(
           <Ink.Text dimColor>{JSON.stringify(argv, null, 2)}</Ink.Text>
         );
       }
     },
-    [debug]
+    [argv]
   );
 
   React.useEffect(
     function syncStateJson() {
       invariant(state.cwd, "state.cwd must exist");
 
-      if (!debug) {
+      if (!argv?.debug) {
         return;
       }
 
@@ -46,7 +45,7 @@ export function Debug() {
       const content = JSON.stringify(serialized, null, 2);
       fs.writeFileSync(output_file, content);
     },
-    [debug, state]
+    [argv, state]
   );
 
   return null;
