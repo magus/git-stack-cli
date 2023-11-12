@@ -96,6 +96,8 @@ export function StatusTable() {
 
   return (
     <Ink.Box flexDirection="column" width={available_width}>
+      <Ink.Box height={1} />
+
       {row_list.map((row) => {
         return (
           <Ink.Box
