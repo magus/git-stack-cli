@@ -16,11 +16,8 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
 
   const cache = Store.getState().pr[branch];
   if (cache) {
-    console.debug("pr_status", "CACHE", "HIT", branch);
     return cache;
   }
-
-  console.debug("pr_status", "CACHE", "MISS", branch);
 
   const pr: PullRequest = JSON.parse(result.stdout);
 
