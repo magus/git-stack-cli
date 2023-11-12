@@ -49,7 +49,6 @@ async function run(args: Args) {
       state.step = "pre-select-commit-ranges";
     });
   } else {
-    actions.newline();
     actions.output(<Ink.Text>✅ Everything up to date.</Ink.Text>);
     actions.output(
       <Ink.Text color="gray">

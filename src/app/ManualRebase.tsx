@@ -36,7 +36,7 @@ async function run() {
   invariant(commit_map, "commit_map must exist");
 
   // always listen for SIGINT event and restore git state
-  process.once("SIGINT", restore_git);
+  process.once("SIGINT", handle_exit);
 
   const temp_branch_name = `${branch_name}_${uuid_v4()}`;
 
@@ -117,26 +117,26 @@ async function run() {
     // move the branch pointer to the newly created temporary branch
     // now we are in locally in sync with github and on the original branch
     await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
+
+    restore_git();
+
+    actions.set((state) => {
+      state.step = "post-rebase-status";
+    });
   } catch (err) {
-    actions.output(<Ink.Text color="red">Error during rebase.</Ink.Text>);
+    actions.output(<Ink.Text color="#ef4444">Error during rebase.</Ink.Text>);
 
     if (argv.debug) {
       if (err instanceof Error) {
-        actions.output(<Ink.Text color="red">{err.message}</Ink.Text>);
+        actions.output(<Ink.Text color="#ef4444">{err.message}</Ink.Text>);
       }
     }
-  } finally {
-    restore_git();
+
+    handle_exit();
   }
 
   // cleanup git operations if cancelled during manual rebase
   function restore_git() {
-    actions.output(
-      <Ink.Text color="yellow">
-        Restoring original branch <Brackets>{branch_name}</Brackets>...
-      </Ink.Text>
-    );
-
     // signint handler MUST run synchronously
     // trying to use `await cli(...)` here will silently fail since
     // all children processes receive the SIGINT signal
@@ -154,6 +154,16 @@ async function run() {
         cli.sync(`git branch -D ${group.id}`, spawn_options);
       }
     }
+  }
+
+  function handle_exit() {
+    actions.output(
+      <Ink.Text color="yellow">
+        Restoring <Brackets>{branch_name}</Brackets>...
+      </Ink.Text>
+    );
+
+    restore_git();
 
     actions.output(
       <Ink.Text color="yellow">
