@@ -1,9 +1,13 @@
 {
-  "name": "git-multi-diff",
+  "name": "git-stack-cli",
   "version": "0.2.0",
   "description": "",
   "author": "magus",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/magus/git-stack-cli.git"
+  },
   "type": "module",
   "preferGlobal": true,
   "bin": {

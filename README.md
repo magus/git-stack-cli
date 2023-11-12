@@ -1,10 +1,11 @@
-# git-multi-diff
+# git-stack-cli
 
 ## install
 
 ```bash
-npm i -g git-multi-diff
+npm i -g git-stack-cli
 
+git stack
 git multi-diff
 ```
 
@@ -13,6 +14,8 @@ git multi-diff
 ```bash
 npm run dev
 npm link
+
+git stack
 git multi-diff
 ```
 
