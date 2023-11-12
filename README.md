@@ -20,41 +20,16 @@ git multi-diff
 ## TODO
 
 - select commit ranges
-
-  - manual rebase to re-label commits locally
   - capture PR title when creating new group
+
+- display PR status table (new, outdated, etc.) after sync
+
+- ManualRebase
   - set nice PR title and summary (diff stack table)
 
-- flow
-
-  walk commits and gather commit ranges
-  commit ranges <--> PRs
-  if we cannot gather commit ranges it means we have new or re-ordered commits
-  -> display PR status table (new, outdated, etc.)
-
-  if --check
-    -> exit
-
-  if any metadata.id are out of place
-  if any new commits
-    -> select commit ranges
-    -> update local commit metadata
-
-  if needs update
-  if --force
-    -> sync
-
-  -> display PR status table (new, outdated, etc.)
-
-
-- build table of stacked PRs to add to each PR as comment
-  - order based on local sha ordering (i.e. group_list, which reflects PR order)
-  - delete and update comment in pr if necessary (use regex)
-
-- avoid updating commits which have not changed
-  - during first walk discover first dirty/new commit and start new branch from that sha
-  - this avoids the cherry pick which creates a new sha, meaning the sha will stay the same
-  - then we can add back the force functionality to forcefully push to remote overriding this optimization
+  - build table of stacked PRs to add to each PR as comment
+    - order based on local sha ordering (i.e. group_list, which reflects PR order)
+    - delete and update comment in pr if necessary (use regex)
 
 
 - interactive PR status table
