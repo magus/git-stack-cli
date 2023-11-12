@@ -5,27 +5,61 @@ import * as Ink from "ink";
 import { Store } from "../app/Store.js";
 
 import { cli } from "./cli.js";
+import { invariant } from "./invariant.js";
 
-export async function pr_status(branch: string): Promise<null | PullRequest> {
+// prettier-ignore
+const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,url";
+
+export async function pr_list(): Promise<Array<PullRequest>> {
   const state = Store.getState();
   const actions = state.actions;
 
-  const result = await cli(
-    `gh pr view ${branch} --json number,state,baseRefName,headRefName,commits,title,url`,
+  const username = state.username;
+  const repo_path = state.repo_path;
+  invariant(username, "username must exist");
+  invariant(repo_path, "repo_path must exist");
+
+  const cli_result = await cli(
+    `gh pr list --repo ${repo_path} --author ${username} --state open ${JSON_FIELDS}`,
     {
       ignoreExitCode: true,
     }
   );
 
-  if (result.code !== 0) {
-    actions.output(<Ink.Text color="#ef4444">{result.output}</Ink.Text>);
-
-    actions.set((state) => {
-      state.step = "github-api-error";
-    });
-
-    throw new Error("Unable to fetch PR status");
+  if (cli_result.code !== 0) {
+    handle_error(cli_result.output);
   }
+
+  const result_pr_list: Array<PullRequest> = JSON.parse(cli_result.stdout);
+
+  actions.set((state) => {
+    for (const pr of result_pr_list) {
+      state.pr[pr.headRefName] = pr;
+    }
+  });
+
+  return result_pr_list;
+}
+
+function handle_error(output: string): never {
+  const state = Store.getState();
+  const actions = state.actions;
+
+  actions.set((state) => {
+    state.step = "github-api-error";
+  });
+
+  throw new Error(output);
+}
+
+export async function pr_status(branch: string): Promise<null | PullRequest> {
+  const state = Store.getState();
+  const actions = state.actions;
+
+  const username = state.username;
+  const repo_path = state.repo_path;
+  invariant(username, "username must exist");
+  invariant(repo_path, "repo_path must exist");
 
   const cache = state.pr[branch];
 
@@ -57,7 +91,18 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
     </Ink.Text>
   );
 
-  const pr: PullRequest = JSON.parse(result.stdout);
+  const cli_result = await cli(
+    `gh pr view ${branch} --repo ${repo_path} --author ${username} ${JSON_FIELDS}`,
+    {
+      ignoreExitCode: true,
+    }
+  );
+
+  if (cli_result.code !== 0) {
+    handle_error(cli_result.output);
+  }
+
+  const pr: PullRequest = JSON.parse(cli_result.stdout);
 
   actions.set((state) => {
     state.pr[pr.headRefName] = pr;
@@ -67,11 +112,21 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
 }
 
 export async function pr_create(branch: string, base: string) {
-  await cli(`gh pr create --fill --head ${branch} --base ${base}`);
+  const cli_result = await cli(
+    `gh pr create --fill --head ${branch} --base ${base}`
+  );
+
+  if (cli_result.code !== 0) {
+    handle_error(cli_result.output);
+  }
 }
 
 export async function pr_base(branch: string, base: string) {
-  await cli(`gh pr edit ${branch} --base ${base}`);
+  const cli_result = await cli(`gh pr edit ${branch} --base ${base}`);
+
+  if (cli_result.code !== 0) {
+    handle_error(cli_result.output);
+  }
 }
 
 type Commit = {
