@@ -40,10 +40,15 @@ async function run(args: Args) {
 
   if (args.argv.check) {
     actions.exit(0);
-    return;
-  }
-
-  if (!args.argv.force && !needs_update) {
+  } else if (args.argv.force) {
+    Store.setState((state) => {
+      state.step = "select-commit-ranges";
+    });
+  } else if (needs_update) {
+    Store.setState((state) => {
+      state.step = "pre-select-commit-ranges";
+    });
+  } else {
     actions.newline();
     actions.output(<Ink.Text>✅ Everything up to date.</Ink.Text>);
     actions.output(
@@ -58,8 +63,4 @@ async function run(args: Args) {
 
     actions.exit(0);
   }
-
-  Store.setState((state) => {
-    state.step = "pre-select-commit-ranges";
-  });
 }
