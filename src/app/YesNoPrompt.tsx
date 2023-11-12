@@ -11,8 +11,12 @@ type Props = {
 };
 
 export function YesNoPrompt(props: Props) {
+  const [answer, set_answer] = React.useState("");
+
   Ink.useInput((input) => {
     const inputLower = input.toLowerCase();
+
+    set_answer(inputLower);
 
     switch (inputLower) {
       case "n":
@@ -32,10 +36,17 @@ export function YesNoPrompt(props: Props) {
 
         <Parens>
           <Ink.Text color="gray">
-            <Ink.Text bold color="#22c55e">
-              Y
-            </Ink.Text>
-            /<Ink.Text color="#ef4444">n</Ink.Text>
+            {answer && answer !== "y" ? null : (
+              <Ink.Text bold color="#22c55e">
+                Y
+              </Ink.Text>
+            )}
+
+            {answer ? null : <Ink.Text>/</Ink.Text>}
+
+            {answer && answer !== "n" ? null : (
+              <Ink.Text color="#ef4444">n</Ink.Text>
+            )}
           </Ink.Text>
         </Parens>
       </Ink.Box>
