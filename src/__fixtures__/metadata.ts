@@ -1,30 +1,15 @@
 // prettier-ignore
 export const METADATA = {
-  "head": "cc09b96b823d9dde77188e675d3090be7c1d625a",
+  "head": "1a50c5fe3cd129547c5c34a54d1611ec06ab213e",
   "merge_base": "9528176b12abf81c779bc5244afc7d760f6fa422",
   "branch_name": "dev/noah/a-test",
   "commit_range": {
-    "invalid": true,
+    "invalid": false,
     "group_list": [
-      {
-        "id": "unassigned",
-        "pr": null,
-        "base": null,
-        "dirty": true,
-        "commits": [
-          {
-            "sha": "24fa3301563d40b42f698bff92b8a805412a4a69",
-            "message": "orange color",
-            "raw_message": "orange color",
-            "pr": null,
-            "branch_id": null
-          }
-        ]
-      },
       {
         "id": "398c0ead-77ad-41a4-af6e-280f99998c28",
         "pr": {
-          "baseRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+          "baseRefName": "79402548-a996-4c2a-a338-86633040358e",
           "commits": [
             {
               "authoredDate": "2023-10-22T23:13:35Z",
@@ -36,10 +21,10 @@ export const METADATA = {
                   "name": "magus"
                 }
               ],
-              "committedDate": "2023-10-28T19:16:40Z",
-              "messageBody": "line2 changed\nline3 'abc'\nline4\nline5 \"hello world\"\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
+              "committedDate": "2023-11-12T03:03:24Z",
+              "messageBody": "line3 'abc'\nline4\nline5 \"hello world\"\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
               "messageHeadline": "cantaloupe",
-              "oid": "86d0b3cf5dcbd94963f2839818734c3b0e13d2fc"
+              "oid": "1a50c5fe3cd129547c5c34a54d1611ec06ab213e"
             }
           ],
           "headRefName": "398c0ead-77ad-41a4-af6e-280f99998c28",
@@ -48,15 +33,15 @@ export const METADATA = {
           "title": "cantaloupe line2 line3 'abc' line4 line5 \"hello world\" Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
           "url": "https://github.com/magus/git-multi-diff-playground/pull/29"
         },
-        "base": null,
-        "dirty": true,
+        "base": "79402548-a996-4c2a-a338-86633040358e",
+        "dirty": false,
         "commits": [
           {
-            "sha": "dea1b85bdbcec0b27f1c5b2cc675e47fd9f51005",
+            "sha": "1a50c5fe3cd129547c5c34a54d1611ec06ab213e",
             "message": "cantaloupe",
-            "raw_message": "cantaloupe\nline2 changed\nline3 'abc'\nline4\nline5 \"hello world\"\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
+            "raw_message": "cantaloupe\n\nline3 'abc'\nline4\nline5 \"hello world\"\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
             "pr": {
-              "baseRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+              "baseRefName": "79402548-a996-4c2a-a338-86633040358e",
               "commits": [
                 {
                   "authoredDate": "2023-10-22T23:13:35Z",
@@ -68,10 +53,10 @@ export const METADATA = {
                       "name": "magus"
                     }
                   ],
-                  "committedDate": "2023-10-28T19:16:40Z",
-                  "messageBody": "line2 changed\nline3 'abc'\nline4\nline5 \"hello world\"\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
+                  "committedDate": "2023-11-12T03:03:24Z",
+                  "messageBody": "line3 'abc'\nline4\nline5 \"hello world\"\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
                   "messageHeadline": "cantaloupe",
-                  "oid": "86d0b3cf5dcbd94963f2839818734c3b0e13d2fc"
+                  "oid": "1a50c5fe3cd129547c5c34a54d1611ec06ab213e"
                 }
               ],
               "headRefName": "398c0ead-77ad-41a4-af6e-280f99998c28",
@@ -81,6 +66,69 @@ export const METADATA = {
               "url": "https://github.com/magus/git-multi-diff-playground/pull/29"
             },
             "branch_id": "398c0ead-77ad-41a4-af6e-280f99998c28"
+          }
+        ]
+      },
+      {
+        "id": "79402548-a996-4c2a-a338-86633040358e",
+        "pr": {
+          "baseRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+          "commits": [
+            {
+              "authoredDate": "2023-10-29T21:58:16Z",
+              "authors": [
+                {
+                  "email": "noah@iamnoah.com",
+                  "id": "MDQ6VXNlcjI5MDA4NA==",
+                  "login": "magus",
+                  "name": "magus"
+                }
+              ],
+              "committedDate": "2023-11-12T02:06:22Z",
+              "messageBody": "git-multi-diff-id: 79402548-a996-4c2a-a338-86633040358e",
+              "messageHeadline": "orange color",
+              "oid": "0481003259c43c07a07eef99895251730a3e4767"
+            }
+          ],
+          "headRefName": "79402548-a996-4c2a-a338-86633040358e",
+          "number": 32,
+          "state": "OPEN",
+          "title": "orange color",
+          "url": "https://github.com/magus/git-multi-diff-playground/pull/32"
+        },
+        "base": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+        "dirty": false,
+        "commits": [
+          {
+            "sha": "0481003259c43c07a07eef99895251730a3e4767",
+            "message": "orange color",
+            "raw_message": "orange color\n\ngit-multi-diff-id: 79402548-a996-4c2a-a338-86633040358e",
+            "pr": {
+              "baseRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+              "commits": [
+                {
+                  "authoredDate": "2023-10-29T21:58:16Z",
+                  "authors": [
+                    {
+                      "email": "noah@iamnoah.com",
+                      "id": "MDQ6VXNlcjI5MDA4NA==",
+                      "login": "magus",
+                      "name": "magus"
+                    }
+                  ],
+                  "committedDate": "2023-11-12T02:06:22Z",
+                  "messageBody": "git-multi-diff-id: 79402548-a996-4c2a-a338-86633040358e",
+                  "messageHeadline": "orange color",
+                  "oid": "0481003259c43c07a07eef99895251730a3e4767"
+                }
+              ],
+              "headRefName": "79402548-a996-4c2a-a338-86633040358e",
+              "number": 32,
+              "state": "OPEN",
+              "title": "orange color",
+              "url": "https://github.com/magus/git-multi-diff-playground/pull/32"
+            },
+            "branch_id": "79402548-a996-4c2a-a338-86633040358e"
           }
         ]
       },
@@ -99,10 +147,25 @@ export const METADATA = {
                   "name": "magus"
                 }
               ],
-              "committedDate": "2023-10-28T19:16:37Z",
+              "committedDate": "2023-11-12T02:06:18Z",
               "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
               "messageHeadline": "strawberry",
-              "oid": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0"
+              "oid": "506c9f7894443ac75f578a5b7d8503cb8f40cec2"
+            },
+            {
+              "authoredDate": "2023-10-30T07:39:35Z",
+              "authors": [
+                {
+                  "email": "noah@iamnoah.com",
+                  "id": "MDQ6VXNlcjI5MDA4NA==",
+                  "login": "magus",
+                  "name": "magus"
+                }
+              ],
+              "committedDate": "2023-11-12T02:06:18Z",
+              "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
+              "messageHeadline": "pineapple",
+              "oid": "867fb2546ff3def993051c059b557c2a1ff4001c"
             }
           ],
           "headRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
@@ -112,10 +175,10 @@ export const METADATA = {
           "url": "https://github.com/magus/git-multi-diff-playground/pull/30"
         },
         "base": "3d1d890d-11c9-4569-83c3-e3aff6426e37",
-        "dirty": true,
+        "dirty": false,
         "commits": [
           {
-            "sha": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0",
+            "sha": "506c9f7894443ac75f578a5b7d8503cb8f40cec2",
             "message": "strawberry",
             "raw_message": "strawberry\n\ngit-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
             "pr": {
@@ -131,10 +194,25 @@ export const METADATA = {
                       "name": "magus"
                     }
                   ],
-                  "committedDate": "2023-10-28T19:16:37Z",
+                  "committedDate": "2023-11-12T02:06:18Z",
                   "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
                   "messageHeadline": "strawberry",
-                  "oid": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0"
+                  "oid": "506c9f7894443ac75f578a5b7d8503cb8f40cec2"
+                },
+                {
+                  "authoredDate": "2023-10-30T07:39:35Z",
+                  "authors": [
+                    {
+                      "email": "noah@iamnoah.com",
+                      "id": "MDQ6VXNlcjI5MDA4NA==",
+                      "login": "magus",
+                      "name": "magus"
+                    }
+                  ],
+                  "committedDate": "2023-11-12T02:06:18Z",
+                  "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
+                  "messageHeadline": "pineapple",
+                  "oid": "867fb2546ff3def993051c059b557c2a1ff4001c"
                 }
               ],
               "headRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
@@ -146,7 +224,7 @@ export const METADATA = {
             "branch_id": "53d15f9a-2451-492c-a831-642d41ad3ef4"
           },
           {
-            "sha": "cc09b96b823d9dde77188e675d3090be7c1d625a",
+            "sha": "867fb2546ff3def993051c059b557c2a1ff4001c",
             "message": "pineapple",
             "raw_message": "pineapple\n\ngit-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
             "pr": {
@@ -162,10 +240,25 @@ export const METADATA = {
                       "name": "magus"
                     }
                   ],
-                  "committedDate": "2023-10-28T19:16:37Z",
+                  "committedDate": "2023-11-12T02:06:18Z",
                   "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
                   "messageHeadline": "strawberry",
-                  "oid": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0"
+                  "oid": "506c9f7894443ac75f578a5b7d8503cb8f40cec2"
+                },
+                {
+                  "authoredDate": "2023-10-30T07:39:35Z",
+                  "authors": [
+                    {
+                      "email": "noah@iamnoah.com",
+                      "id": "MDQ6VXNlcjI5MDA4NA==",
+                      "login": "magus",
+                      "name": "magus"
+                    }
+                  ],
+                  "committedDate": "2023-11-12T02:06:18Z",
+                  "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
+                  "messageHeadline": "pineapple",
+                  "oid": "867fb2546ff3def993051c059b557c2a1ff4001c"
                 }
               ],
               "headRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
@@ -369,7 +462,7 @@ export const METADATA = {
         "branch_id": "3d1d890d-11c9-4569-83c3-e3aff6426e37"
       },
       {
-        "sha": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0",
+        "sha": "506c9f7894443ac75f578a5b7d8503cb8f40cec2",
         "message": "strawberry",
         "raw_message": "strawberry\n\ngit-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
         "pr": {
@@ -385,10 +478,25 @@ export const METADATA = {
                   "name": "magus"
                 }
               ],
-              "committedDate": "2023-10-28T19:16:37Z",
+              "committedDate": "2023-11-12T02:06:18Z",
               "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
               "messageHeadline": "strawberry",
-              "oid": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0"
+              "oid": "506c9f7894443ac75f578a5b7d8503cb8f40cec2"
+            },
+            {
+              "authoredDate": "2023-10-30T07:39:35Z",
+              "authors": [
+                {
+                  "email": "noah@iamnoah.com",
+                  "id": "MDQ6VXNlcjI5MDA4NA==",
+                  "login": "magus",
+                  "name": "magus"
+                }
+              ],
+              "committedDate": "2023-11-12T02:06:18Z",
+              "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
+              "messageHeadline": "pineapple",
+              "oid": "867fb2546ff3def993051c059b557c2a1ff4001c"
             }
           ],
           "headRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
@@ -400,45 +508,7 @@ export const METADATA = {
         "branch_id": "53d15f9a-2451-492c-a831-642d41ad3ef4"
       },
       {
-        "sha": "24fa3301563d40b42f698bff92b8a805412a4a69",
-        "message": "orange color",
-        "raw_message": "orange color",
-        "pr": null,
-        "branch_id": null
-      },
-      {
-        "sha": "dea1b85bdbcec0b27f1c5b2cc675e47fd9f51005",
-        "message": "cantaloupe",
-        "raw_message": "cantaloupe\nline2 changed\nline3 'abc'\nline4\nline5 \"hello world\"\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
-        "pr": {
-          "baseRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
-          "commits": [
-            {
-              "authoredDate": "2023-10-22T23:13:35Z",
-              "authors": [
-                {
-                  "email": "noah@iamnoah.com",
-                  "id": "MDQ6VXNlcjI5MDA4NA==",
-                  "login": "magus",
-                  "name": "magus"
-                }
-              ],
-              "committedDate": "2023-10-28T19:16:40Z",
-              "messageBody": "line2 changed\nline3 'abc'\nline4\nline5 \"hello world\"\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
-              "messageHeadline": "cantaloupe",
-              "oid": "86d0b3cf5dcbd94963f2839818734c3b0e13d2fc"
-            }
-          ],
-          "headRefName": "398c0ead-77ad-41a4-af6e-280f99998c28",
-          "number": 29,
-          "state": "OPEN",
-          "title": "cantaloupe line2 line3 'abc' line4 line5 \"hello world\" Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-          "url": "https://github.com/magus/git-multi-diff-playground/pull/29"
-        },
-        "branch_id": "398c0ead-77ad-41a4-af6e-280f99998c28"
-      },
-      {
-        "sha": "cc09b96b823d9dde77188e675d3090be7c1d625a",
+        "sha": "867fb2546ff3def993051c059b557c2a1ff4001c",
         "message": "pineapple",
         "raw_message": "pineapple\n\ngit-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
         "pr": {
@@ -454,10 +524,25 @@ export const METADATA = {
                   "name": "magus"
                 }
               ],
-              "committedDate": "2023-10-28T19:16:37Z",
+              "committedDate": "2023-11-12T02:06:18Z",
               "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
               "messageHeadline": "strawberry",
-              "oid": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0"
+              "oid": "506c9f7894443ac75f578a5b7d8503cb8f40cec2"
+            },
+            {
+              "authoredDate": "2023-10-30T07:39:35Z",
+              "authors": [
+                {
+                  "email": "noah@iamnoah.com",
+                  "id": "MDQ6VXNlcjI5MDA4NA==",
+                  "login": "magus",
+                  "name": "magus"
+                }
+              ],
+              "committedDate": "2023-11-12T02:06:18Z",
+              "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
+              "messageHeadline": "pineapple",
+              "oid": "867fb2546ff3def993051c059b557c2a1ff4001c"
             }
           ],
           "headRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
@@ -467,6 +552,68 @@ export const METADATA = {
           "url": "https://github.com/magus/git-multi-diff-playground/pull/30"
         },
         "branch_id": "53d15f9a-2451-492c-a831-642d41ad3ef4"
+      },
+      {
+        "sha": "0481003259c43c07a07eef99895251730a3e4767",
+        "message": "orange color",
+        "raw_message": "orange color\n\ngit-multi-diff-id: 79402548-a996-4c2a-a338-86633040358e",
+        "pr": {
+          "baseRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+          "commits": [
+            {
+              "authoredDate": "2023-10-29T21:58:16Z",
+              "authors": [
+                {
+                  "email": "noah@iamnoah.com",
+                  "id": "MDQ6VXNlcjI5MDA4NA==",
+                  "login": "magus",
+                  "name": "magus"
+                }
+              ],
+              "committedDate": "2023-11-12T02:06:22Z",
+              "messageBody": "git-multi-diff-id: 79402548-a996-4c2a-a338-86633040358e",
+              "messageHeadline": "orange color",
+              "oid": "0481003259c43c07a07eef99895251730a3e4767"
+            }
+          ],
+          "headRefName": "79402548-a996-4c2a-a338-86633040358e",
+          "number": 32,
+          "state": "OPEN",
+          "title": "orange color",
+          "url": "https://github.com/magus/git-multi-diff-playground/pull/32"
+        },
+        "branch_id": "79402548-a996-4c2a-a338-86633040358e"
+      },
+      {
+        "sha": "1a50c5fe3cd129547c5c34a54d1611ec06ab213e",
+        "message": "cantaloupe",
+        "raw_message": "cantaloupe\n\nline3 'abc'\nline4\nline5 \"hello world\"\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
+        "pr": {
+          "baseRefName": "79402548-a996-4c2a-a338-86633040358e",
+          "commits": [
+            {
+              "authoredDate": "2023-10-22T23:13:35Z",
+              "authors": [
+                {
+                  "email": "noah@iamnoah.com",
+                  "id": "MDQ6VXNlcjI5MDA4NA==",
+                  "login": "magus",
+                  "name": "magus"
+                }
+              ],
+              "committedDate": "2023-11-12T03:03:24Z",
+              "messageBody": "line3 'abc'\nline4\nline5 \"hello world\"\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
+              "messageHeadline": "cantaloupe",
+              "oid": "1a50c5fe3cd129547c5c34a54d1611ec06ab213e"
+            }
+          ],
+          "headRefName": "398c0ead-77ad-41a4-af6e-280f99998c28",
+          "number": 29,
+          "state": "OPEN",
+          "title": "cantaloupe line2 line3 'abc' line4 line5 \"hello world\" Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+          "url": "https://github.com/magus/git-multi-diff-playground/pull/29"
+        },
+        "branch_id": "398c0ead-77ad-41a4-af6e-280f99998c28"
       }
     ],
     "UNASSIGNED": "unassigned"
@@ -535,10 +682,25 @@ export const METADATA = {
               "name": "magus"
             }
           ],
-          "committedDate": "2023-10-28T19:16:37Z",
+          "committedDate": "2023-11-12T02:06:18Z",
           "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
           "messageHeadline": "strawberry",
-          "oid": "a339f9cc4d8c10b691fef2c2425bf4a67c8c70f0"
+          "oid": "506c9f7894443ac75f578a5b7d8503cb8f40cec2"
+        },
+        {
+          "authoredDate": "2023-10-30T07:39:35Z",
+          "authors": [
+            {
+              "email": "noah@iamnoah.com",
+              "id": "MDQ6VXNlcjI5MDA4NA==",
+              "login": "magus",
+              "name": "magus"
+            }
+          ],
+          "committedDate": "2023-11-12T02:06:18Z",
+          "messageBody": "git-multi-diff-id: 53d15f9a-2451-492c-a831-642d41ad3ef4",
+          "messageHeadline": "pineapple",
+          "oid": "867fb2546ff3def993051c059b557c2a1ff4001c"
         }
       ],
       "headRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
@@ -547,8 +709,33 @@ export const METADATA = {
       "title": "strawberry",
       "url": "https://github.com/magus/git-multi-diff-playground/pull/30"
     },
-    "398c0ead-77ad-41a4-af6e-280f99998c28": {
+    "79402548-a996-4c2a-a338-86633040358e": {
       "baseRefName": "53d15f9a-2451-492c-a831-642d41ad3ef4",
+      "commits": [
+        {
+          "authoredDate": "2023-10-29T21:58:16Z",
+          "authors": [
+            {
+              "email": "noah@iamnoah.com",
+              "id": "MDQ6VXNlcjI5MDA4NA==",
+              "login": "magus",
+              "name": "magus"
+            }
+          ],
+          "committedDate": "2023-11-12T02:06:22Z",
+          "messageBody": "git-multi-diff-id: 79402548-a996-4c2a-a338-86633040358e",
+          "messageHeadline": "orange color",
+          "oid": "0481003259c43c07a07eef99895251730a3e4767"
+        }
+      ],
+      "headRefName": "79402548-a996-4c2a-a338-86633040358e",
+      "number": 32,
+      "state": "OPEN",
+      "title": "orange color",
+      "url": "https://github.com/magus/git-multi-diff-playground/pull/32"
+    },
+    "398c0ead-77ad-41a4-af6e-280f99998c28": {
+      "baseRefName": "79402548-a996-4c2a-a338-86633040358e",
       "commits": [
         {
           "authoredDate": "2023-10-22T23:13:35Z",
@@ -560,10 +747,10 @@ export const METADATA = {
               "name": "magus"
             }
           ],
-          "committedDate": "2023-10-28T19:16:40Z",
-          "messageBody": "line2 changed\nline3 'abc'\nline4\nline5 \"hello world\"\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
+          "committedDate": "2023-11-12T03:03:24Z",
+          "messageBody": "line3 'abc'\nline4\nline5 \"hello world\"\n\ngit-multi-diff-id: 398c0ead-77ad-41a4-af6e-280f99998c28",
           "messageHeadline": "cantaloupe",
-          "oid": "86d0b3cf5dcbd94963f2839818734c3b0e13d2fc"
+          "oid": "1a50c5fe3cd129547c5c34a54d1611ec06ab213e"
         }
       ],
       "headRefName": "398c0ead-77ad-41a4-af6e-280f99998c28",
