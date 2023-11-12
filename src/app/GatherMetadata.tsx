@@ -18,16 +18,20 @@ export function GatherMetadata(props: Props) {
   const argv = Store.useState((state) => state.argv);
   invariant(argv, "argv must exist");
 
+  const fallback = (
+    <Ink.Text color="yellow">Fetching PR status from Github...</Ink.Text>
+  );
+
   if (argv["mock-metadata"]) {
     return (
-      <Await fallback={null} function={mock_metadata}>
+      <Await fallback={fallback} function={mock_metadata}>
         {props.children}
       </Await>
     );
   }
 
   return (
-    <Await fallback={null} function={gather_metadata}>
+    <Await fallback={fallback} function={gather_metadata}>
       {props.children}
     </Await>
   );
