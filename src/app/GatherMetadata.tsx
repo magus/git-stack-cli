@@ -65,14 +65,24 @@ async function gather_metadata() {
 
   const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
 
-  const commit_range = await CommitMetadata.range();
+  try {
+    const commit_range = await CommitMetadata.range();
 
-  Store.setState((state) => {
-    state.head = head;
-    state.merge_base = merge_base;
-    state.branch_name = branch_name;
-    state.commit_range = commit_range;
+    Store.setState((state) => {
+      state.head = head;
+      state.merge_base = merge_base;
+      state.branch_name = branch_name;
+      state.commit_range = commit_range;
 
-    state.step = "status";
-  });
+      state.step = "status";
+    });
+  } catch (err) {
+    actions.output(
+      <Ink.Text color="#ef4444">Error gathering metadata.</Ink.Text>
+    );
+
+    if (err instanceof Error) {
+      actions.debug(<Ink.Text color="#ef4444">{err.message}</Ink.Text>);
+    }
+  }
 }
