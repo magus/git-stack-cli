@@ -80,6 +80,10 @@ async function gather_metadata() {
   });
 
   try {
+    // gather all open prs in repo first
+    // cheaper query to populate cache
+    await github.pr_list();
+
     const commit_range = await CommitMetadata.range();
 
     Store.setState((state) => {
