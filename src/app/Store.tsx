@@ -44,6 +44,7 @@ export type State = {
     unmount(): void;
     newline(): void;
     output(node: React.ReactNode): void;
+    debug(node: React.ReactNode): void;
 
     reset_pr(): void;
 
@@ -96,6 +97,14 @@ const BaseStore = createStore<State>()(
       output(node: React.ReactNode) {
         set((state) => {
           state.mutate.output(state, node);
+        });
+      },
+
+      debug(node: React.ReactNode) {
+        set((state) => {
+          if (state.argv?.debug) {
+            state.mutate.output(state, node);
+          }
         });
       },
 

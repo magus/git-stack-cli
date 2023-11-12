@@ -25,7 +25,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
   const cache = state.pr[branch];
 
   if (cache) {
-    actions.output(
+    actions.debug(
       <Ink.Text>
         <Ink.Text dimColor>Github pr_status cache</Ink.Text>
         <Ink.Text> </Ink.Text>
@@ -40,7 +40,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
     return cache;
   }
 
-  actions.output(
+  actions.debug(
     <Ink.Text>
       <Ink.Text dimColor>Github pr_status cache</Ink.Text>
       <Ink.Text> </Ink.Text>

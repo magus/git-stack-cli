@@ -25,12 +25,10 @@ export function ManualRebase() {
 async function run() {
   const state = Store.getState();
   const actions = state.actions;
-  const argv = state.argv;
   const branch_name = state.branch_name;
   const merge_base = state.merge_base;
   const commit_map = state.commit_map;
 
-  invariant(argv, "argv must exist");
   invariant(branch_name, "branch_name must exist");
   invariant(merge_base, "merge_base must exist");
   invariant(commit_map, "commit_map must exist");
@@ -126,10 +124,8 @@ async function run() {
   } catch (err) {
     actions.output(<Ink.Text color="#ef4444">Error during rebase.</Ink.Text>);
 
-    if (argv.debug) {
-      if (err instanceof Error) {
-        actions.output(<Ink.Text color="#ef4444">{err.message}</Ink.Text>);
-      }
+    if (err instanceof Error) {
+      actions.debug(<Ink.Text color="#ef4444">{err.message}</Ink.Text>);
     }
 
     handle_exit();
