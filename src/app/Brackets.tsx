@@ -8,7 +8,7 @@ type Props = {
 
 export function Brackets(props: Props) {
   const color = "#f97316";
-  const text_color = "#06b6d4";
+  const text_color = "#38bdf8";
 
   return (
     <Ink.Text color={text_color}>

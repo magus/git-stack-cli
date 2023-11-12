@@ -7,7 +7,7 @@ type Props = {
 };
 
 export function Parens(props: Props) {
-  const color = "#06b6d4";
+  const color = "#38bdf8";
 
   return (
     <Ink.Text>
