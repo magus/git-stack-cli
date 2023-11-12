@@ -40,12 +40,14 @@ export async function cli(
       if (!options.ignoreExitCode && code !== 0) {
         reject(new Error(`[${command}] (${code})`));
       } else {
-        resolve({
+        const result = {
           code: code || 0,
           stdout: stdout.trimEnd(),
           stderr: stderr.trimEnd(),
           output: output.trimEnd(),
-        });
+        };
+
+        resolve(result);
       }
     });
 
@@ -54,3 +56,19 @@ export async function cli(
     });
   });
 }
+
+cli.sync = function cli_sync(
+  command: string,
+  unsafe_options?: Options
+): Return {
+  const options = Object.assign({}, unsafe_options);
+
+  const spawn_return = child.spawnSync("sh", ["-c", command], options);
+
+  const stdout = String(spawn_return.stdout);
+  const stderr = String(spawn_return.stderr);
+  const output = String(spawn_return.output);
+  const code = spawn_return.status || 0;
+
+  return { code, stdout, stderr, output };
+};
