@@ -78,7 +78,8 @@ git multi-diff
 
 ## names
 
-- git-prs
+- stack
+- prs
 - batch
 - cake
 - pancake
