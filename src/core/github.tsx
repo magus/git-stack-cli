@@ -2,6 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { Brackets } from "../app/Brackets.js";
 import { Store } from "../app/Store.js";
 
 import { cli } from "./cli.js";
@@ -31,6 +32,19 @@ export async function pr_list(): Promise<Array<PullRequest>> {
   }
 
   const result_pr_list: Array<PullRequest> = JSON.parse(cli_result.stdout);
+
+  actions.debug(
+    <Ink.Text dimColor>
+      <Ink.Text>{"Github cache "}</Ink.Text>
+      <Ink.Text bold color="yellow">
+        {result_pr_list.length}
+      </Ink.Text>
+      <Ink.Text>{" open PRs from "}</Ink.Text>
+      <Brackets>{repo_path}</Brackets>
+      <Ink.Text>{" authored by "}</Ink.Text>
+      <Brackets>{username}</Brackets>
+    </Ink.Text>
+  );
 
   actions.set((state) => {
     for (const pr of result_pr_list) {
