@@ -21,13 +21,15 @@ export function GithubApiError() {
 async function run() {
   const actions = Store.getState().actions;
 
-  const res = await cli(
-    `gh api https://api.github.com/rate_limit | jq ".resources.graphql"`
-  );
+  const res = await cli(`gh api https://api.github.com/rate_limit`);
+
   const res_json = JSON.parse(res.stdout);
 
-  // convert unix timestamp to milliseconds and create a Date object
-  const reset_date = new Date(res_json.reset * 1000);
+  const resources_graphql = res_json.resources.graphql;
+
+  const used = resources_graphql.used;
+  const limit = resources_graphql.limit;
+  const reset_date = new Date(resources_graphql.reset * 1000);
 
   // calculate the time remaining in minutes
   const now = new Date();
@@ -45,9 +47,17 @@ async function run() {
 
   actions.output(
     <Ink.Text dimColor>
-      <Ink.Text>{"Github API for "}</Ink.Text>
+      <Ink.Text>{"Github "}</Ink.Text>
 
       <Brackets>graphql</Brackets>
+
+      <Ink.Text>{" API rate limit "}</Ink.Text>
+
+      <Brackets>
+        <Ink.Text>{used}</Ink.Text>
+        <Ink.Text>/</Ink.Text>
+        <Ink.Text>{limit}</Ink.Text>
+      </Brackets>
 
       <Ink.Text>{" will reset at "}</Ink.Text>
 
