@@ -2,6 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { ManualRebase } from "./ManualRebase.js";
 import { PreSelectCommitRanges } from "./PreSelectCommitRanges.js";
 import { SelectCommitRanges } from "./SelectCommitRanges.js";
 import { Status } from "./Status.js";
@@ -24,6 +25,10 @@ export function Main() {
 
   if (step === "select-commit-ranges") {
     return <SelectCommitRanges />;
+  }
+
+  if (step === "manual-rebase") {
+    return <ManualRebase />;
   }
 
   return <Ink.Text>Main</Ink.Text>;
