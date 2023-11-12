@@ -7,7 +7,10 @@ import { is_command_available } from "../core/is_command_available.js";
 import { match_group } from "../core/match_group.js";
 
 import { Await } from "./Await.js";
+import { Command } from "./Command.js";
+import { Parens } from "./Parens.js";
 import { Store } from "./Store.js";
+import { Url } from "./Url.js";
 
 type Props = {
   children: React.ReactNode;
@@ -19,9 +22,9 @@ export function DependencyCheck(props: Props) {
   return (
     <Await
       fallback={
-        <Ink.Box>
-          <Ink.Text>Checking git install...</Ink.Text>
-        </Ink.Box>
+        <Ink.Text color="yellow">
+          Checking <Command>git</Command> install...
+        </Ink.Text>
       }
       function={async () => {
         if (is_command_available("git")) {
@@ -29,8 +32,8 @@ export function DependencyCheck(props: Props) {
         }
 
         actions.output(
-          <Ink.Text>
-            <Ink.Text color="yellow">git</Ink.Text> must be installed.
+          <Ink.Text color="yellow">
+            <Command>git</Command> must be installed.
           </Ink.Text>
         );
 
@@ -39,9 +42,11 @@ export function DependencyCheck(props: Props) {
     >
       <Await
         fallback={
-          <Ink.Box>
-            <Ink.Text>Checking gh install...</Ink.Text>
-          </Ink.Box>
+          <Ink.Text color="yellow">
+            <Ink.Text>
+              Checking <Command>gh</Command> install...
+            </Ink.Text>
+          </Ink.Text>
         }
         function={async () => {
           if (is_command_available("gh")) {
@@ -49,20 +54,21 @@ export function DependencyCheck(props: Props) {
           }
 
           actions.output(
-            <Ink.Text>
-              <Ink.Text color="yellow">gh</Ink.Text> must be installed.
+            <Ink.Text color="yellow">
+              <Command>gh</Command> must be installed.
             </Ink.Text>
           );
 
           actions.output(
-            <Ink.Box flexDirection="row" gap={1}>
-              <Ink.Text>Visit</Ink.Text>
-              <Ink.Text color="#38bdf8">https://cli.github.com</Ink.Text>
-              <Ink.Text>to install the github cli</Ink.Text>
-              <Ink.Text>
-                (<Ink.Text color="yellow">gh</Ink.Text>)
-              </Ink.Text>
-            </Ink.Box>
+            <Ink.Text color="yellow">
+              <Ink.Text>{"Visit "}</Ink.Text>
+              <Url>https://cli.github.com</Url>
+              <Ink.Text>{" to install the github cli "}</Ink.Text>
+
+              <Parens>
+                <Command>gh</Command>
+              </Parens>
+            </Ink.Text>
           );
 
           actions.exit(3);
@@ -70,9 +76,11 @@ export function DependencyCheck(props: Props) {
       >
         <Await
           fallback={
-            <Ink.Box>
-              <Ink.Text>Checking gh auth status...</Ink.Text>
-            </Ink.Box>
+            <Ink.Text color="yellow">
+              <Ink.Text>
+                Checking <Command>gh auth status</Command>...
+              </Ink.Text>
+            </Ink.Text>
           }
           function={async () => {
             const auth_output = await cli(`gh auth status`, {
@@ -94,13 +102,11 @@ export function DependencyCheck(props: Props) {
             }
 
             actions.output(
-              <Ink.Box flexDirection="row" gap={1}>
-                <Ink.Text color="yellow">gh</Ink.Text>
-                <Ink.Text>requires login, please run</Ink.Text>
-                <Ink.Text>
-                  <Ink.Text color="yellow">gh auth login</Ink.Text>
-                </Ink.Text>
-              </Ink.Box>
+              <Ink.Text color="yellow">
+                <Command>gh</Command>
+                <Ink.Text>{" requires login, please run "}</Ink.Text>
+                <Command>gh auth login</Command>
+              </Ink.Text>
             );
 
             actions.exit(4);
