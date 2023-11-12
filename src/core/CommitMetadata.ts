@@ -5,7 +5,7 @@ import * as github from "./github.js";
 export type CommitMetadata = Awaited<ReturnType<typeof commit>>;
 export type CommitRange = Awaited<ReturnType<typeof range>>;
 
-type PullRequest = NonNullable<CommitMetadata["pr"]>;
+type PullRequest = NonNullable<Awaited<ReturnType<typeof github.pr_status>>>;
 
 type CommitGroup = {
   id: string;
@@ -35,10 +35,8 @@ export async function range(commit_map?: CommitMap) {
       id = commit_map[commit.sha];
     }
 
-    const pr = commit.pr;
-
-    if (!pr) {
-      // console.debug("INVALID", "MISSING PR", commit.message);
+    if (!id) {
+      // console.debug("INVALID", "MISSING ID", commit.message);
       invalid = true;
     }
 
@@ -61,7 +59,7 @@ export async function range(commit_map?: CommitMap) {
 
     const group = group_map.get(id) || {
       id,
-      pr,
+      pr: null,
       base: null,
       dirty: false,
       commits: [],
@@ -79,6 +77,14 @@ export async function range(commit_map?: CommitMap) {
 
   for (let i = 0; i < group_value_list.length; i++) {
     const group = group_value_list[i];
+
+    if (group.id !== UNASSIGNED) {
+      const pr_result = await github.pr_status(group.id);
+
+      if (pr_result && pr_result.state === "OPEN") {
+        group.pr = pr_result;
+      }
+    }
 
     // console.debug("group", group.pr?.title.substring(0, 40));
     // console.debug("  ", "id", group.id);
@@ -162,21 +168,10 @@ export async function commit(sha: string) {
   const branch_id = await Metadata.read(raw_message);
   const message = display_message(raw_message);
 
-  let pr = null;
-
-  if (branch_id) {
-    const pr_result = await github.pr_status(branch_id);
-
-    if (pr_result && pr_result.state === "OPEN") {
-      pr = pr_result;
-    }
-  }
-
   return {
     sha,
     message,
     raw_message,
-    pr,
     branch_id,
   };
 }
