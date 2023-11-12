@@ -1,8 +1,15 @@
+import * as React from "react";
+
+import * as Ink from "ink";
+
 import { Store } from "../app/Store.js";
 
 import { cli } from "./cli.js";
 
 export async function pr_status(branch: string): Promise<null | PullRequest> {
+  const state = Store.getState();
+  const actions = state.actions;
+
   const result = await cli(
     `gh pr view ${branch} --json number,state,baseRefName,headRefName,commits,title,url`,
     {
@@ -11,17 +18,43 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
   );
 
   if (result.code !== 0) {
-    return null;
+    actions.output(<Ink.Text color="#ef4444">{result.output}</Ink.Text>);
+    actions.exit(6);
   }
 
-  const cache = Store.getState().pr[branch];
+  const cache = state.pr[branch];
+
   if (cache) {
+    actions.output(
+      <Ink.Text>
+        <Ink.Text dimColor>Github pr_status cache</Ink.Text>
+        <Ink.Text> </Ink.Text>
+        <Ink.Text bold color="#22c55e">
+          {"HIT "}
+        </Ink.Text>
+        <Ink.Text> </Ink.Text>
+        <Ink.Text dimColor>{branch}</Ink.Text>
+      </Ink.Text>
+    );
+
     return cache;
   }
 
+  actions.output(
+    <Ink.Text>
+      <Ink.Text dimColor>Github pr_status cache</Ink.Text>
+      <Ink.Text> </Ink.Text>
+      <Ink.Text bold color="#ef4444">
+        MISS
+      </Ink.Text>
+      <Ink.Text> </Ink.Text>
+      <Ink.Text dimColor>{branch}</Ink.Text>
+    </Ink.Text>
+  );
+
   const pr: PullRequest = JSON.parse(result.stdout);
 
-  Store.getState().actions.set((state) => {
+  actions.set((state) => {
     state.pr[pr.headRefName] = pr;
   });
 
