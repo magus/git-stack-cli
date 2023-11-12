@@ -97,6 +97,7 @@ function test() {
   ] as const;
 
   for (const prop of PROP_LIST) {
+    // eslint-disable-next-line no-console
     console.debug(chalk[prop](prop));
   }
 }
