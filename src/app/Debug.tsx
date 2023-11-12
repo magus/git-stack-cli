@@ -31,7 +31,7 @@ export function Debug() {
     function syncStateJson() {
       invariant(state.cwd, "state.cwd must exist");
 
-      if (!argv?.debug) {
+      if (!argv?.["write-state-json"]) {
         return;
       }
 
