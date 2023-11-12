@@ -15,8 +15,8 @@ git multi-diff
 npm run dev
 npm link
 
-git stack
-git multi-diff
+git stack --debug
+git multi-diff --debug
 ```
 
 
