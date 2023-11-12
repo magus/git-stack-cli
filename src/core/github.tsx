@@ -55,17 +55,6 @@ export async function pr_list(): Promise<Array<PullRequest>> {
   return result_pr_list;
 }
 
-function handle_error(output: string): never {
-  const state = Store.getState();
-  const actions = state.actions;
-
-  actions.set((state) => {
-    state.step = "github-api-error";
-  });
-
-  throw new Error(output);
-}
-
 export async function pr_status(branch: string): Promise<null | PullRequest> {
   const state = Store.getState();
   const actions = state.actions;
@@ -106,14 +95,15 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
   );
 
   const cli_result = await cli(
-    `gh pr view ${branch} --repo ${repo_path} --author ${username} ${JSON_FIELDS}`,
+    `gh pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`,
     {
       ignoreExitCode: true,
     }
   );
 
   if (cli_result.code !== 0) {
-    handle_error(cli_result.output);
+    // handle_error(cli_result.output);
+    return null;
   }
 
   const pr: PullRequest = JSON.parse(cli_result.stdout);
@@ -141,6 +131,17 @@ export async function pr_base(branch: string, base: string) {
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
   }
+}
+
+function handle_error(output: string): never {
+  const state = Store.getState();
+  const actions = state.actions;
+
+  actions.set((state) => {
+    state.step = "github-api-error";
+  });
+
+  throw new Error(output);
 }
 
 type Commit = {
