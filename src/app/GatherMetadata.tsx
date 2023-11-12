@@ -4,7 +4,6 @@ import * as Ink from "ink";
 
 import * as CommitMetadata from "../core/CommitMetadata.js";
 import { cli } from "../core/cli.js";
-import * as github from "../core/github.js";
 import { invariant } from "../core/invariant.js";
 import * as json from "../core/json.js";
 import { match_group } from "../core/match_group.js";
@@ -80,10 +79,6 @@ async function gather_metadata() {
   });
 
   try {
-    // gather all open prs in repo first
-    // cheaper query to populate cache
-    await github.pr_list();
-
     const commit_range = await CommitMetadata.range();
 
     Store.setState((state) => {

@@ -18,6 +18,10 @@ type CommitGroup = {
 type CommitMap = { [id: string]: string };
 
 export async function range(commit_map?: CommitMap) {
+  // gather all open prs in repo first
+  // cheaper query to populate cache
+  await github.pr_list();
+
   const commit_list = await get_commit_list();
 
   let invalid = false;
