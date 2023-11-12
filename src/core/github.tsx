@@ -19,7 +19,12 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
 
   if (result.code !== 0) {
     actions.output(<Ink.Text color="#ef4444">{result.output}</Ink.Text>);
-    actions.exit(6);
+
+    actions.set((state) => {
+      state.step = "github-api-error";
+    });
+
+    throw new Error("Unable to fetch PR status");
   }
 
   const cache = state.pr[branch];

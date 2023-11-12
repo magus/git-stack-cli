@@ -27,6 +27,7 @@ export type State = {
   commit_map: null | CommitMap;
 
   step:
+    | "github-api-error"
     | "loading"
     | "status"
     | "pre-select-commit-ranges"

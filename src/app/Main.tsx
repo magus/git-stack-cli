@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { assertNever } from "../core/assertNever.js";
 
+import { GithubApiError } from "./GithubApiError.js";
 import { ManualRebase } from "./ManualRebase.js";
 import { PostRebaseStatus } from "./PostRebaseStatus.js";
 import { PreSelectCommitRanges } from "./PreSelectCommitRanges.js";
@@ -13,6 +14,9 @@ export function Main() {
   const step = Store.useState((state) => state.step);
 
   switch (step) {
+    case "github-api-error":
+      return <GithubApiError />;
+
     case "loading":
       return null;
 
