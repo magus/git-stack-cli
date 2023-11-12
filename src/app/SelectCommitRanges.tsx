@@ -53,7 +53,7 @@ function SelectCommitRangesInternal(props: Props) {
     new Map(),
     (map) => {
       for (const commit of props.commit_range.commit_list) {
-        map.set(commit.sha, commit.metadata.id);
+        map.set(commit.sha, commit.branch_id);
       }
 
       return new Map(map);

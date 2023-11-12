@@ -24,7 +24,7 @@ export async function range(commit_map?: CommitMap) {
   const group_map = new Map<string, CommitGroup>();
 
   for (const commit of commit_list) {
-    let id = commit.metadata.id;
+    let id = commit.branch_id;
 
     // use commit map if provided (via select commit ranges)
     if (commit_map) {
@@ -155,15 +155,13 @@ async function get_commit_list() {
 
 export async function commit(sha: string) {
   const raw_message = (await cli(`git show -s --format=%B ${sha}`)).stdout;
-  const metadata = await Metadata.read(raw_message);
+  const branch_id = await Metadata.read(raw_message);
   const message = display_message(raw_message);
 
   let pr = null;
 
-  if (metadata.id) {
-    const pr_branch = metadata.id;
-
-    const pr_result = await github.pr_status(pr_branch);
+  if (branch_id) {
+    const pr_result = await github.pr_status(branch_id);
 
     if (pr_result && pr_result.state === "OPEN") {
       pr = pr_result;
@@ -175,22 +173,14 @@ export async function commit(sha: string) {
     message,
     raw_message,
     pr,
-    metadata,
+    branch_id,
   };
 }
 
 function display_message(message: string) {
   const line_list = lines(message);
   const first_line = line_list[0];
-
-  let result = first_line;
-
-  // remove metadata
-  result = result.replace(new RegExp(Metadata.id_regex(), "g"), "");
-
-  result = result.trimEnd();
-
-  return result;
+  return Metadata.remove(first_line);
 }
 
 function lines(value: string) {

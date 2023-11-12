@@ -1,52 +1,51 @@
-import { cli } from "../core/cli.js";
 import { invariant } from "../core/invariant.js";
 
-type Metadata = {
-  id: null | string;
-};
+export function write(message: string, branch_id: string) {
+  let result = message;
 
-export async function write(args: { metadata: Metadata; message: string }) {
-  invariant(args.metadata.id, "metadata must have id");
+  // escape double-quote for cli
+  result = result.replace(RE.all_double_quote, '\\"');
 
-  let message = args.message;
-  message = message.replace(RE.all_double_quote, '\\"');
+  // remove any previous metadata lines
+  result = remove(result);
 
-  const line_list = [message, "", TEMPLATE.metadata_id(args.metadata.id)];
+  const line_list = [result, "", TEMPLATE.branch_id(branch_id)];
   const new_message = line_list.join("\n");
 
-  await cli(`git commit --amend -m "${new_message}"`);
+  return new_message;
 }
 
-export async function read(message: string): Promise<Metadata> {
-  const match = message.match(RE.metadata_id);
-
-  const metadata: Metadata = {
-    id: null,
-  };
+export function read(message: string): null | string {
+  const match = message.match(RE.branch_id);
 
   if (!match?.groups) {
-    return metadata;
+    return null;
   }
 
   const id = match.groups["id"];
   invariant(id, "id must exist");
 
-  metadata.id = id;
-
-  return metadata;
+  return id;
 }
 
-export function id_regex() {
-  return RE.metadata_id;
+export function remove(message: string) {
+  let result = message;
+
+  // remove metadata
+  result = result.replace(new RegExp(RE.branch_id, "g"), "");
+
+  result = result.trimEnd();
+
+  return result;
 }
 
 const TEMPLATE = {
-  metadata_id(id: string) {
+  branch_id(id: string) {
     return `git-multi-diff-id: ${id}`;
   },
 };
 
 const RE = {
   all_double_quote: /"/g,
-  metadata_id: new RegExp(TEMPLATE.metadata_id("(?<id>[a-z0-9-]+)")),
+  branch_id: new RegExp(TEMPLATE.branch_id("(?<id>[a-z0-9-]+)")),
 };
