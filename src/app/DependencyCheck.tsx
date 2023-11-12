@@ -6,7 +6,6 @@ import { cli } from "../core/cli.js";
 import { is_command_available } from "../core/is_command_available.js";
 
 import { Await } from "./Await.js";
-import { Exit } from "./Exit.js";
 import { Store } from "./Store.js";
 
 type Props = {
@@ -34,7 +33,7 @@ export function DependencyCheck(props: Props) {
           </Ink.Text>
         );
 
-        actions.output(<Exit clear code={2} />);
+        actions.exit(2);
       }}
     >
       <Await
@@ -65,7 +64,7 @@ export function DependencyCheck(props: Props) {
             </Ink.Box>
           );
 
-          actions.output(<Exit clear code={3} />);
+          actions.exit(3);
         }}
       >
         <Await
@@ -93,7 +92,7 @@ export function DependencyCheck(props: Props) {
               </Ink.Box>
             );
 
-            actions.output(<Exit clear code={4} />);
+            actions.exit(4);
           }}
         >
           {props.children}

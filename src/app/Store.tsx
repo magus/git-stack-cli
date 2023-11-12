@@ -4,6 +4,8 @@ import * as Ink from "ink";
 import { createStore, useStore } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
+import { Exit } from "./Exit.js";
+
 import type { Argv } from "../command.js";
 import type * as CommitMetadata from "../core/CommitMetadata.js";
 import type { PullRequest } from "../core/github.js";
@@ -36,14 +38,19 @@ export type State = {
   pr: { [branch: string]: PullRequest };
 
   actions: {
+    exit(code: number, clear?: boolean): void;
     clear(): void;
-    exit(): void;
+    unmount(): void;
     newline(): void;
     output(node: React.ReactNode): void;
 
     reset_pr(): void;
 
     set(setter: Setter): void;
+  };
+
+  mutate: {
+    output(state: State, node: React.ReactNode): void;
   };
 };
 
@@ -57,7 +64,7 @@ const BaseStore = createStore<State>()(
     merge_base: null,
     branch_name: null,
     commit_range: null,
-    select_commit_ranges: null,
+    commit_map: null,
 
     step: "loading",
     output: [],
@@ -65,23 +72,29 @@ const BaseStore = createStore<State>()(
     pr: {},
 
     actions: {
+      exit(code, clear = true) {
+        set((state) => {
+          state.mutate.output(state, <Exit clear={clear} code={code} />);
+        });
+      },
+
       clear() {
         get().ink?.clear();
       },
 
-      exit() {
+      unmount() {
         get().ink?.unmount();
       },
 
       newline() {
         set((state) => {
-          state.output.push(<Ink.Text>‎</Ink.Text>);
+          state.mutate.output(state, <Ink.Text>‎</Ink.Text>);
         });
       },
 
       output(node: React.ReactNode) {
         set((state) => {
-          state.output.push(node);
+          state.mutate.output(state, node);
         });
       },
 
@@ -95,6 +108,12 @@ const BaseStore = createStore<State>()(
         set((state) => {
           setter(state);
         });
+      },
+    },
+
+    mutate: {
+      output(state, node) {
+        state.output.push(node);
       },
     },
   }))

@@ -8,7 +8,6 @@ import { invariant } from "../core/invariant.js";
 import * as json from "../core/json.js";
 
 import { Await } from "./Await.js";
-import { Exit } from "./Exit.js";
 import { Store } from "./Store.js";
 
 type Props = {
@@ -56,7 +55,7 @@ async function gather_metadata() {
   if (head === merge_base) {
     actions.newline();
     actions.output(<Ink.Text color="gray">No changes detected.</Ink.Text>);
-    actions.output(<Exit clear code={0} />);
+    actions.exit(0);
     return;
   }
 

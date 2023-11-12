@@ -5,7 +5,6 @@ import * as Ink from "ink";
 import { invariant } from "../core/invariant.js";
 
 import { Await } from "./Await.js";
-import { Exit } from "./Exit.js";
 import { StatusTable } from "./StatusTable.js";
 import { Store } from "./Store.js";
 
@@ -40,7 +39,7 @@ async function run(args: Args) {
   }
 
   if (args.argv.check) {
-    actions.output(<Exit clear code={0} />);
+    actions.exit(0);
     return;
   }
 
@@ -56,7 +55,8 @@ async function run(args: Args) {
         <Ink.Text>to force update all pull requests.</Ink.Text>
       </Ink.Text>
     );
-    actions.output(<Exit clear code={0} />);
+
+    actions.exit(0);
   }
 
   Store.setState((state) => {

@@ -11,13 +11,14 @@ export function Exit(props: Props) {
   const actions = Store.useActions();
 
   React.useEffect(() => {
-    process.exitCode = props.code;
-
     if (props.clear) {
       actions.clear();
     }
 
-    actions.exit();
+    actions.unmount();
+
+    process.exitCode = props.code;
+    process.exit();
   }, [props.clear, props.code]);
 
   return null;

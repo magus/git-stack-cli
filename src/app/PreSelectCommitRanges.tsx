@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import { Exit } from "./Exit.js";
 import { Store } from "./Store.js";
 import { YesNoPrompt } from "./YesNoPrompt.js";
 
@@ -15,9 +14,7 @@ export function PreSelectCommitRanges() {
           state.step = "select-commit-ranges";
         });
       }}
-      onNo={() => {
-        actions.output(<Exit clear code={0} />);
-      }}
+      onNo={() => actions.exit(0)}
     />
   );
 }
