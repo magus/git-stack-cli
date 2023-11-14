@@ -1,5 +1,7 @@
 # git-stack-cli
 
+> create stacked diffs (PRs) on Github from a single branch by grouping commits
+
 ## install
 
 ```bash
