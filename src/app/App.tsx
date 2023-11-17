@@ -6,6 +6,7 @@ import { GatherMetadata } from "./GatherMetadata.js";
 import { GithubApiError } from "./GithubApiError.js";
 import { Main } from "./Main.js";
 import { Output } from "./Output.js";
+import { Providers } from "./Providers.js";
 import { Store } from "./Store.js";
 
 export function App() {
@@ -27,7 +28,7 @@ export function App() {
   // );
 
   return (
-    <React.Fragment>
+    <Providers>
       <Debug />
       <Output />
 
@@ -38,6 +39,6 @@ export function App() {
           <Main />
         </GatherMetadata>
       </DependencyCheck>
-    </React.Fragment>
+    </Providers>
   );
 }

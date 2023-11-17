@@ -6,6 +6,7 @@ import { v4 as uuid_v4 } from "uuid";
 import { invariant } from "../core/invariant.js";
 import { wrap_index } from "../core/wrap_index.js";
 
+import { FormatText } from "./FormatText.js";
 import { MultiSelect } from "./MultiSelect.js";
 import { Parens } from "./Parens.js";
 import { Store } from "./Store.js";
@@ -230,26 +231,27 @@ function SelectCommitRangesInternal(props: Props) {
       <Ink.Box height={1} />
 
       {unassigned_count > 0 ? (
-        <Ink.Text color="gray">
-          <Ink.Text color="#3b82f6" bold>
-            {unassigned_count}
-          </Ink.Text>
-          <Ink.Text>{" unassigned commits"}</Ink.Text>
-
-          {!isUnassigned ? null : (
-            <Ink.Text color="gray">
-              <Ink.Text>{", press "}</Ink.Text>
+        <FormatText
+          wrapper={<Ink.Text color="gray" />}
+          message="{count} unassigned commits, press {c} to {create} a new group"
+          values={{
+            count: (
+              <Ink.Text color="#3b82f6" bold>
+                {unassigned_count}
+              </Ink.Text>
+            ),
+            c: (
               <Ink.Text bold color="#22c55e">
                 c
               </Ink.Text>
-              {" to "}
+            ),
+            create: (
               <Ink.Text bold color="#22c55e">
                 <Parens>c</Parens>reate
               </Ink.Text>
-              {" a new group"}
-            </Ink.Text>
-          )}
-        </Ink.Text>
+            ),
+          }}
+        />
       ) : (
         <React.Fragment>
           <Ink.Text>
