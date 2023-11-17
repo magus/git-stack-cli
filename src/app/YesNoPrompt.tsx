@@ -27,6 +27,31 @@ export function YesNoPrompt(props: Props) {
     }
   });
 
+  // prettier-ignore
+  const y = <Ink.Text bold color="#22c55e">Y</Ink.Text>;
+  const n = <Ink.Text color="#ef4444">n</Ink.Text>;
+
+  let choices;
+
+  switch (answer) {
+    case "y":
+      choices = y;
+      break;
+
+    case "n":
+      choices = n;
+      break;
+
+    default:
+      choices = (
+        <React.Fragment>
+          {y}
+          <Ink.Text>/</Ink.Text>
+          {n}
+        </React.Fragment>
+      );
+  }
+
   return (
     <Ink.Box flexDirection="column">
       <Ink.Box>
@@ -35,19 +60,7 @@ export function YesNoPrompt(props: Props) {
         <Ink.Text> </Ink.Text>
 
         <Parens>
-          <Ink.Text color="gray">
-            {answer && answer !== "y" ? null : (
-              <Ink.Text bold color="#22c55e">
-                Y
-              </Ink.Text>
-            )}
-
-            {answer ? null : <Ink.Text>/</Ink.Text>}
-
-            {answer && answer !== "n" ? null : (
-              <Ink.Text color="#ef4444">n</Ink.Text>
-            )}
-          </Ink.Text>
+          <Ink.Text color="gray">{choices}</Ink.Text>
         </Parens>
       </Ink.Box>
     </Ink.Box>
