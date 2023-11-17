@@ -40,6 +40,11 @@ export function StatusTable() {
       }
 
       if (group.pr) {
+        if (group.pr.state === "MERGED") {
+          row.icon = "↗";
+          row.status = "MERGED";
+        }
+
         row.title = group.pr.title;
         row.count = `${group.pr.commits.length}/${group.commits.length}`;
         row.url = group.pr.url;

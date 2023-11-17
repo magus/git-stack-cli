@@ -81,7 +81,7 @@ export async function range(commit_map?: CommitMap) {
     if (group.id !== UNASSIGNED) {
       const pr_result = await github.pr_status(group.id);
 
-      if (pr_result && pr_result.state === "OPEN") {
+      if (pr_result && pr_result.state !== "CLOSED") {
         group.pr = pr_result;
       }
     }

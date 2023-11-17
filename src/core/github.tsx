@@ -162,7 +162,7 @@ type Commit = {
 
 export type PullRequest = {
   number: number;
-  state: "OPEN" | "CLOSED";
+  state: "OPEN" | "MERGED" | "CLOSED";
   baseRefName: string;
   headRefName: string;
   commits: Array<Commit>;
