@@ -100,7 +100,9 @@ function SelectCommitRangesInternal(props: Props) {
   Ink.useInput((input, key) => {
     const inputLower = input.toLowerCase();
 
-    if (unassigned_count === 0 && (inputLower === "r" || inputLower === "s")) {
+    const hasUnassignedCommits = unassigned_count > 0;
+
+    if (!hasUnassignedCommits && (inputLower === "r" || inputLower === "s")) {
       actions.set((state) => {
         state.commit_map = {};
         for (const [sha, id] of commit_map.entries()) {
@@ -122,7 +124,7 @@ function SelectCommitRangesInternal(props: Props) {
     }
 
     // only allow create when on unassigned group
-    if (isUnassigned && inputLower === "c") {
+    if (hasUnassignedCommits && inputLower === "c") {
       const id = uuid_v4();
 
       actions.output(
