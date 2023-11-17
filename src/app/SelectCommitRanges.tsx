@@ -189,14 +189,14 @@ function SelectCommitRangesInternal(props: Props) {
 
   items.reverse();
 
-  // console.debug({ group, isUnassigned });
+  // console.debug({ current_index, group, isUnassigned });
 
   return (
     <Ink.Box flexDirection="column">
       <Ink.Box height={1} />
 
       <MultiSelect
-        key={current_index}
+        key={group.id}
         items={items}
         onSelect={(args) => {
           // console.debug("onSelect", args);
