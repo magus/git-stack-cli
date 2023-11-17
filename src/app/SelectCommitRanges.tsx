@@ -83,10 +83,10 @@ function SelectCommitRangesInternal(props: Props) {
   group_list.push(...new_group_list);
 
   for (const group of props.commit_range.group_list) {
-    if (group.pr) {
+    if (group.id !== props.commit_range.UNASSIGNED) {
       group_list.push({
         id: group.id,
-        title: group.pr.title,
+        title: group.pr?.title || group.id,
       });
     }
   }
