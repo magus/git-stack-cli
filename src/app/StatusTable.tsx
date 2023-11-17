@@ -21,6 +21,7 @@ export function StatusTable() {
       status: "",
       title: "",
       url: "",
+      id: group.id,
     };
 
     if (group.id === commit_range.UNASSIGNED) {
@@ -106,7 +107,7 @@ export function StatusTable() {
       {row_list.map((row) => {
         return (
           <Ink.Box
-            key={row.url}
+            key={row.id}
             // borderStyle="round"
             flexDirection="row"
             columnGap={columnGap}
