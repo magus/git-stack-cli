@@ -1,8 +1,6 @@
 import crypto from "node:crypto";
 
-// console.log(id());
-
-export function id() {
+export function short_id() {
   const timestamp = Date.now();
 
   // 9 223 372 036 854 775 808

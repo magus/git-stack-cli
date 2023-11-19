@@ -30,7 +30,6 @@
     "ink": "^4.4.1",
     "react": "^18.2.0",
     "react-intl": "^6.5.5",
-    "uuid": "^9.0.1",
     "yargs": "^17.7.2",
     "zustand": "^4.4.4"
   },
@@ -38,7 +37,6 @@
     "@types/chalk": "^2.2.0",
     "@types/node": "^20.8.7",
     "@types/react": "^18.2.33",
-    "@types/uuid": "^9.0.6",
     "@types/yargs": "^17.0.29",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.9.0",

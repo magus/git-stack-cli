@@ -19,8 +19,6 @@
   - instead, drop the commits tagged for the PR entirely before rebasing, start from the first not merged PR in the stack for the rebase
 
 
-- `id.js` create shorter unique identifiers instead of uuid (too long!)
-
 - `--debug` show output from git push command
 
 - add `-—no-verify` flag to pass into git push to skip pre-commit (sync step is slow on work laptop because of this I suspect)

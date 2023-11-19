@@ -1,9 +1,9 @@
 import * as React from "react";
 
 import * as Ink from "ink";
-import { v4 as uuid_v4 } from "uuid";
 
 import { invariant } from "../core/invariant.js";
+import { short_id } from "../core/short_id.js";
 import { wrap_index } from "../core/wrap_index.js";
 
 import { FormatText } from "./FormatText.js";
@@ -126,7 +126,7 @@ function SelectCommitRangesInternal(props: Props) {
 
     // only allow create when on unassigned group
     if (hasUnassignedCommits && inputLower === "c") {
-      const id = uuid_v4();
+      const id = short_id();
 
       actions.output(
         <Ink.Box>

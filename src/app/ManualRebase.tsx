@@ -1,13 +1,13 @@
 import * as React from "react";
 
 import * as Ink from "ink";
-import { v4 as uuid_v4 } from "uuid";
 
 import * as CommitMetadata from "../core/CommitMetadata.js";
 import * as Metadata from "../core/Metadata.js";
 import { cli } from "../core/cli.js";
 import * as github from "../core/github.js";
 import { invariant } from "../core/invariant.js";
+import { short_id } from "../core/short_id.js";
 
 import { Await } from "./Await.js";
 import { Brackets } from "./Brackets.js";
@@ -40,7 +40,7 @@ async function run(props: Props) {
   // always listen for SIGINT event and restore git state
   process.once("SIGINT", handle_exit);
 
-  const temp_branch_name = `${branch_name}_${uuid_v4()}`;
+  const temp_branch_name = `${branch_name}_${short_id()}`;
 
   let commit_range: Awaited<ReturnType<typeof CommitMetadata.range>>;
 
