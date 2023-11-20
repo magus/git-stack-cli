@@ -42,9 +42,7 @@ async function run(props: Props) {
 
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
-  let commit_range: Awaited<ReturnType<typeof CommitMetadata.range>>;
-
-  commit_range = await CommitMetadata.range(commit_map);
+  const commit_range = await CommitMetadata.range(commit_map);
 
   // reverse commit list so that we can cherry-pick in order
   commit_range.group_list.reverse();
