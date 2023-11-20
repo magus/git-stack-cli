@@ -96,7 +96,7 @@ const BaseStore = createStore<State>()(
 
       newline() {
         set((state) => {
-          state.mutate.output(state, <Ink.Text>‎</Ink.Text>);
+          state.mutate.output(state, "‎");
         });
       },
 
@@ -129,6 +129,14 @@ const BaseStore = createStore<State>()(
 
     mutate: {
       output(state, node) {
+        switch (typeof node) {
+          case "boolean":
+          case "number":
+          case "string":
+            state.output.push(<Ink.Text>{String(node)}</Ink.Text>);
+            return;
+        }
+
         state.output.push(node);
       },
     },
