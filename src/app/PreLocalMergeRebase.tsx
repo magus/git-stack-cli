@@ -5,7 +5,7 @@ import { invariant } from "../core/invariant.js";
 import { Store } from "./Store.js";
 import { YesNoPrompt } from "./YesNoPrompt.js";
 
-export function PreSelectCommitRanges() {
+export function PreLocalMergeRebase() {
   const actions = Store.useActions();
   const argv = Store.useState((state) => state.argv);
   invariant(argv, "argv must exist");
@@ -13,17 +13,17 @@ export function PreSelectCommitRanges() {
   React.useEffect(() => {
     if (argv.force) {
       Store.setState((state) => {
-        state.step = "select-commit-ranges";
+        state.step = "local-merge-rebase";
       });
     }
   }, [argv]);
 
   return (
     <YesNoPrompt
-      message="Some commits are new or outdated, would you like to select new commit ranges?"
+      message="Merged PRs detected, would you like to rebase to update your local branch?"
       onYes={() => {
         actions.set((state) => {
-          state.step = "select-commit-ranges";
+          state.step = "local-merge-rebase";
         });
       }}
       onNo={() => actions.exit(0)}

@@ -32,6 +32,8 @@ export type State = {
     | "github-api-error"
     | "loading"
     | "status"
+    | "pre-local-merge-rebase"
+    | "local-merge-rebase"
     | "pre-select-commit-ranges"
     | "select-commit-ranges"
     | "manual-rebase"

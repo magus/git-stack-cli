@@ -3,8 +3,10 @@ import * as React from "react";
 import { assertNever } from "../core/assertNever.js";
 
 import { GithubApiError } from "./GithubApiError.js";
+import { LocalMergeRebase } from "./LocalMergeRebase.js";
 import { ManualRebase } from "./ManualRebase.js";
 import { PostRebaseStatus } from "./PostRebaseStatus.js";
+import { PreLocalMergeRebase } from "./PreLocalMergeRebase.js";
 import { PreSelectCommitRanges } from "./PreSelectCommitRanges.js";
 import { SelectCommitRanges } from "./SelectCommitRanges.js";
 import { Status } from "./Status.js";
@@ -22,6 +24,12 @@ export function Main() {
 
     case "status":
       return <Status />;
+
+    case "local-merge-rebase":
+      return <LocalMergeRebase />;
+
+    case "pre-local-merge-rebase":
+      return <PreLocalMergeRebase />;
 
     case "pre-select-commit-ranges":
       return <PreSelectCommitRanges />;

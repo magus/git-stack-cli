@@ -29,6 +29,7 @@ async function run(args: Args) {
 
   actions.output(<StatusTable />);
 
+  let needs_rebase = false;
   let needs_update = false;
 
   for (const group of commit_range.group_list) {
@@ -38,15 +39,26 @@ async function run(args: Args) {
     }
   }
 
+  for (const group of commit_range.group_list) {
+    if (group.pr?.state === "MERGED") {
+      needs_rebase = true;
+      break;
+    }
+  }
+
   if (args.argv.check) {
     actions.exit(0);
-  } else if (args.argv.force) {
+  } else if (needs_rebase) {
     Store.setState((state) => {
-      state.step = "select-commit-ranges";
+      state.step = "pre-local-merge-rebase";
     });
   } else if (needs_update) {
     Store.setState((state) => {
       state.step = "pre-select-commit-ranges";
+    });
+  } else if (args.argv.force) {
+    Store.setState((state) => {
+      state.step = "select-commit-ranges";
     });
   } else {
     actions.output(<Ink.Text>✅ Everything up to date.</Ink.Text>);
