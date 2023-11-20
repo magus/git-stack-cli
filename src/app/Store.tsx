@@ -47,6 +47,7 @@ export type State = {
     clear(): void;
     unmount(): void;
     newline(): void;
+    json(value: object): void;
     output(node: React.ReactNode): void;
     debug(node: React.ReactNode): void;
 
@@ -75,6 +76,7 @@ const BaseStore = createStore<State>()(
     commit_map: null,
 
     step: "loading",
+
     output: [],
 
     pr: {},
@@ -97,6 +99,12 @@ const BaseStore = createStore<State>()(
       newline() {
         set((state) => {
           state.mutate.output(state, "‎");
+        });
+      },
+
+      json(value) {
+        set((state) => {
+          state.mutate.output(state, JSON.stringify(value, null, 2));
         });
       },
 
