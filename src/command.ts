@@ -61,11 +61,6 @@ function DebugMode() {
         description: "Enable debug mode with more options for debugging",
       })
 
-      .option("verbose", {
-        type: "boolean",
-        description: "Log extra information during execution",
-      })
-
       .option("write-state-json", {
         type: "boolean",
         description: "Write state to local json file for debugging",

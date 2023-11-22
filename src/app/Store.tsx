@@ -54,7 +54,6 @@ export type State = {
     output(node: React.ReactNode): void;
 
     debug(): boolean;
-    verbose(): boolean;
 
     reset_pr(): void;
 
@@ -67,7 +66,6 @@ export type State = {
 
   select: {
     debug(state: State): boolean;
-    verbose(state: State): boolean;
   };
 };
 
@@ -138,11 +136,6 @@ const BaseStore = createStore<State>()(
         return state.select.debug(state);
       },
 
-      verbose() {
-        const state = get();
-        return state.select.verbose(state);
-      },
-
       reset_pr() {
         set((state) => {
           state.pr = {};
@@ -173,10 +166,6 @@ const BaseStore = createStore<State>()(
     select: {
       debug(state) {
         return state.argv?.debug || false;
-      },
-
-      verbose(state) {
-        return state.argv?.verbose || false;
       },
     },
   }))
