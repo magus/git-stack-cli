@@ -1,27 +1,13 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-export type Argv = Awaited<ReturnType<typeof DebugMode>>;
+export type Argv = Awaited<ReturnType<typeof command>>;
 
 export async function command() {
-  const debug_argv = await yargs(hideBin(process.argv))
-    .option("debug", {
-      type: "boolean",
-      description: "Enable debug mode with more options for debugging",
-    })
-
-    .help(false).argv;
-
-  if (!debug_argv.debug) {
-    return NormalMode() as Argv;
-  }
-
-  return DebugMode();
-}
-
-function NormalMode() {
+  // https://yargs.js.org/docs/#api-reference-optionkey-opt
   return (
     yargs(hideBin(process.argv))
+      .usage("Usage: git stack [options]")
       .option("force", {
         type: "boolean",
         description: "Force sync even if no changes are detected",
@@ -34,44 +20,29 @@ function NormalMode() {
 
       .option("debug", {
         type: "boolean",
-        description: "Enable debug mode with more options for debugging",
-      })
-
-      // disallow unknown options
-      .strict()
-      .help().argv
-  );
-}
-
-function DebugMode() {
-  return (
-    yargs(hideBin(process.argv))
-      .option("force", {
-        type: "boolean",
-        description: "Force sync even if no changes are detected",
-      })
-
-      .option("check", {
-        type: "boolean",
-        description: "Print status table without syncing",
-      })
-
-      .option("debug", {
-        type: "boolean",
-        description: "Enable debug mode with more options for debugging",
+        alias: ["verbose", "v", "d"],
+        description:
+          "Enable debug mode with more detailed output for debugging",
       })
 
       .option("write-state-json", {
+        hidden: true,
         type: "boolean",
         description: "Write state to local json file for debugging",
       })
 
       .option("mock-metadata", {
+        hidden: true,
         type: "boolean",
         description: "Mock local store metadata for testing",
       })
+
+      // do not wrap to 80 columns (yargs default)
+      // .wrap(yargs().terminalWidth()) will fill terminal (maximuize)
+      .wrap(null)
       // disallow unknown options
       .strict()
+      .version()
       .help().argv
   );
 }
