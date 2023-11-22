@@ -50,8 +50,11 @@ export type State = {
     unmount(): void;
     newline(): void;
     json(value: object): void;
+    error(message: string): void;
     output(node: React.ReactNode): void;
-    debug(node: React.ReactNode): void;
+
+    debug(): boolean;
+    verbose(): boolean;
 
     reset_pr(): void;
 
@@ -60,6 +63,11 @@ export type State = {
 
   mutate: {
     output(state: State, node: React.ReactNode): void;
+  };
+
+  select: {
+    debug(state: State): boolean;
+    verbose(state: State): boolean;
   };
 };
 
@@ -110,18 +118,29 @@ const BaseStore = createStore<State>()(
         });
       },
 
+      error(message) {
+        set((state) => {
+          state.mutate.output(
+            state,
+            <Ink.Text color="#ef4444">{message}</Ink.Text>
+          );
+        });
+      },
+
       output(node: React.ReactNode) {
         set((state) => {
           state.mutate.output(state, node);
         });
       },
 
-      debug(node: React.ReactNode) {
-        set((state) => {
-          if (state.argv?.debug) {
-            state.mutate.output(state, node);
-          }
-        });
+      debug() {
+        const state = get();
+        return state.select.debug(state);
+      },
+
+      verbose() {
+        const state = get();
+        return state.select.verbose(state);
       },
 
       reset_pr() {
@@ -148,6 +167,16 @@ const BaseStore = createStore<State>()(
         }
 
         state.output.push(node);
+      },
+    },
+
+    select: {
+      debug(state) {
+        return state.argv?.debug || false;
+      },
+
+      verbose(state) {
+        return state.argv?.verbose || false;
       },
     },
   }))

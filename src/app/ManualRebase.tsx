@@ -126,10 +126,12 @@ async function run(props: Props) {
       state.step = "post-rebase-status";
     });
   } catch (err) {
-    actions.output(<Ink.Text color="#ef4444">Error during rebase.</Ink.Text>);
+    actions.error("Unable to rebase.");
 
     if (err instanceof Error) {
-      actions.debug(<Ink.Text color="#ef4444">{err.message}</Ink.Text>);
+      if (actions.debug()) {
+        actions.error(err.message);
+      }
     }
 
     handle_exit();

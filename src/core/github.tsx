@@ -33,18 +33,20 @@ export async function pr_list(): Promise<Array<PullRequest>> {
 
   const result_pr_list: Array<PullRequest> = JSON.parse(cli_result.stdout);
 
-  actions.debug(
-    <Ink.Text dimColor>
-      <Ink.Text>{"Github cache "}</Ink.Text>
-      <Ink.Text bold color="yellow">
-        {result_pr_list.length}
+  if (actions.debug()) {
+    actions.output(
+      <Ink.Text dimColor>
+        <Ink.Text>{"Github cache "}</Ink.Text>
+        <Ink.Text bold color="yellow">
+          {result_pr_list.length}
+        </Ink.Text>
+        <Ink.Text>{" open PRs from "}</Ink.Text>
+        <Brackets>{repo_path}</Brackets>
+        <Ink.Text>{" authored by "}</Ink.Text>
+        <Brackets>{username}</Brackets>
       </Ink.Text>
-      <Ink.Text>{" open PRs from "}</Ink.Text>
-      <Brackets>{repo_path}</Brackets>
-      <Ink.Text>{" authored by "}</Ink.Text>
-      <Brackets>{username}</Brackets>
-    </Ink.Text>
-  );
+    );
+  }
 
   actions.set((state) => {
     for (const pr of result_pr_list) {
@@ -67,32 +69,36 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
   const cache = state.pr[branch];
 
   if (cache) {
-    actions.debug(
+    if (actions.debug()) {
+      actions.output(
+        <Ink.Text>
+          <Ink.Text dimColor>Github pr_status cache</Ink.Text>
+          <Ink.Text> </Ink.Text>
+          <Ink.Text bold color="#22c55e">
+            {"HIT "}
+          </Ink.Text>
+          <Ink.Text> </Ink.Text>
+          <Ink.Text dimColor>{branch}</Ink.Text>
+        </Ink.Text>
+      );
+    }
+
+    return cache;
+  }
+
+  if (actions.debug()) {
+    actions.output(
       <Ink.Text>
         <Ink.Text dimColor>Github pr_status cache</Ink.Text>
         <Ink.Text> </Ink.Text>
-        <Ink.Text bold color="#22c55e">
-          {"HIT "}
+        <Ink.Text bold color="#ef4444">
+          MISS
         </Ink.Text>
         <Ink.Text> </Ink.Text>
         <Ink.Text dimColor>{branch}</Ink.Text>
       </Ink.Text>
     );
-
-    return cache;
   }
-
-  actions.debug(
-    <Ink.Text>
-      <Ink.Text dimColor>Github pr_status cache</Ink.Text>
-      <Ink.Text> </Ink.Text>
-      <Ink.Text bold color="#ef4444">
-        MISS
-      </Ink.Text>
-      <Ink.Text> </Ink.Text>
-      <Ink.Text dimColor>{branch}</Ink.Text>
-    </Ink.Text>
-  );
 
   const cli_result = await cli(
     `gh pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`,

@@ -14,12 +14,17 @@ export function Debug() {
   const actions = Store.useActions();
   const state = Store.useState((state) => state);
   const argv = Store.useState((state) => state.argv);
+  const debug = Store.useState((state) => state.select.debug(state));
+  const verbose = Store.useState((state) => state.select.verbose(state));
 
   React.useEffect(
     function debugMessageOnce() {
-      actions.debug(<Ink.Text color="yellow">Debug mode enabled</Ink.Text>);
-      if (argv?.verbose) {
-        actions.debug(
+      if (debug) {
+        actions.output(<Ink.Text color="yellow">Debug mode enabled</Ink.Text>);
+      }
+
+      if (verbose) {
+        actions.output(
           <Ink.Text dimColor>{JSON.stringify(argv, null, 2)}</Ink.Text>
         );
       }
