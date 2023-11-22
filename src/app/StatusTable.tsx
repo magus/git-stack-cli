@@ -81,29 +81,28 @@ export function StatusTable() {
   const { stdout } = Ink.useStdout();
   const available_width = stdout.columns;
   const columnGap = 2;
-  const breathing_room = 10;
+  const breathing_room = 0;
 
-  const max_title_width = Math.min(max_col_width.title, MAX_TITLE_LENGTH);
-
-  const remaining_space = clamp(
+  const remaining_space =
     available_width -
-      // icon
-      max_col_width.icon -
-      // status
-      max_col_width.status -
-      // commits
-      max_col_width.count -
-      // url
-      max_col_width.url -
-      // gap * col count
-      columnGap * col_list.length -
-      // remove some extra space
-      breathing_room,
-    0,
-    max_title_width
-  );
+    // icon
+    max_col_width.icon -
+    // status
+    max_col_width.status -
+    // commits
+    max_col_width.count -
+    // url
+    max_col_width.url -
+    // gap * col count (minus one for row.id which is not shown but used at key)
+    columnGap * (col_list.length - 1) -
+    // remove some extra space
+    breathing_room;
 
-  const title_width = remaining_space;
+  // add one for ellipsis character
+  const title_width = Math.min(max_col_width.title, remaining_space + 1);
+
+  // prettier-ignore
+  // console.debug({ available_width, remaining_space, title_width, max_col_width });
 
   return (
     <Ink.Box flexDirection="column" width={available_width}>
@@ -134,6 +133,7 @@ export function StatusTable() {
               <Ink.Text wrap="truncate-end">{row.title}</Ink.Text>
             </Ink.Box>
 
+
             <Ink.Box width={max_col_width.url}>
               <Ink.Text>{row.url}</Ink.Text>
             </Ink.Box>
@@ -145,5 +145,3 @@ export function StatusTable() {
     </Ink.Box>
   );
 }
-
-const MAX_TITLE_LENGTH = 50;
