@@ -33,7 +33,7 @@ export async function pr_list(): Promise<Array<PullRequest>> {
 
   const result_pr_list: Array<PullRequest> = JSON.parse(cli_result.stdout);
 
-  if (actions.debug()) {
+  if (actions.isDebug()) {
     actions.output(
       <Ink.Text dimColor>
         <Ink.Text>{"Github cache "}</Ink.Text>
@@ -69,7 +69,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
   const cache = state.pr[branch];
 
   if (cache) {
-    if (actions.debug()) {
+    if (actions.isDebug()) {
       actions.output(
         <Ink.Text>
           <Ink.Text dimColor>Github pr_status cache</Ink.Text>
@@ -86,7 +86,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
     return cache;
   }
 
-  if (actions.debug()) {
+  if (actions.isDebug()) {
     actions.output(
       <Ink.Text>
         <Ink.Text dimColor>Github pr_status cache</Ink.Text>

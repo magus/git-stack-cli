@@ -135,7 +135,7 @@ async function run(props: Props) {
     actions.error("Unable to rebase.");
 
     if (err instanceof Error) {
-      if (actions.debug()) {
+      if (actions.isDebug()) {
         actions.error(err.message);
       }
     }

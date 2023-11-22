@@ -66,7 +66,7 @@ async function run() {
       const merged_pr = merged_pr_map.get(commit.branch_id || "");
 
       if (merged_pr) {
-        if (actions.debug()) {
+        if (actions.isDebug()) {
           actions.output(
             <FormatText
               wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
@@ -83,7 +83,7 @@ async function run() {
       }
 
       // cherry-pick and amend commits one by one
-      if (actions.debug()) {
+      if (actions.isDebug()) {
         actions.output(
           <FormatText
             wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
@@ -114,7 +114,7 @@ async function run() {
     actions.error("Unable to rebase.");
 
     if (err instanceof Error) {
-      if (actions.debug()) {
+      if (actions.isDebug()) {
         actions.error(err.message);
       }
     }

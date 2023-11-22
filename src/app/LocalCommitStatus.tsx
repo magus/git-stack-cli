@@ -62,7 +62,7 @@ async function gather_metadata() {
     actions.error("Unable to retrieve local commit status.");
 
     if (err instanceof Error) {
-      if (actions.debug()) {
+      if (actions.isDebug()) {
         actions.error(err.message);
       }
     }

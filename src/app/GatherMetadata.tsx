@@ -70,7 +70,7 @@ async function gather_metadata() {
     actions.error("Unable to gather git metadata.");
 
     if (err instanceof Error) {
-      if (actions.debug()) {
+      if (actions.isDebug()) {
         actions.error(err.message);
       }
     }

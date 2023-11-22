@@ -53,7 +53,7 @@ export type State = {
     error(message: string): void;
     output(node: React.ReactNode): void;
 
-    debug(): boolean;
+    isDebug(): boolean;
 
     reset_pr(): void;
 
@@ -131,7 +131,7 @@ const BaseStore = createStore<State>()(
         });
       },
 
-      debug() {
+      isDebug() {
         const state = get();
         return state.select.debug(state);
       },
