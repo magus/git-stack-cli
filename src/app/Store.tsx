@@ -52,6 +52,7 @@ export type State = {
     json(value: object): void;
     error(message: string): void;
     output(node: React.ReactNode): void;
+    debug(node: React.ReactNode): void;
 
     isDebug(): boolean;
 
@@ -125,10 +126,18 @@ const BaseStore = createStore<State>()(
         });
       },
 
-      output(node: React.ReactNode) {
+      output(node) {
         set((state) => {
           state.mutate.output(state, node);
         });
+      },
+
+      debug(node) {
+        if (get().actions.isDebug()) {
+          set((state) => {
+            state.mutate.output(state, <Ink.Text dimColor>{node}</Ink.Text>);
+          });
+        }
       },
 
       isDebug() {

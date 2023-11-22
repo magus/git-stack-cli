@@ -8,10 +8,6 @@
 
 - color + style StatusTable
 
-- `--debug` show output from git push command
-
-- add `-—no-verify` flag to pass into git push to skip pre-commit (sync step is slow on work laptop because of this I suspect)
-
 - capture PR title when creating new group
 
 - ManualRebase

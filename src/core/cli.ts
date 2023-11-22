@@ -53,10 +53,8 @@ export async function cli(
           output: output.trimEnd(),
         };
 
-        if (state.actions.isDebug()) {
-          state.actions.output(`$ ${command}`);
-          state.actions.output(result.output);
-        }
+        state.actions.debug(`$ ${command}`);
+        state.actions.debug(result.output);
 
         resolve(result);
       }
