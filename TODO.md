@@ -8,17 +8,6 @@
 
 - color + style StatusTable
 
-
-- rebase prompt
-  - when MERGED pr group detected, YesNoPrompt to fetch and rebase (equivalent to git sync)
-  - "Merged PRs detected, you must update the [master] branch to properly rebase"
-  - for rebase we can skip groups with merged pr, might be simplest approach?
-  - we should update and do a rebase against latest master though to ensure we are up to date
-  - use the git pr that landed to skip and rebase on top of all the commits
-  - normal rebase against master may cause conflicts if "squash and merge" was used in github ui, because the single commit won't line up with the many commits locally
-  - instead, drop the commits tagged for the PR entirely before rebasing, start from the first not merged PR in the stack for the rebase
-
-
 - `--debug` show output from git push command
 
 - add `-—no-verify` flag to pass into git push to skip pre-commit (sync step is slow on work laptop because of this I suspect)

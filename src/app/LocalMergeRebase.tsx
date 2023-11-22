@@ -3,13 +3,14 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import * as CommitMetadata from "../core/CommitMetadata.js";
-import * as Metadata from "../core/Metadata.js";
 import { cli } from "../core/cli.js";
 import { invariant } from "../core/invariant.js";
 import { short_id } from "../core/short_id.js";
 
 import { Await } from "./Await.js";
 import { Brackets } from "./Brackets.js";
+import { FormatText } from "./FormatText.js";
+import { Parens } from "./Parens.js";
 import { Store } from "./Store.js";
 
 export function LocalMergeRebase() {
@@ -25,71 +26,75 @@ async function run() {
   const state = Store.getState();
   const actions = state.actions;
   const branch_name = state.branch_name;
+  const commit_range = state.commit_range;
 
   invariant(branch_name, "branch_name must exist");
+  invariant(commit_range, "commit_range must exist");
+
+  type PullRequest = NonNullable<
+    (typeof commit_range)["group_list"][number]["pr"]
+  >;
 
   // always listen for SIGINT event and restore git state
   process.once("SIGINT", handle_exit);
 
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
-  const commit_range = await CommitMetadata.range();
+  // drop commits that are in groups of merged PRs
+  const merged_pr_map = new Map<string, PullRequest>();
 
-  // reverse commit list so that we can cherry-pick in order
-  commit_range.group_list.reverse();
-
-  await cli(`git fetch --no-tags -v origin master:master`);
-  const master_sha = (await cli(`git rev-parse master`)).stdout;
-
-  let rebase_merge_base = master_sha;
-  let rebase_group_index = 0;
-
-  // TODO find index of first non-MERGED pr group
+  // walk groups in reverse order commit list so that we can cherry-pick in order
   for (let i = 0; i < commit_range.group_list.length; i++) {
     const group = commit_range.group_list[i];
 
-    if (!group.dirty) {
-      continue;
+    if (group.pr?.state === "MERGED") {
+      merged_pr_map.set(group.id, group.pr);
     }
-
-    if (i > 0) {
-      const last_group = commit_range.group_list[i - 1];
-      const last_commit = last_group.commits[last_group.commits.length - 1];
-      rebase_merge_base = last_commit.sha;
-      rebase_group_index = i;
-    }
-
-    break;
   }
 
-  actions.json({ rebase_merge_base, rebase_group_index });
-  actions.exit(999);
-  throw new Error("STOP");
-
   try {
+    await cli(`git fetch --no-tags -v origin master:master`);
+    const master_sha = (await cli(`git rev-parse master`)).stdout;
+
+    const rebase_merge_base = master_sha;
+
     // create temporary branch based on merge base
     await cli(`git checkout -b ${temp_branch_name} ${rebase_merge_base}`);
 
-    for (let i = rebase_group_index; i < commit_range.group_list.length; i++) {
-      const group = commit_range.group_list[i];
+    for (let i = 0; i < commit_range.commit_list.length; i++) {
+      const commit = commit_range.commit_list[i];
+      const merged_pr = merged_pr_map.get(commit.branch_id || "");
 
-      invariant(group.base, "group.base must exist");
-
-      // cherry-pick and amend commits one by one
-      for (const commit of group.commits) {
-        await cli(`git cherry-pick ${commit.sha}`);
-
-        if (commit.branch_id !== group.id) {
-          const new_message = await Metadata.write(commit.message, group.id);
-          await cli(`git commit --amend -m "${new_message}"`);
+      if (merged_pr) {
+        if (actions.debug()) {
+          actions.output(
+            <FormatText
+              wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
+              message="Dropping {commit_message} {pr_status}"
+              values={{
+                commit_message: <Brackets>{commit.message}</Brackets>,
+                pr_status: <Parens>MERGED</Parens>,
+              }}
+            />
+          );
         }
+
+        continue;
       }
 
-      actions.output(
-        <Ink.Text color="yellow" wrap="truncate-end">
-          Syncing <Brackets>{group.pr?.title || group.id}</Brackets>...
-        </Ink.Text>
-      );
+      // cherry-pick and amend commits one by one
+      if (actions.debug()) {
+        actions.output(
+          <FormatText
+            wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
+            message="Picking {commit_message}"
+            values={{
+              commit_message: <Brackets>{commit.message}</Brackets>,
+            }}
+          />
+        );
+      }
+      await cli(`git cherry-pick ${commit.sha}`);
     }
 
     // after all commits have been cherry-picked and amended
@@ -99,14 +104,19 @@ async function run() {
 
     restore_git();
 
+    const next_commit_range = await CommitMetadata.range();
+
     actions.set((state) => {
-      state.step = "post-rebase-status";
+      state.commit_range = next_commit_range;
+      state.step = "status";
     });
   } catch (err) {
-    actions.output(<Ink.Text color="#ef4444">Error during rebase.</Ink.Text>);
+    actions.error("Unable to rebase.");
 
     if (err instanceof Error) {
-      actions.debug(<Ink.Text color="#ef4444">{err.message}</Ink.Text>);
+      if (actions.debug()) {
+        actions.error(err.message);
+      }
     }
 
     handle_exit();
