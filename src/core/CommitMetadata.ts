@@ -5,11 +5,11 @@ import * as github from "./github.js";
 export type CommitMetadata = Awaited<ReturnType<typeof commit>>;
 export type CommitRange = Awaited<ReturnType<typeof range>>;
 
-type PullRequest = NonNullable<Awaited<ReturnType<typeof github.pr_status>>>;
+type MaybePullRequest = Awaited<ReturnType<typeof github.pr_status>>;
 
 type CommitGroup = {
   id: string;
-  pr: null | PullRequest;
+  pr: MaybePullRequest;
   base: null | string;
   dirty: boolean;
   commits: Array<CommitMetadata>;
@@ -149,6 +149,10 @@ async function get_commit_list() {
   const log_result = await cli(
     `git log master..HEAD --oneline --format=%H --color=never`
   );
+
+  if (!log_result.stdout) {
+    return [];
+  }
 
   const sha_list = lines(log_result.stdout).reverse();
 
