@@ -11,11 +11,13 @@ export async function command() {
 
       .option("force", {
         type: "boolean",
+        alias: ["f"],
         description: "Force sync even if no changes are detected",
       })
 
       .option("check", {
         type: "boolean",
+        alias: ["c"],
         description: "Print status table without syncing",
       })
 
@@ -49,6 +51,6 @@ export async function command() {
       // disallow unknown options
       .strict()
       .version()
-      .help().argv
+      .help("help").argv
   );
 }
