@@ -4,6 +4,7 @@ import { Debug } from "./Debug.js";
 import { DependencyCheck } from "./DependencyCheck.js";
 import { GatherMetadata } from "./GatherMetadata.js";
 import { GithubApiError } from "./GithubApiError.js";
+import { LocalCommitStatus } from "./LocalCommitStatus.js";
 import { Main } from "./Main.js";
 import { Output } from "./Output.js";
 import { Providers } from "./Providers.js";
@@ -36,7 +37,9 @@ export function App() {
 
       <DependencyCheck>
         <GatherMetadata>
-          <Main />
+          <LocalCommitStatus>
+            <Main />
+          </LocalCommitStatus>
         </GatherMetadata>
       </DependencyCheck>
     </Providers>
