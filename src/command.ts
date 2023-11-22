@@ -8,6 +8,7 @@ export async function command() {
   return (
     yargs(hideBin(process.argv))
       .usage("Usage: git stack [options]")
+
       .option("force", {
         type: "boolean",
         description: "Force sync even if no changes are detected",
@@ -16,6 +17,11 @@ export async function command() {
       .option("check", {
         type: "boolean",
         description: "Print status table without syncing",
+      })
+
+      .option("no-verify", {
+        type: "boolean",
+        description: "Disable the pre-push hook, bypassing it completely",
       })
 
       .option("debug", {

@@ -29,10 +29,12 @@ export function ManualRebase(props: Props) {
 async function run(props: Props) {
   const state = Store.getState();
   const actions = state.actions;
+  const argv = state.argv;
   const branch_name = state.branch_name;
   const merge_base = state.merge_base;
   const commit_map = state.commit_map;
 
+  invariant(argv, "argv must exist");
   invariant(branch_name, "branch_name must exist");
   invariant(merge_base, "merge_base must exist");
   invariant(commit_map, "commit_map must exist");
@@ -94,7 +96,11 @@ async function run(props: Props) {
 
       if (!props.skipSync) {
         // push to origin since github requires commit shas to line up perfectly
-        await cli(`git push -f origin HEAD:${group.id}`);
+        const git_push_command = [`git push -f origin HEAD:${group.id}`];
+        if (argv["no-verify"]) {
+          git_push_command.push("--no-verify");
+        }
+        await cli(git_push_command.join(" "));
 
         if (group.pr) {
           // ensure base matches pr in github
