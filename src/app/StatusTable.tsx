@@ -2,7 +2,6 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { clamp } from "../core/clamp.js";
 import { invariant } from "../core/invariant.js";
 
 import { Store } from "./Store.js";
@@ -58,7 +57,11 @@ export function StatusTable() {
   }
 
   if (!row_list.length) {
-    return <Ink.Text dimColor>No data found.</Ink.Text>;
+    return (
+      <Container>
+        <Ink.Text dimColor>No data found.</Ink.Text>
+      </Container>
+    );
   }
 
   // walk data and discover max width for each column
@@ -105,9 +108,8 @@ export function StatusTable() {
   // console.debug({ available_width, remaining_space, title_width, max_col_width });
 
   return (
-    <Ink.Box flexDirection="column" width={available_width}>
-      <Ink.Box height={1} />
 
+    <Container>
       {row_list.map((row) => {
         return (
           <Ink.Box
@@ -141,6 +143,15 @@ export function StatusTable() {
         );
       })}
 
+</Container>
+  );
+}
+
+function Container(props: { children: React.ReactNode }) {
+  return (
+    <Ink.Box flexDirection="column">
+      <Ink.Box height={1} />
+      {props.children}
       <Ink.Box height={1} />
     </Ink.Box>
   );
