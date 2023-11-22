@@ -1,5 +1,7 @@
 import * as child from "node:child_process";
 
+import { Store } from "../app/Store.js";
+
 type SpawnOptions = Parameters<typeof child.spawn>[2];
 
 type Options = SpawnOptions & {
@@ -18,6 +20,8 @@ export async function cli(
   command: string,
   unsafe_options?: Options
 ): Promise<Return> {
+  const state = Store.getState();
+
   const options = Object.assign({}, unsafe_options);
 
   return new Promise((resolve, reject) => {
@@ -48,6 +52,11 @@ export async function cli(
           stderr: stderr.trimEnd(),
           output: output.trimEnd(),
         };
+
+        if (state.actions.debug()) {
+          state.actions.output(`$ ${command}`);
+          state.actions.output(result.output);
+        }
 
         resolve(result);
       }
