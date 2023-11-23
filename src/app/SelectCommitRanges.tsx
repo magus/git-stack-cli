@@ -248,54 +248,73 @@ function SelectCommitRangesInternal(props: Props) {
         />
       ) : (
         <React.Fragment>
-          <Ink.Text>
-            {"🎉 Done! Press "}
-            <Ink.Text bold color="#22c55e">
-              s
-            </Ink.Text>
-            {" to "}
-            <Ink.Text bold color="#22c55e">
-              <Parens>s</Parens>ync
-            </Ink.Text>
-            {" the commits to Github"}
-          </Ink.Text>
+          <FormatText
+            wrapper={<Ink.Text />}
+            message="🎉 Done! Press {s} to {sync} the commits to Github"
+            values={{
+              s: (
+                <Ink.Text bold color="#22c55e">
+                  s
+                </Ink.Text>
+              ),
+              sync: (
+                <Ink.Text bold color="#22c55e">
+                  <Parens>s</Parens>ync
+                </Ink.Text>
+              ),
+            }}
+          />
 
-          <Ink.Text color="gray">
-            <Ink.Text>{"Press "}</Ink.Text>
-            <Ink.Text bold color="#22c55e">
-              r
-            </Ink.Text>
-            {" to locally "}
-            <Ink.Text bold color="#22c55e">
-              <Parens>r</Parens>ebase
-            </Ink.Text>
-            {" only"}
-          </Ink.Text>
+          <FormatText
+            wrapper={<Ink.Text color="gray" />}
+            message="Press {r} to locally {rebase} only"
+            values={{
+              r: (
+                <Ink.Text bold color="#22c55e">
+                  r
+                </Ink.Text>
+              ),
+              rebase: (
+                <Ink.Text bold color="#22c55e">
+                  <Parens>r</Parens>ebase
+                </Ink.Text>
+              ),
+            }}
+          />
         </React.Fragment>
       )}
 
       <Ink.Box>
-        <Ink.Text color="gray">
-          <Ink.Text>{"Press "}</Ink.Text>
-          <Ink.Text bold color="#22c55e">
-            {SYMBOL.left}
-          </Ink.Text>
-          {" and "}
-          <Ink.Text bold color="#22c55e">
-            {SYMBOL.right}
-          </Ink.Text>
-          {" to view PR groups"}
-        </Ink.Text>
+        <FormatText
+          wrapper={<Ink.Text color="gray" />}
+          message="Press {left} and {right} to view PR groups"
+          values={{
+            left: (
+              <Ink.Text bold color="#22c55e">
+                {SYMBOL.left}
+              </Ink.Text>
+            ),
+            right: (
+              <Ink.Text bold color="#22c55e">
+                {SYMBOL.right}
+              </Ink.Text>
+            ),
+          }}
+        />
       </Ink.Box>
 
       <Ink.Box>
-        <Ink.Text color="gray">
-          <Ink.Text>{"Press "}</Ink.Text>
-          <Ink.Text bold color="#22c55e">
-            {SYMBOL.enter}
-          </Ink.Text>
-          {" to toggle commit selection"}
-        </Ink.Text>
+        <FormatText
+          wrapper={<Ink.Text color="gray" />}
+          message="Press {enter} to toggle commit selection"
+          values={{
+            enter: (
+              <Ink.Text bold color="#22c55e">
+                {SYMBOL.enter}
+              </Ink.Text>
+            ),
+          }}
+        />
       </Ink.Box>
     </Ink.Box>
   );
