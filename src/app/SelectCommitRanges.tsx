@@ -73,13 +73,6 @@ function SelectCommitRangesInternal(props: Props) {
     }
   }
 
-  if (unassigned_count) {
-    group_list.push({
-      id: "unassigned",
-      title: "Unassigned",
-    });
-  }
-
   group_list.push(...new_group_list);
 
   for (const group of props.commit_range.group_list) {
