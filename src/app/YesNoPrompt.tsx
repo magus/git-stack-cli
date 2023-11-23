@@ -5,7 +5,7 @@ import * as Ink from "ink";
 import { Parens } from "./Parens.js";
 
 type Props = {
-  message: string;
+  message: React.ReactNode;
   onYes(): void;
   onNo(): void;
 };
@@ -55,7 +55,11 @@ export function YesNoPrompt(props: Props) {
   return (
     <Ink.Box flexDirection="column">
       <Ink.Box>
-        <Ink.Text color="yellow">{props.message}</Ink.Text>
+        {typeof props.message === "object" ? (
+          props.message
+        ) : (
+          <Ink.Text color="yellow">{props.message}</Ink.Text>
+        )}
 
         <Ink.Text> </Ink.Text>
 
