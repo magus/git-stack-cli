@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { AutoUpdate } from "./AutoUpdate.js";
 import { Debug } from "./Debug.js";
 import { DependencyCheck } from "./DependencyCheck.js";
 import { GatherMetadata } from "./GatherMetadata.js";
@@ -11,6 +12,8 @@ import { Providers } from "./Providers.js";
 import { Store } from "./Store.js";
 
 export function App() {
+  const actions = Store.useActions();
+
   const ink = Store.useState((state) => state.ink);
   const argv = Store.useState((state) => state.argv);
 
@@ -36,11 +39,17 @@ export function App() {
       {!argv.debug ? null : <GithubApiError />}
 
       <DependencyCheck>
-        <GatherMetadata>
-          <LocalCommitStatus>
-            <Main />
-          </LocalCommitStatus>
-        </GatherMetadata>
+        <AutoUpdate
+          name="git-stack-cli"
+          verbose={argv.debug}
+          onOutput={actions.output}
+        >
+          <GatherMetadata>
+            <LocalCommitStatus>
+              <Main />
+            </LocalCommitStatus>
+          </GatherMetadata>
+        </AutoUpdate>
       </DependencyCheck>
     </Providers>
   );

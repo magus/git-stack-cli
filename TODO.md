@@ -1,10 +1,5 @@
 # TODO
 
-- auto update
-  - check npm for latest version
-  - compare against local package.json
-  - offer to update YesNoPrompt
-
 
 - color + style StatusTable
 
