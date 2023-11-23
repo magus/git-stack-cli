@@ -37,9 +37,7 @@ async function gather_metadata() {
     // handle when there are no detected changes
     if (branch_name === "master") {
       actions.newline();
-      actions.output(
-        <Ink.Text color="#ef4444">Must run within a branch.</Ink.Text>
-      );
+      actions.error("Must run within a branch.");
       actions.exit(0);
       return;
     }
