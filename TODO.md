@@ -1,8 +1,5 @@
 # TODO
 
-
-- color + style StatusTable
-
 - ManualRebase
   - set nice PR title and summary (diff stack table)
 
