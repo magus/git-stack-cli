@@ -3,8 +3,6 @@
 
 - color + style StatusTable
 
-- capture PR title when creating new group
-
 - ManualRebase
   - set nice PR title and summary (diff stack table)
 

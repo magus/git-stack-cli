@@ -5,19 +5,21 @@ import * as github from "./github.js";
 export type CommitMetadata = Awaited<ReturnType<typeof commit>>;
 export type CommitRange = Awaited<ReturnType<typeof range>>;
 
-type MaybePullRequest = Awaited<ReturnType<typeof github.pr_status>>;
+type PullRequest = NonNullable<Awaited<ReturnType<typeof github.pr_status>>>;
 
 type CommitGroup = {
   id: string;
-  pr: MaybePullRequest;
+  title: string;
+  pr: null | PullRequest;
   base: null | string;
   dirty: boolean;
   commits: Array<CommitMetadata>;
 };
 
-type CommitMap = { [id: string]: string };
+type SimpleGroup = { id: string; title: string };
+type CommitGroupMap = { [sha: string]: SimpleGroup };
 
-export async function range(commit_map?: CommitMap) {
+export async function range(commit_group_map?: CommitGroupMap) {
   // gather all open prs in repo first
   // cheaper query to populate cache
   await github.pr_list();
@@ -29,10 +31,16 @@ export async function range(commit_map?: CommitMap) {
 
   for (const commit of commit_list) {
     let id = commit.branch_id;
+    let title = id;
 
     // use commit map if provided (via select commit ranges)
-    if (commit_map) {
-      id = commit_map[commit.sha];
+    if (commit_group_map) {
+      const group = commit_group_map[commit.sha];
+
+      if (group) {
+        id = group.id;
+        title = group.title;
+      }
     }
 
     if (!id) {
@@ -57,8 +65,13 @@ export async function range(commit_map?: CommitMap) {
       id = UNASSIGNED;
     }
 
+    if (!title) {
+      title = id;
+    }
+
     const group = group_map.get(id) || {
       id,
+      title,
       pr: null,
       base: null,
       dirty: false,

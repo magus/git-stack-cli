@@ -7,6 +7,7 @@ import { Store } from "../app/Store.js";
 
 import { cli } from "./cli.js";
 import { invariant } from "./invariant.js";
+import { safe_quote } from "./safe_quote.js";
 
 // prettier-ignore
 const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,url";
@@ -121,9 +122,17 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
   return pr;
 }
 
-export async function pr_create(branch: string, base: string) {
+type CreatePullRequestArgs = {
+  branch: string;
+  base: string;
+  title: string;
+};
+
+export async function pr_create(args: CreatePullRequestArgs) {
+  const title = safe_quote(args.title);
+
   const cli_result = await cli(
-    `gh pr create --fill --head ${branch} --base ${base}`
+    `gh pr create --fill --head ${args.branch} --base ${args.base} --title="${title}"`
   );
 
   if (cli_result.code !== 0) {

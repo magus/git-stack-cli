@@ -6,10 +6,12 @@ import { invariant } from "../core/invariant.js";
 import { short_id } from "../core/short_id.js";
 import { wrap_index } from "../core/wrap_index.js";
 
+import { Brackets } from "./Brackets.js";
 import { FormatText } from "./FormatText.js";
 import { MultiSelect } from "./MultiSelect.js";
 import { Parens } from "./Parens.js";
 import { Store } from "./Store.js";
+import { TextInput } from "./TextInput.js";
 
 import type { State } from "./Store.js";
 
@@ -31,12 +33,15 @@ type SimpleGroup = { id: string; title: string };
 function SelectCommitRangesInternal(props: Props) {
   const actions = Store.useActions();
 
+  const [selected_group_id, set_selected_group_id] = React.useState(
+    props.commit_range.UNASSIGNED
+  );
+
+  const [group_input, set_group_input] = React.useState(false);
+
   const [new_group_list, create_group] = React.useReducer(
-    (group_list: Array<SimpleGroup>, id: string) => {
-      return group_list.concat({
-        id,
-        title: id,
-      });
+    (group_list: Array<SimpleGroup>, group: SimpleGroup) => {
+      return group_list.concat(group);
     },
     []
   );
@@ -64,7 +69,6 @@ function SelectCommitRangesInternal(props: Props) {
   const group_list: Array<SimpleGroup> = [];
 
   // detect if there are unassigned commits
-  // unshift an unassigned group if so to collect them
   let unassigned_count = 0;
   for (const [, group_id] of commit_map.entries()) {
     if (group_id === null) {
@@ -76,8 +80,19 @@ function SelectCommitRangesInternal(props: Props) {
   group_list.push(...new_group_list);
 
   for (const group of props.commit_range.group_list) {
-    if (group.id === props.commit_range.UNASSIGNED) continue;
     if (group.pr?.state === "MERGED") continue;
+
+    if (group.id === props.commit_range.UNASSIGNED) {
+      // only include unassigned group when there are no other groups
+      if (group_list.length === 0) {
+        group_list.push({
+          id: group.id,
+          title: "Unassigned",
+        });
+      }
+
+      continue;
+    }
 
     group_list.push({
       id: group.id,
@@ -85,24 +100,27 @@ function SelectCommitRangesInternal(props: Props) {
     });
   }
 
-  const [selected_group_id, set_selected_group_id] = React.useState(
-    group_list[0].id
-  );
-
-  const isUnassigned = selected_group_id === "unassigned";
-  const current_index = group_list.findIndex((g) => g.id === selected_group_id);
+  let current_index = group_list.findIndex((g) => g.id === selected_group_id);
+  if (current_index === -1) {
+    current_index = 0;
+  }
 
   Ink.useInput((input, key) => {
     const inputLower = input.toLowerCase();
 
     const hasUnassignedCommits = unassigned_count > 0;
 
-    if (!hasUnassignedCommits && (inputLower === "r" || inputLower === "s")) {
+    if (!hasUnassignedCommits && inputLower === "s") {
       actions.set((state) => {
         state.commit_map = {};
+
         for (const [sha, id] of commit_map.entries()) {
           if (id) {
-            state.commit_map[sha] = id;
+            const group = new_group_list.find((g) => g.id === id);
+            // console.debug({ sha, id, group });
+            if (group) {
+              state.commit_map[sha] = group;
+            }
           }
         }
 
@@ -110,9 +128,6 @@ function SelectCommitRangesInternal(props: Props) {
           case "s":
             state.step = "manual-rebase";
             break;
-
-          case "r":
-            state.step = "manual-rebase-no-sync";
         }
       });
       return;
@@ -120,17 +135,7 @@ function SelectCommitRangesInternal(props: Props) {
 
     // only allow create when on unassigned group
     if (hasUnassignedCommits && inputLower === "c") {
-      const id = short_id();
-
-      actions.output(
-        <Ink.Box>
-          <Ink.Text dimColor>{"Created new group "}</Ink.Text>
-          <Ink.Text color="blueBright">{id}</Ink.Text>
-        </Ink.Box>
-      );
-
-      create_group(id);
-      set_selected_group_id(id);
+      set_group_input(true);
       return;
     }
 
@@ -156,7 +161,7 @@ function SelectCommitRangesInternal(props: Props) {
   const left_arrow = `${SYMBOL.left} `;
   const right_arrow = ` ${SYMBOL.right}`;
   const group_position = `(${current_index + 1}/${group_list.length}) `;
-  const title = group.title || "Unassigned";
+  const title = group.title;
 
   group_title_width -= group_position.length;
   group_title_width -= left_arrow.length + right_arrow.length;
@@ -168,7 +173,8 @@ function SelectCommitRangesInternal(props: Props) {
     const selected = commit_metadata_id !== null;
 
     let disabled;
-    if (isUnassigned) {
+
+    if (group.id === props.commit_range.UNASSIGNED) {
       disabled = true;
     } else {
       disabled = Boolean(selected && commit_metadata_id !== group.id);
@@ -183,8 +189,6 @@ function SelectCommitRangesInternal(props: Props) {
   });
 
   items.reverse();
-
-  // console.debug({ current_index, group, isUnassigned });
 
   return (
     <Ink.Box flexDirection="column">
@@ -264,23 +268,37 @@ function SelectCommitRangesInternal(props: Props) {
               ),
             }}
           />
+        </React.Fragment>
+      )}
+
+      {!group_input ? null : (
+        <React.Fragment>
+          <Ink.Box height={1} />
 
           <FormatText
             wrapper={<Ink.Text color="gray" />}
-            message="Press {r} to locally {rebase} only"
+            message="Enter a title for the PR {note}"
             values={{
-              r: (
-                <Ink.Text bold color="#22c55e">
-                  r
-                </Ink.Text>
-              ),
-              rebase: (
-                <Ink.Text bold color="#22c55e">
-                  <Parens>r</Parens>ebase
-                </Ink.Text>
+              note: (
+                <Parens>
+                  <FormatText
+                    message="press {enter} to submit"
+                    values={{
+                      enter: (
+                        <Ink.Text bold color="#22c55e">
+                          {SYMBOL.enter}
+                        </Ink.Text>
+                      ),
+                    }}
+                  />
+                </Parens>
               ),
             }}
           />
+
+          <TextInput onSubmit={submit_group_input} />
+
+          <Ink.Box height={1} />
         </React.Fragment>
       )}
 
@@ -318,6 +336,26 @@ function SelectCommitRangesInternal(props: Props) {
       </Ink.Box>
     </Ink.Box>
   );
+
+  function submit_group_input(title: string) {
+    const id = short_id();
+
+    actions.output(
+      <FormatText
+        wrapper={<Ink.Text dimColor />}
+        message="Created new group {group} {note}"
+        values={{
+          group: <Brackets>{title}</Brackets>,
+          note: <Parens>{id}</Parens>,
+        }}
+      />
+    );
+
+    // console.debug("submit_group_input", { title, id });
+    create_group({ id, title });
+    set_selected_group_id(id);
+    set_group_input(false);
+  }
 }
 
 const SYMBOL = {

@@ -11,6 +11,7 @@ import { short_id } from "../core/short_id.js";
 
 import { Await } from "./Await.js";
 import { Brackets } from "./Brackets.js";
+import { FormatText } from "./FormatText.js";
 import { Store } from "./Store.js";
 
 type Props = {
@@ -89,9 +90,15 @@ async function run(props: Props) {
       }
 
       actions.output(
-        <Ink.Text color="yellow" wrap="truncate-end">
-          Syncing <Brackets>{group.pr?.title || group.id}</Brackets>...
-        </Ink.Text>
+        <FormatText
+          wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
+          message="Syncing {group}…"
+          values={{
+            group: (
+              <Brackets>{group.pr?.title || group.title || group.id}</Brackets>
+            ),
+          }}
+        />
       );
 
       if (!props.skipSync) {
@@ -113,7 +120,11 @@ async function run(props: Props) {
           await cli(`git checkout -b ${group.id}`);
 
           // create pr in github
-          await github.pr_create(group.id, group.base);
+          await github.pr_create({
+            branch: group.id,
+            base: group.base,
+            title: group.title,
+          });
 
           // move back to temp branch
           await cli(`git checkout ${temp_branch_name}`);
