@@ -203,6 +203,11 @@ function SelectCommitRangesInternal(props: Props) {
         onSelect={(args) => {
           // console.debug("onSelect", args);
 
+          if (group_input) {
+            // console.debug("group_input is true, ignoring onSelect");
+            return;
+          }
+
           const key = args.item.sha;
 
           let value;
