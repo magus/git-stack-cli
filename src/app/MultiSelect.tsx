@@ -5,6 +5,13 @@ import * as Ink from "ink";
 import { clamp } from "../core/clamp.js";
 import { wrap_index } from "../core/wrap_index.js";
 
+type Props<T> = {
+  items: Array<Item<T>>;
+  onSelect(args: SelectArgs<T>): void;
+  disabled?: boolean;
+  maxWidth?: number;
+};
+
 type Item<T> = {
   label: string;
   value: T;
@@ -16,12 +23,6 @@ type SelectArgs<T> = {
   item: T;
   selected: boolean;
   state: Array<T>;
-};
-
-type Props<T> = {
-  items: Array<Item<T>>;
-  onSelect(args: SelectArgs<T>): void;
-  maxWidth?: number;
 };
 
 export function MultiSelect<T>(props: Props<T>) {
@@ -95,6 +96,11 @@ export function MultiSelect<T>(props: Props<T>) {
   }, [selected_set]);
 
   Ink.useInput((_input, key) => {
+    if (props.disabled) {
+      console.debug("[MultiSelect] disabled, ignoring input");
+      return;
+    }
+
     if (key.return) {
       selectRef.current = true;
       const item = props.items[index];
