@@ -33,7 +33,7 @@ export function Debug() {
         return;
       }
 
-      const output_file = path.join(state.cwd, "git-multi-diff-state.json");
+      const output_file = path.join(state.cwd, "git-stack-state.json");
 
       if (fs.existsSync(output_file)) {
         fs.rmSync(output_file);

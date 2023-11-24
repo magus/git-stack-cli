@@ -11,8 +11,7 @@
   "type": "module",
   "preferGlobal": true,
   "bin": {
-    "git-stack": "dist/index.js",
-    "git-multi-diff": "dist/index.js"
+    "git-stack": "dist/index.js"
   },
   "files": [
     "dist"

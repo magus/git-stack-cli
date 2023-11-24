@@ -41,7 +41,7 @@ export function remove(message: string) {
 
 const TEMPLATE = {
   branch_id(id: string) {
-    return `git-multi-diff-id: ${id}`;
+    return `git-stack-id: ${id}`;
   },
 };
 

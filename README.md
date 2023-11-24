@@ -8,7 +8,6 @@
 npm i -g git-stack-cli
 
 git stack
-git multi-diff
 ```
 
 ## development
@@ -18,5 +17,4 @@ npm run dev
 npm link
 
 git stack --debug
-git multi-diff --debug
 ```
