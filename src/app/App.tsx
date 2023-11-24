@@ -36,12 +36,12 @@ export function App() {
       <Debug />
       <Output />
 
-      {!argv.debug ? null : <GithubApiError />}
+      {!argv.verbose ? null : <GithubApiError />}
 
       <DependencyCheck>
         <AutoUpdate
           name="git-stack-cli"
-          verbose={argv.debug}
+          verbose={argv.verbose}
           onOutput={actions.output}
         >
           <GatherMetadata>

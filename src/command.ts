@@ -26,11 +26,11 @@ export async function command() {
         description: "Disable the pre-push hook, bypassing it completely",
       })
 
-      .option("debug", {
+      .option("verbose", {
         type: "boolean",
-        alias: ["verbose", "v", "d"],
+        alias: ["v"],
         description:
-          "Enable debug mode with more detailed output for debugging",
+          "Enable verbose mode with more detailed output for debugging",
       })
 
       .option("write-state-json", {

@@ -174,7 +174,7 @@ const BaseStore = createStore<State>()(
 
     select: {
       debug(state) {
-        return state.argv?.debug || false;
+        return state.argv?.verbose || false;
       },
     },
   }))
