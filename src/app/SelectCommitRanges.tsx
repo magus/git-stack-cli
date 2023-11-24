@@ -157,19 +157,6 @@ function SelectCommitRangesInternal(props: Props) {
 
   const group = group_list[current_index];
 
-  // <-  (2/4) #742 Title A ->
-  const max_group_label_width = 64;
-  let group_title_width = max_group_label_width;
-
-  const left_arrow = `${SYMBOL.left} `;
-  const right_arrow = ` ${SYMBOL.right}`;
-  const group_position = `(${current_index + 1}/${group_list.length}) `;
-  const title = group.title;
-
-  group_title_width -= group_position.length;
-  group_title_width -= left_arrow.length + right_arrow.length;
-  group_title_width = Math.min(title.length, group_title_width);
-
   const items = props.commit_range.commit_list.map((commit) => {
     const commit_metadata_id = commit_map.get(commit.sha);
 
@@ -193,6 +180,21 @@ function SelectCommitRangesInternal(props: Props) {
 
   items.reverse();
 
+  // <-  (2/4) #742 Title A ->
+
+  const left_arrow = `${SYMBOL.left} `;
+  const right_arrow = ` ${SYMBOL.right}`;
+  const group_position = `(${current_index + 1}/${group_list.length}) `;
+
+  const max_group_label_width = 80;
+  let group_title_width = max_group_label_width;
+  group_title_width -= group_position.length;
+  group_title_width -= left_arrow.length + right_arrow.length;
+  group_title_width = Math.min(group.title.length, group_title_width);
+
+  let max_item_width = max_group_label_width;
+  max_item_width -= left_arrow.length + right_arrow.length;
+
   return (
     <Ink.Box flexDirection="column">
       <Ink.Box height={1} />
@@ -200,6 +202,7 @@ function SelectCommitRangesInternal(props: Props) {
       <MultiSelect
         key={group.id}
         items={items}
+        maxWidth={max_item_width}
         onSelect={(args) => {
           // console.debug("onSelect", args);
 
@@ -228,7 +231,7 @@ function SelectCommitRangesInternal(props: Props) {
         <Ink.Text>{group_position}</Ink.Text>
 
         <Ink.Box width={group_title_width} justifyContent="center">
-          <Ink.Text wrap="truncate-end">{title}</Ink.Text>
+          <Ink.Text wrap="truncate-end">{group.title}</Ink.Text>
         </Ink.Box>
 
         <Ink.Text>{right_arrow}</Ink.Text>
