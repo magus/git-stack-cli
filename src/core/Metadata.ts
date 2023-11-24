@@ -1,10 +1,11 @@
 import { invariant } from "../core/invariant.js";
+import { safe_quote } from "../core/safe_quote.js";
 
 export function write(message: string, branch_id: string) {
   let result = message;
 
   // escape double-quote for cli
-  result = result.replace(RE.all_double_quote, '\\"');
+  result = safe_quote(result);
 
   // remove any previous metadata lines
   result = remove(result);
