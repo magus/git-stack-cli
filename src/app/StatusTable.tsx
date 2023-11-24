@@ -64,18 +64,19 @@ export function StatusTable() {
     );
   }
 
-  // walk data and discover max width for each column
-  const sample_row = row_list[0];
-  type ColKey = keyof typeof sample_row;
-  const col_list = Object.keys(sample_row) as Array<ColKey>;
-  const max_col_width = {} as { [key in ColKey]: number };
+  const RowColumnList = ["icon", "status", "count", "title", "url"] as const;
 
-  for (const col of col_list) {
+  // walk data and discover max width for each column
+  const max_col_width = {} as {
+    [key in (typeof RowColumnList)[number]]: number;
+  };
+
+  for (const col of RowColumnList) {
     max_col_width[col] = 0;
   }
 
   for (const row of row_list) {
-    for (const col of col_list) {
+    for (const col of RowColumnList) {
       const value = row[col];
       max_col_width[col] = Math.max(value.length, max_col_width[col]);
     }
@@ -96,8 +97,8 @@ export function StatusTable() {
     max_col_width.count -
     // url
     max_col_width.url -
-    // gap * col count (minus one for row.id which is not shown but used at key)
-    columnGap * (col_list.length - 1) -
+    // gap * col count
+    columnGap * RowColumnList.length -
     // remove some extra space
     breathing_room;
 
