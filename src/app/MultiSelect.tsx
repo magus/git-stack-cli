@@ -21,6 +21,7 @@ type SelectArgs<T> = {
 type Props<T> = {
   items: Array<Item<T>>;
   onSelect(args: SelectArgs<T>): void;
+  maxWidth?: number;
 };
 
 export function MultiSelect<T>(props: Props<T>) {
@@ -143,6 +144,7 @@ export function MultiSelect<T>(props: Props<T>) {
             active={active}
             selected={selected}
             disabled={disabled}
+            maxWidth={props.maxWidth}
           />
         );
       })}
@@ -155,6 +157,7 @@ type ItemRowProps = {
   active: boolean;
   selected: boolean;
   disabled: boolean;
+  maxWidth?: number;
 };
 
 function ItemRow(props: ItemRowProps) {
@@ -184,7 +187,7 @@ function ItemRow(props: ItemRowProps) {
     <Ink.Box flexDirection="row" gap={1}>
       <Radio selected={props.selected} disabled={props.disabled} />
 
-      <Ink.Box>
+      <Ink.Box width={props.maxWidth}>
         <Ink.Text
           bold={bold}
           underline={underline}
