@@ -82,7 +82,26 @@ async function run() {
           />
         );
       }
+
       await cli(`git cherry-pick ${commit.sha}`);
+
+      if (commit.branch_id && !commit_pr) {
+        if (actions.isDebug()) {
+          actions.output(
+            <FormatText
+              wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
+              message="Cleaning up unused group {group}"
+              values={{
+                group: <Brackets>{commit.branch_id}</Brackets>,
+              }}
+            />
+          );
+        }
+
+        // missing PR, clear branch id from commit
+        const new_message = await Metadata.remove(commit.message);
+        await cli(`git commit --amend -m "${new_message}"`);
+      }
     }
 
     // after all commits have been cherry-picked and amended

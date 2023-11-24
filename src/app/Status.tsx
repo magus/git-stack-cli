@@ -35,14 +35,19 @@ async function run(args: Args) {
   for (const group of commit_range.group_list) {
     if (group.dirty) {
       needs_update = true;
-      break;
+    }
+
+    if (group.pr?.state === "MERGED") {
+      needs_rebase = true;
     }
   }
 
-  for (const group of commit_range.group_list) {
-    if (group.pr?.state === "MERGED") {
+  for (let i = 0; i < commit_range.commit_list.length; i++) {
+    const commit = commit_range.commit_list[i];
+    const commit_pr = commit_range.pr_map.get(commit.branch_id || "");
+
+    if (commit.branch_id && !commit_pr) {
       needs_rebase = true;
-      break;
     }
   }
 

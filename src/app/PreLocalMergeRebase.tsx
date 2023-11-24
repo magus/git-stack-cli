@@ -20,7 +20,7 @@ export function PreLocalMergeRebase() {
 
   return (
     <YesNoPrompt
-      message="Merged PRs detected, would you like to rebase to update your local branch?"
+      message="Local branch needs to be rebased, would you like to rebase to update your local branch?"
       onYes={() => {
         actions.set((state) => {
           state.step = "local-merge-rebase";
