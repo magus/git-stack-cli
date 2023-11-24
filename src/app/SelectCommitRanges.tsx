@@ -79,12 +79,15 @@ function SelectCommitRangesInternal(props: Props) {
 
   group_list.push(...new_group_list);
 
+  const total_group_count =
+    new_group_list.length + props.commit_range.group_list.length;
+
   for (const group of props.commit_range.group_list) {
     if (group.pr?.state === "MERGED") continue;
 
     if (group.id === props.commit_range.UNASSIGNED) {
       // only include unassigned group when there are no other groups
-      if (group_list.length === 0) {
+      if (total_group_count === 1) {
         group_list.push({
           id: group.id,
           title: "Unassigned",
