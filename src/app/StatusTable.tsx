@@ -14,13 +14,13 @@ export function StatusTable() {
   const row_list = [];
 
   for (const group of commit_range.group_list) {
-    const row = {
+    const row: Row = {
+      id: group.id,
       icon: "",
       count: "",
       status: "",
       title: "",
       url: "",
-      id: group.id,
     };
 
     if (group.id === commit_range.UNASSIGNED) {
@@ -48,7 +48,7 @@ export function StatusTable() {
         row.count = `${group.pr.commits.length}/${group.commits.length}`;
         row.url = group.pr.url;
       } else {
-        row.title = group.id;
+        row.title = group.title || group.id;
         row.count = `0/${group.commits.length}`;
       }
     }
@@ -64,8 +64,6 @@ export function StatusTable() {
     );
   }
 
-  const RowColumnList = ["icon", "status", "count", "title", "url"] as const;
-
   // walk data and discover max width for each column
   const max_col_width = {} as {
     [key in (typeof RowColumnList)[number]]: number;
@@ -77,8 +75,8 @@ export function StatusTable() {
 
   for (const row of row_list) {
     for (const col of RowColumnList) {
-      const value = row[col];
-      max_col_width[col] = Math.max(value.length, max_col_width[col]);
+      const row_col = row[col];
+      max_col_width[col] = Math.max(row_col.length, max_col_width[col]);
     }
   }
 
@@ -103,13 +101,11 @@ export function StatusTable() {
     breathing_room;
 
   // add one for ellipsis character
-  const title_width = Math.min(max_col_width.title, remaining_space + 1);
+  max_col_width.title = Math.min(max_col_width.title, remaining_space + 1);
 
-  // prettier-ignore
-  // console.debug({ available_width, remaining_space, title_width, max_col_width });
+  // console.debug({ available_width, remaining_space, max_col_width });
 
   return (
-
     <Container>
       {row_list.map((row) => {
         return (
@@ -120,31 +116,19 @@ export function StatusTable() {
             columnGap={columnGap}
             width={available_width}
           >
-            <Ink.Box width={max_col_width.icon}>
-              <Ink.Text>{row.icon}</Ink.Text>
-            </Ink.Box>
+            {RowColumnList.map((column) => {
+              const ColumnComponent = ColumnComponentMap[column];
 
-            <Ink.Box width={max_col_width.status}>
-              <Ink.Text>{row.status}</Ink.Text>
-            </Ink.Box>
-
-            <Ink.Box width={max_col_width.count}>
-              <Ink.Text>{row.count}</Ink.Text>
-            </Ink.Box>
-
-            <Ink.Box width={title_width}>
-              <Ink.Text wrap="truncate-end">{row.title}</Ink.Text>
-            </Ink.Box>
-
-
-            <Ink.Box width={max_col_width.url}>
-              <Ink.Text>{row.url}</Ink.Text>
-            </Ink.Box>
+              return (
+                <Ink.Box key={column} width={max_col_width[column]}>
+                  <ColumnComponent key={column} row={row} column={column} />
+                </Ink.Box>
+              );
+            })}
           </Ink.Box>
         );
       })}
-
-</Container>
+    </Container>
   );
 }
 
@@ -156,4 +140,57 @@ function Container(props: { children: React.ReactNode }) {
       <Ink.Box height={1} />
     </Ink.Box>
   );
+}
+
+const RowColumnList = ["icon", "status", "count", "title", "url"] as const;
+
+type Column = (typeof RowColumnList)[number];
+type Row = { [key in Column]: string } & { id: string };
+
+const ColumnComponentMap: ColumnComponentMapType = {
+  icon: Icon,
+  status: Status,
+  count: Count,
+  title: Title,
+  url: Url,
+};
+
+type ColumnComponentMapType = {
+  [key in Column]: (props: ColumnProps) => React.ReactNode;
+};
+
+type ColumnProps = { row: Row; column: Column };
+
+function Icon(props: ColumnProps) {
+  const value = props.row[props.column];
+
+  return (
+    <Ink.Text color="yellow" bold>
+      {value}
+    </Ink.Text>
+  );
+}
+
+function Status(props: ColumnProps) {
+  const value = props.row[props.column];
+
+  return <Ink.Text>{value}</Ink.Text>;
+}
+
+function Count(props: ColumnProps) {
+  const value = props.row[props.column];
+
+  return <Ink.Text>{value}</Ink.Text>;
+}
+
+function Title(props: ColumnProps) {
+  const value = props.row[props.column];
+
+  return <Ink.Text wrap="truncate-end">{value}</Ink.Text>;
+}
+
+function Url(props: ColumnProps) {
+  const value = props.row[props.column];
+
+  return <Ink.Text>{value}</Ink.Text>;
 }
