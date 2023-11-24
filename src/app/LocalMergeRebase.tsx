@@ -3,6 +3,7 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import * as CommitMetadata from "../core/CommitMetadata.js";
+import * as Metadata from "../core/Metadata.js";
 import { cli } from "../core/cli.js";
 import { invariant } from "../core/invariant.js";
 import { short_id } from "../core/short_id.js";
@@ -31,26 +32,10 @@ async function run() {
   invariant(branch_name, "branch_name must exist");
   invariant(commit_range, "commit_range must exist");
 
-  type PullRequest = NonNullable<
-    (typeof commit_range)["group_list"][number]["pr"]
-  >;
-
   // always listen for SIGINT event and restore git state
   process.once("SIGINT", handle_exit);
 
   const temp_branch_name = `${branch_name}_${short_id()}`;
-
-  // drop commits that are in groups of merged PRs
-  const merged_pr_map = new Map<string, PullRequest>();
-
-  // walk groups in reverse order commit list so that we can cherry-pick in order
-  for (let i = 0; i < commit_range.group_list.length; i++) {
-    const group = commit_range.group_list[i];
-
-    if (group.pr?.state === "MERGED") {
-      merged_pr_map.set(group.id, group.pr);
-    }
-  }
 
   try {
     await cli(`git fetch --no-tags -v origin master:master`);
@@ -63,7 +48,10 @@ async function run() {
 
     for (let i = 0; i < commit_range.commit_list.length; i++) {
       const commit = commit_range.commit_list[i];
-      const merged_pr = merged_pr_map.get(commit.branch_id || "");
+      const commit_pr = commit_range.pr_map.get(commit.branch_id || "");
+
+      // drop commits that are in groups of merged PRs
+      const merged_pr = commit_pr?.state === "MERGED";
 
       if (merged_pr) {
         if (actions.isDebug()) {

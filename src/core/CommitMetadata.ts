@@ -26,6 +26,8 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
   const commit_list = await get_commit_list();
 
+  const pr_map = new Map<string, PullRequest>();
+
   let invalid = false;
   const group_map = new Map<string, CommitGroup>();
 
@@ -96,6 +98,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
       if (pr_result && pr_result.state !== "CLOSED") {
         group.pr = pr_result;
+        pr_map.set(group.id, pr_result);
       }
     }
 
@@ -155,7 +158,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
     group_list.unshift(unassigned_group);
   }
 
-  return { invalid, group_list, commit_list, UNASSIGNED };
+  return { invalid, group_list, commit_list, pr_map, UNASSIGNED };
 }
 
 async function get_commit_list() {
