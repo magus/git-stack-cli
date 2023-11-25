@@ -1,5 +1,9 @@
 # TODO
 
+- default to main and fallback to master
+- automatically detect by default
+- add `--branch` param to command to override
+
 - ManualRebase
   - set nice PR title and summary (diff stack table)
 
