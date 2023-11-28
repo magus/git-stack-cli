@@ -12,23 +12,27 @@ export async function command() {
       .option("force", {
         type: "boolean",
         alias: ["f"],
+        default: false,
         description: "Force sync even if no changes are detected",
       })
 
       .option("check", {
         type: "boolean",
         alias: ["c"],
+        default: false,
         description: "Print status table without syncing",
       })
 
-      .option("no-verify", {
+      .option("verify", {
         type: "boolean",
+        default: true,
         description: "Disable the pre-push hook, bypassing it completely",
       })
 
       .option("verbose", {
         type: "boolean",
         alias: ["v"],
+        default: false,
         description:
           "Enable verbose mode with more detailed output for debugging",
       })
@@ -36,12 +40,14 @@ export async function command() {
       .option("write-state-json", {
         hidden: true,
         type: "boolean",
+        default: false,
         description: "Write state to local json file for debugging",
       })
 
       .option("mock-metadata", {
         hidden: true,
         type: "boolean",
+        default: false,
         description: "Mock local store metadata for testing",
       })
 
