@@ -97,7 +97,7 @@ export function MultiSelect<T>(props: Props<T>) {
 
   Ink.useInput((_input, key) => {
     if (props.disabled) {
-      console.debug("[MultiSelect] disabled, ignoring input");
+      // console.debug("[MultiSelect] disabled, ignoring input");
       return;
     }
 
