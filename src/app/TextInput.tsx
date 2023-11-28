@@ -19,6 +19,23 @@ export function TextInput(props: Props) {
     [props.value]
   );
 
+  const [caret_visible, set_caret_visible] = React.useState(false);
+
+  React.useEffect(function blink_caret() {
+    const interval_ms = 500;
+
+    let timeoutId = setTimeout(tick, interval_ms);
+
+    function tick() {
+      set_caret_visible((visible) => !visible);
+      timeoutId = setTimeout(tick, interval_ms);
+    }
+
+    return function cleanup() {
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   Ink.useInput((input, key) => {
     let next_value = value;
 
@@ -56,6 +73,11 @@ export function TextInput(props: Props) {
       borderDimColor
     >
       <Ink.Text>{value || "‎"}</Ink.Text>
+      {!caret_visible ? null : (
+        <Ink.Text color="yellow" dimColor>
+          {"|"}
+        </Ink.Text>
+      )}
     </Ink.Box>
   );
 }
