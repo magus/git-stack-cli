@@ -45,7 +45,9 @@ export function Table<T extends BaseRow>(props: Props<T>) {
   const { stdout } = Ink.useStdout();
   const available_width = stdout.columns;
   const columnGap = is_finite_value(props.columnGap) ? props.columnGap : 2;
-  const breathing_room = 0;
+
+  // single character breathing room to prevent url including next line via overflow
+  const breathing_room = 1;
 
   if (props.fillColumn) {
     let remaining_space = available_width;
