@@ -47,6 +47,5 @@ const TEMPLATE = {
 };
 
 const RE = {
-  all_double_quote: /"/g,
   branch_id: new RegExp(TEMPLATE.branch_id("(?<id>[a-z0-9-+]+)"), "i"),
 };
