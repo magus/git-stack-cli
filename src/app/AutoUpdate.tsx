@@ -6,6 +6,7 @@ import path from "node:path";
 import * as Ink from "ink";
 
 import { cli } from "../core/cli.js";
+import { fetch_json } from "../core/fetch_json.js";
 import { read_json } from "../core/read_json.js";
 import { sleep } from "../core/sleep.js";
 
@@ -72,15 +73,13 @@ export function AutoUpdate(props: Props) {
 
       const timeout_ms = 2 * 1000;
 
-      const npm_res = await Promise.race([
-        fetch(`https://registry.npmjs.org/${props.name}`),
+      const npm_json = await Promise.race([
+        fetch_json(`https://registry.npmjs.org/${props.name}`),
 
         sleep(timeout_ms).then(() => {
           throw new Error("timeout");
         }),
       ]);
-
-      const npm_json = await npm_res.json();
 
       latest_version = npm_json?.["dist-tags"]?.latest;
 
