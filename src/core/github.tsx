@@ -1,5 +1,9 @@
 import * as React from "react";
 
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+
 import * as Ink from "ink";
 
 import { Brackets } from "../app/Brackets.js";
@@ -10,7 +14,7 @@ import { invariant } from "./invariant.js";
 import { safe_quote } from "./safe_quote.js";
 
 // prettier-ignore
-const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,url";
+const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,body,url";
 
 export async function pr_list(): Promise<Array<PullRequest>> {
   const state = Store.getState();
@@ -126,13 +130,14 @@ type CreatePullRequestArgs = {
   branch: string;
   base: string;
   title: string;
+  body: string;
 };
 
 export async function pr_create(args: CreatePullRequestArgs) {
   const title = safe_quote(args.title);
 
   const cli_result = await cli(
-    `gh pr create --fill --head ${args.branch} --base ${args.base} --title="${title}"`
+    `gh pr create --fill --head ${args.branch} --base ${args.base} --title="${title}" --body="${args.body}"`
   );
 
   if (cli_result.code !== 0) {
@@ -140,8 +145,17 @@ export async function pr_create(args: CreatePullRequestArgs) {
   }
 }
 
-export async function pr_base(branch: string, base: string) {
-  const cli_result = await cli(`gh pr edit ${branch} --base ${base}`);
+type EditPullRequestArgs = {
+  branch: string;
+  base: string;
+  body: string;
+};
+
+export async function pr_edit(args: EditPullRequestArgs) {
+  const cli_result = await cli(
+    // prettier-ignore
+    `gh pr edit ${args.branch} --base ${args.base} --body-file="${body_file(args.body)}"`
+  );
 
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
@@ -157,6 +171,17 @@ function handle_error(output: string): never {
   });
 
   throw new Error(output);
+}
+
+// convert a string to a file for use via github cli `--body-file`
+function body_file(body: string) {
+  const temp_dir = os.tmpdir();
+  const temp_path = path.join(temp_dir, "git-stack-body");
+  if (fs.existsSync(temp_path)) {
+    fs.rmSync(temp_path);
+  }
+  fs.writeFileSync(temp_path, body);
+  return temp_path;
 }
 
 type Commit = {
@@ -182,5 +207,6 @@ export type PullRequest = {
   headRefName: string;
   commits: Array<Commit>;
   title: string;
+  body: string;
   url: string;
 };

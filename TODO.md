@@ -4,13 +4,6 @@
 - automatically detect by default
 - add `--branch` param to command to override
 
-- ManualRebase
-  - set nice PR title and summary (diff stack table)
-
-  - build table of stacked PRs to add to each PR as comment
-    - order based on local sha ordering (i.e. group_list, which reflects PR order)
-    - delete and update comment in pr if necessary (use regex)
-
 
 - interactive PR status table
   - ▶ Unassigned (8 commits)

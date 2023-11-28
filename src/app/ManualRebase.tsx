@@ -4,6 +4,7 @@ import * as Ink from "ink";
 
 import * as CommitMetadata from "../core/CommitMetadata.js";
 import * as Metadata from "../core/Metadata.js";
+import * as StackSummaryTable from "../core/StackSummaryTable.js";
 import { cli } from "../core/cli.js";
 import * as github from "../core/github.js";
 import { invariant } from "../core/invariant.js";
@@ -104,14 +105,24 @@ async function run(props: Props) {
       if (!props.skipSync) {
         // push to origin since github requires commit shas to line up perfectly
         const git_push_command = [`git push -f origin HEAD:${group.id}`];
+
         if (argv["no-verify"]) {
           git_push_command.push("--no-verify");
         }
+
         await cli(git_push_command.join(" "));
 
         if (group.pr) {
           // ensure base matches pr in github
-          await github.pr_base(group.id, group.base);
+          await github.pr_edit({
+            branch: group.id,
+            base: group.base,
+            body: StackSummaryTable.write({
+              body: group.pr.body,
+              commit_range,
+              selected_group_id: group.id,
+            }),
+          });
         } else {
           // delete local group branch if leftover
           await cli(`git branch -D ${group.id}`, { ignoreExitCode: true });
@@ -124,6 +135,11 @@ async function run(props: Props) {
             branch: group.id,
             base: group.base,
             title: group.title,
+            body: StackSummaryTable.write({
+              body: "",
+              commit_range,
+              selected_group_id: group.id,
+            }),
           });
 
           // move back to temp branch
