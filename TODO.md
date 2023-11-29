@@ -1,6 +1,11 @@
 # TODO
 
-- setup a publish flow that checks types and tests before publishing?
+
+- multiselect with more items than terminal rows needs pagination
+  - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
+  - allow typing to filder the list based on regex match?
+  - quicksearch may be similar or at least inspo
+  - https://github.com/Eximchain/ink-quicksearch-input
 
 
 - interactive PR status table
@@ -15,13 +20,6 @@
   - when expanded
     - each commit should also show status, e.g. new commits should show with NEW
     - show actions, e.g. Shift+D -> Delete
-
-
-- multiselect with more items than terminal rows needs pagination
-  - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
-  - allow typing to filder the list based on regex match?
-  - quicksearch may be similar or at least inspo
-  - https://github.com/Eximchain/ink-quicksearch-input
 
 ## names
 
