@@ -106,7 +106,7 @@ async function run(props: Props) {
         // push to origin since github requires commit shas to line up perfectly
         const git_push_command = [`git push -f origin HEAD:${group.id}`];
 
-        if (argv["no-verify"]) {
+        if (argv.verify === false) {
           git_push_command.push("--no-verify");
         }
 
