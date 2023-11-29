@@ -3,16 +3,6 @@
 - Style MERGED state (currently it’s not purple but should be the same GitHub purple as GitHub merged state)
 - Match colors to GitHub colors
 
-- Blinking cursor (without layout shift)
-- Blank space with inverted colors via caret_visible toggling periodically
-
-```tsx
-React.createElement(
-  Ink.Text,
-  { color: "yellow", dimColor: true, inverse: caret_visible },
-  " "
-)
-```
 
 - allow toggling multiselect with spacebar too
 

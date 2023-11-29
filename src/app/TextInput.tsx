@@ -72,12 +72,11 @@ export function TextInput(props: Props) {
       borderColor="yellow"
       borderDimColor
     >
-      <Ink.Text>{value || "‎"}</Ink.Text>
-      {!caret_visible ? null : (
-        <Ink.Text color="yellow" dimColor>
-          {"|"}
-        </Ink.Text>
-      )}
+      <Ink.Text>{value || ""}</Ink.Text>
+
+      <Ink.Text color="yellow" dimColor inverse={caret_visible}>
+        {" "}
+      </Ink.Text>
     </Ink.Box>
   );
 }
