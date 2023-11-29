@@ -3,6 +3,7 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import { clamp } from "../core/clamp.js";
+import { colors } from "../core/colors.js";
 import { wrap_index } from "../core/wrap_index.js";
 
 type Props<T> = {
@@ -175,7 +176,7 @@ function ItemRow(props: ItemRowProps) {
   let dimColor;
 
   if (props.active) {
-    color = "#38bdf8";
+    color = colors.blue;
     underline = true;
   }
 
@@ -223,7 +224,7 @@ function Radio(props: RadioProps) {
   if (props.selected) {
     // display = "✓";
     display = "◉";
-    color = "green";
+    color = colors.green;
   } else {
     // display = " ";
     display = "◯";
@@ -231,7 +232,7 @@ function Radio(props: RadioProps) {
   }
 
   if (props.disabled) {
-    color = "gray";
+    color = colors.gray;
     dimColor = true;
   }
 

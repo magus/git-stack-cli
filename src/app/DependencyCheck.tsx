@@ -3,6 +3,7 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import { cli } from "../core/cli.js";
+import { colors } from "../core/colors.js";
 import { is_command_available } from "../core/is_command_available.js";
 import { match_group } from "../core/match_group.js";
 import { semver_compare } from "../core/semver_compare.js";
@@ -23,7 +24,7 @@ export function DependencyCheck(props: Props) {
   return (
     <Await
       fallback={
-        <Ink.Text color="yellow">
+        <Ink.Text color={colors.yellow}>
           Checking <Command>git</Command> install...
         </Ink.Text>
       }
@@ -33,7 +34,7 @@ export function DependencyCheck(props: Props) {
         }
 
         actions.output(
-          <Ink.Text color="yellow">
+          <Ink.Text color={colors.yellow}>
             <Command>git</Command> must be installed.
           </Ink.Text>
         );
@@ -43,7 +44,7 @@ export function DependencyCheck(props: Props) {
     >
       <Await
         fallback={
-          <Ink.Text color="yellow">
+          <Ink.Text color={colors.yellow}>
             Checking <Command>node</Command> install...
           </Ink.Text>
         }
@@ -56,7 +57,7 @@ export function DependencyCheck(props: Props) {
           }
 
           actions.output(
-            <Ink.Text color="yellow">
+            <Ink.Text color={colors.yellow}>
               <Command>node</Command> must be installed.
             </Ink.Text>
           );
@@ -66,7 +67,7 @@ export function DependencyCheck(props: Props) {
       >
         <Await
           fallback={
-            <Ink.Text color="yellow">
+            <Ink.Text color={colors.yellow}>
               <Ink.Text>
                 Checking <Command>gh</Command> install...
               </Ink.Text>
@@ -78,13 +79,13 @@ export function DependencyCheck(props: Props) {
             }
 
             actions.output(
-              <Ink.Text color="yellow">
+              <Ink.Text color={colors.yellow}>
                 <Command>gh</Command> must be installed.
               </Ink.Text>
             );
 
             actions.output(
-              <Ink.Text color="yellow">
+              <Ink.Text color={colors.yellow}>
                 <Ink.Text>{"Visit "}</Ink.Text>
                 <Url>https://cli.github.com</Url>
                 <Ink.Text>{" to install the github cli "}</Ink.Text>
@@ -100,7 +101,7 @@ export function DependencyCheck(props: Props) {
         >
           <Await
             fallback={
-              <Ink.Text color="yellow">
+              <Ink.Text color={colors.yellow}>
                 <Ink.Text>
                   Checking <Command>gh auth status</Command>...
                 </Ink.Text>
@@ -126,7 +127,7 @@ export function DependencyCheck(props: Props) {
               }
 
               actions.output(
-                <Ink.Text color="yellow">
+                <Ink.Text color={colors.yellow}>
                   <Command>gh</Command>
                   <Ink.Text>{" requires login, please run "}</Ink.Text>
                   <Command>gh auth login</Command>

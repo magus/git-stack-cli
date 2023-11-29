@@ -3,6 +3,7 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import { cli } from "../core/cli.js";
+import { colors } from "../core/colors.js";
 import * as date from "../core/date.js";
 import { invariant } from "../core/invariant.js";
 
@@ -61,7 +62,7 @@ async function run() {
 
       <Ink.Text>{" will reset at "}</Ink.Text>
 
-      <Ink.Text bold color="yellow">
+      <Ink.Text bold color={colors.yellow}>
         {reset_time}
       </Ink.Text>
 
@@ -69,7 +70,7 @@ async function run() {
 
       <Parens>
         <Ink.Text>{"in "}</Ink.Text>
-        <Ink.Text bold color="yellow">
+        <Ink.Text bold color={colors.yellow}>
           {time_until}
         </Ink.Text>
       </Parens>

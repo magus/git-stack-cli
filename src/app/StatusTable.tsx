@@ -141,7 +141,7 @@ function get_status_color(row: Row) {
       return colors.green;
     default:
       assertNever(row.status);
-      return colors.lightGray;
+      return colors.gray;
   }
 }
 

@@ -2,6 +2,8 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { colors } from "../core/colors.js";
+
 type Props = {
   multiline?: boolean;
   value?: string;
@@ -69,12 +71,12 @@ export function TextInput(props: Props) {
     <Ink.Box
       borderStyle="single"
       minHeight={1}
-      borderColor="yellow"
+      borderColor={colors.yellow}
       borderDimColor
     >
       <Ink.Text>{value || ""}</Ink.Text>
 
-      <Ink.Text color="yellow" dimColor inverse={caret_visible}>
+      <Ink.Text color={colors.yellow} dimColor inverse={caret_visible}>
         {" "}
       </Ink.Text>
     </Ink.Box>

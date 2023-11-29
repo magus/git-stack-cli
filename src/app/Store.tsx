@@ -4,6 +4,8 @@ import * as Ink from "ink";
 import { createStore, useStore } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
+import { colors } from "../core/colors.js";
+
 import { Exit } from "./Exit.js";
 
 import type { Argv } from "../command.js";
@@ -121,7 +123,7 @@ const BaseStore = createStore<State>()(
         set((state) => {
           state.mutate.output(
             state,
-            <Ink.Text color="#ef4444">{message}</Ink.Text>
+            <Ink.Text color={colors.red}>{message}</Ink.Text>
           );
         });
       },

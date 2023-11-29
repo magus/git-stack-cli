@@ -6,6 +6,7 @@ import * as CommitMetadata from "../core/CommitMetadata.js";
 import * as Metadata from "../core/Metadata.js";
 import * as StackSummaryTable from "../core/StackSummaryTable.js";
 import { cli } from "../core/cli.js";
+import { colors } from "../core/colors.js";
 import * as github from "../core/github.js";
 import { invariant } from "../core/invariant.js";
 import { short_id } from "../core/short_id.js";
@@ -22,7 +23,7 @@ type Props = {
 export function ManualRebase(props: Props) {
   return (
     <Await
-      fallback={<Ink.Text color="yellow">Rebasing commits...</Ink.Text>}
+      fallback={<Ink.Text color={colors.yellow}>Rebasing commits...</Ink.Text>}
       function={() => run(props)}
     />
   );
@@ -92,7 +93,7 @@ async function run(props: Props) {
 
       actions.output(
         <FormatText
-          wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
+          wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
           message="Syncing {group}…"
           values={{
             group: (
@@ -193,7 +194,7 @@ async function run(props: Props) {
 
   function handle_exit() {
     actions.output(
-      <Ink.Text color="yellow">
+      <Ink.Text color={colors.yellow}>
         Restoring <Brackets>{branch_name}</Brackets>...
       </Ink.Text>
     );
@@ -201,7 +202,7 @@ async function run(props: Props) {
     restore_git();
 
     actions.output(
-      <Ink.Text color="yellow">
+      <Ink.Text color={colors.yellow}>
         Restored <Brackets>{branch_name}</Brackets>.
       </Ink.Text>
     );

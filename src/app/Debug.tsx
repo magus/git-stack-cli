@@ -5,6 +5,7 @@ import path from "node:path";
 
 import * as Ink from "ink";
 
+import { colors } from "../core/colors.js";
 import { invariant } from "../core/invariant.js";
 import * as json from "../core/json.js";
 
@@ -19,7 +20,9 @@ export function Debug() {
   React.useEffect(
     function debugMessageOnce() {
       if (debug) {
-        actions.output(<Ink.Text color="yellow">Debug mode enabled</Ink.Text>);
+        actions.output(
+          <Ink.Text color={colors.yellow}>Debug mode enabled</Ink.Text>
+        );
       }
     },
     [argv]

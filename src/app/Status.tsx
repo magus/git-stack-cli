@@ -2,6 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { colors } from "../core/colors.js";
 import { invariant } from "../core/invariant.js";
 
 import { Await } from "./Await.js";
@@ -68,9 +69,9 @@ async function run(args: Args) {
   } else {
     actions.output(<Ink.Text>✅ Everything up to date.</Ink.Text>);
     actions.output(
-      <Ink.Text color="gray">
+      <Ink.Text color={colors.gray}>
         <Ink.Text>Run with</Ink.Text>
-        <Ink.Text bold color="yellow">
+        <Ink.Text bold color={colors.yellow}>
           {` --force `}
         </Ink.Text>
         <Ink.Text>to force update all pull requests.</Ink.Text>

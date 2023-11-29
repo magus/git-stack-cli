@@ -8,6 +8,7 @@ import * as Ink from "ink";
 
 import { Brackets } from "../app/Brackets.js";
 import { Store } from "../app/Store.js";
+import { colors } from "../core/colors.js";
 
 import { cli } from "./cli.js";
 import { invariant } from "./invariant.js";
@@ -42,7 +43,7 @@ export async function pr_list(): Promise<Array<PullRequest>> {
     actions.output(
       <Ink.Text dimColor>
         <Ink.Text>{"Github cache "}</Ink.Text>
-        <Ink.Text bold color="yellow">
+        <Ink.Text bold color={colors.yellow}>
           {result_pr_list.length}
         </Ink.Text>
         <Ink.Text>{" open PRs from "}</Ink.Text>
@@ -79,7 +80,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
         <Ink.Text>
           <Ink.Text dimColor>Github pr_status cache</Ink.Text>
           <Ink.Text> </Ink.Text>
-          <Ink.Text bold color="#22c55e">
+          <Ink.Text bold color={colors.green}>
             {"HIT "}
           </Ink.Text>
           <Ink.Text> </Ink.Text>
@@ -96,7 +97,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
       <Ink.Text>
         <Ink.Text dimColor>Github pr_status cache</Ink.Text>
         <Ink.Text> </Ink.Text>
-        <Ink.Text bold color="#ef4444">
+        <Ink.Text bold color={colors.red}>
           MISS
         </Ink.Text>
         <Ink.Text> </Ink.Text>

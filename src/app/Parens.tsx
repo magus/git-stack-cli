@@ -2,12 +2,14 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { colors } from "../core/colors.js";
+
 type Props = {
   children: React.ReactNode;
 };
 
 export function Parens(props: Props) {
-  const color = "#38bdf8";
+  const color = colors.blue;
 
   return (
     <Ink.Text>

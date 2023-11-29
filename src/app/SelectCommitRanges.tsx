@@ -2,6 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { colors } from "../core/colors.js";
 import { invariant } from "../core/invariant.js";
 import { short_id } from "../core/short_id.js";
 import { wrap_index } from "../core/wrap_index.js";
@@ -237,21 +238,21 @@ function SelectCommitRangesInternal(props: Props) {
 
       {unassigned_count > 0 ? (
         <FormatText
-          wrapper={<Ink.Text color="gray" />}
+          wrapper={<Ink.Text color={colors.gray} />}
           message="{count} unassigned commits, press {c} to {create} a new group"
           values={{
             count: (
-              <Ink.Text color="#3b82f6" bold>
+              <Ink.Text color={colors.yellow} bold>
                 {unassigned_count}
               </Ink.Text>
             ),
             c: (
-              <Ink.Text bold color="#22c55e">
+              <Ink.Text bold color={colors.green}>
                 c
               </Ink.Text>
             ),
             create: (
-              <Ink.Text bold color="#22c55e">
+              <Ink.Text bold color={colors.green}>
                 <Parens>c</Parens>reate
               </Ink.Text>
             ),
@@ -264,12 +265,12 @@ function SelectCommitRangesInternal(props: Props) {
             message="🎉 Done! Press {s} to {sync} the commits to Github"
             values={{
               s: (
-                <Ink.Text bold color="#22c55e">
+                <Ink.Text bold color={colors.green}>
                   s
                 </Ink.Text>
               ),
               sync: (
-                <Ink.Text bold color="#22c55e">
+                <Ink.Text bold color={colors.green}>
                   <Parens>s</Parens>ync
                 </Ink.Text>
               ),
@@ -283,7 +284,7 @@ function SelectCommitRangesInternal(props: Props) {
           <Ink.Box height={1} />
 
           <FormatText
-            wrapper={<Ink.Text color="gray" />}
+            wrapper={<Ink.Text color={colors.gray} />}
             message="Enter a title for the PR {note}"
             values={{
               note: (
@@ -292,7 +293,7 @@ function SelectCommitRangesInternal(props: Props) {
                     message="press {enter} to submit"
                     values={{
                       enter: (
-                        <Ink.Text bold color="#22c55e">
+                        <Ink.Text bold color={colors.green}>
                           {SYMBOL.enter}
                         </Ink.Text>
                       ),
@@ -311,16 +312,16 @@ function SelectCommitRangesInternal(props: Props) {
 
       <Ink.Box>
         <FormatText
-          wrapper={<Ink.Text color="gray" />}
+          wrapper={<Ink.Text color={colors.gray} />}
           message="Press {left} and {right} to view PR groups"
           values={{
             left: (
-              <Ink.Text bold color="#22c55e">
+              <Ink.Text bold color={colors.green}>
                 {SYMBOL.left}
               </Ink.Text>
             ),
             right: (
-              <Ink.Text bold color="#22c55e">
+              <Ink.Text bold color={colors.green}>
                 {SYMBOL.right}
               </Ink.Text>
             ),
@@ -330,11 +331,11 @@ function SelectCommitRangesInternal(props: Props) {
 
       <Ink.Box>
         <FormatText
-          wrapper={<Ink.Text color="gray" />}
+          wrapper={<Ink.Text color={colors.gray} />}
           message="Press {enter} to toggle commit selection"
           values={{
             enter: (
-              <Ink.Text bold color="#22c55e">
+              <Ink.Text bold color={colors.green}>
                 {SYMBOL.enter}
               </Ink.Text>
             ),

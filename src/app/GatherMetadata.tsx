@@ -3,6 +3,7 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import { cli } from "../core/cli.js";
+import { colors } from "../core/colors.js";
 import { invariant } from "../core/invariant.js";
 import { match_group } from "../core/match_group.js";
 
@@ -18,7 +19,9 @@ export function GatherMetadata(props: Props) {
   invariant(argv, "argv must exist");
 
   const fallback = (
-    <Ink.Text color="yellow">Gathering local git information...</Ink.Text>
+    <Ink.Text color={colors.yellow}>
+      Gathering local git information...
+    </Ink.Text>
   );
 
   return (
@@ -48,7 +51,9 @@ async function gather_metadata() {
     // handle when there are no detected changes
     if (head === merge_base) {
       actions.newline();
-      actions.output(<Ink.Text color="gray">No changes detected.</Ink.Text>);
+      actions.output(
+        <Ink.Text color={colors.gray}>No changes detected.</Ink.Text>
+      );
       actions.exit(0);
       return;
     }

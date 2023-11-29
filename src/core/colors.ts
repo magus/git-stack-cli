@@ -17,5 +17,7 @@ export const colors = {
 
   yellow: "rgb(234, 179, 8)",
 
+  gray: "rgb(110, 118, 129)",
+
   lightGray: "rgb(125, 133, 144)",
 };

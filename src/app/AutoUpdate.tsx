@@ -6,6 +6,7 @@ import path from "node:path";
 import * as Ink from "ink";
 
 import { cli } from "../core/cli.js";
+import { colors } from "../core/colors.js";
 import { fetch_json } from "../core/fetch_json.js";
 import { read_json } from "../core/read_json.js";
 import { semver_compare } from "../core/semver_compare.js";
@@ -144,7 +145,7 @@ export function AutoUpdate(props: Props) {
 
         if (props_ref.current.verbose) {
           handle_output(
-            <Ink.Text key="error" dimColor color="red">
+            <Ink.Text key="error" dimColor color={colors.red}>
               {error?.message}
             </Ink.Text>
           );
@@ -161,7 +162,7 @@ export function AutoUpdate(props: Props) {
         return (
           <YesNoPrompt
             message={
-              <Ink.Text color="yellow">
+              <Ink.Text color={colors.yellow}>
                 New version available, would you like to update?
               </Ink.Text>
             }
@@ -172,9 +173,11 @@ export function AutoUpdate(props: Props) {
                   wrapper={<Ink.Text />}
                   message="Installing {name}@{version}..."
                   values={{
-                    name: <Ink.Text color="yellow">{props.name}</Ink.Text>,
+                    name: (
+                      <Ink.Text color={colors.yellow}>{props.name}</Ink.Text>
+                    ),
                     version: (
-                      <Ink.Text color="#38bdf8">
+                      <Ink.Text color={colors.blue}>
                         {state.latest_version}
                       </Ink.Text>
                     ),

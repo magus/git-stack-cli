@@ -5,6 +5,7 @@ import * as Ink from "ink";
 import * as CommitMetadata from "../core/CommitMetadata.js";
 import * as Metadata from "../core/Metadata.js";
 import { cli } from "../core/cli.js";
+import { colors } from "../core/colors.js";
 import { invariant } from "../core/invariant.js";
 import { short_id } from "../core/short_id.js";
 
@@ -17,7 +18,7 @@ import { Store } from "./Store.js";
 export function LocalMergeRebase() {
   return (
     <Await
-      fallback={<Ink.Text color="yellow">Rebasing commits...</Ink.Text>}
+      fallback={<Ink.Text color={colors.yellow}>Rebasing commits...</Ink.Text>}
       function={run}
     />
   );
@@ -57,7 +58,7 @@ async function run() {
         if (actions.isDebug()) {
           actions.output(
             <FormatText
-              wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
+              wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
               message="Dropping {commit_message} {pr_status}"
               values={{
                 commit_message: <Brackets>{commit.message}</Brackets>,
@@ -74,7 +75,7 @@ async function run() {
       if (actions.isDebug()) {
         actions.output(
           <FormatText
-            wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
+            wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
             message="Picking {commit_message}"
             values={{
               commit_message: <Brackets>{commit.message}</Brackets>,
@@ -89,7 +90,7 @@ async function run() {
         if (actions.isDebug()) {
           actions.output(
             <FormatText
-              wrapper={<Ink.Text color="yellow" wrap="truncate-end" />}
+              wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
               message="Cleaning up unused group {group}"
               values={{
                 group: <Brackets>{commit.branch_id}</Brackets>,
@@ -152,7 +153,7 @@ async function run() {
 
   function handle_exit() {
     actions.output(
-      <Ink.Text color="yellow">
+      <Ink.Text color={colors.yellow}>
         Restoring <Brackets>{branch_name}</Brackets>...
       </Ink.Text>
     );
@@ -160,7 +161,7 @@ async function run() {
     restore_git();
 
     actions.output(
-      <Ink.Text color="yellow">
+      <Ink.Text color={colors.yellow}>
         Restored <Brackets>{branch_name}</Brackets>.
       </Ink.Text>
     );

@@ -2,6 +2,8 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { colors } from "../core/colors.js";
+
 import { Parens } from "./Parens.js";
 
 type Props = {
@@ -28,8 +30,8 @@ export function YesNoPrompt(props: Props) {
   });
 
   // prettier-ignore
-  const y = <Ink.Text bold color="#22c55e">Y</Ink.Text>;
-  const n = <Ink.Text color="#ef4444">n</Ink.Text>;
+  const y = <Ink.Text bold color={colors.green}>Y</Ink.Text>;
+  const n = <Ink.Text color={colors.red}>n</Ink.Text>;
 
   let choices;
 
@@ -58,13 +60,13 @@ export function YesNoPrompt(props: Props) {
         {typeof props.message === "object" ? (
           props.message
         ) : (
-          <Ink.Text color="yellow">{props.message}</Ink.Text>
+          <Ink.Text color={colors.yellow}>{props.message}</Ink.Text>
         )}
 
         <Ink.Text> </Ink.Text>
 
         <Parens>
-          <Ink.Text color="gray">{choices}</Ink.Text>
+          <Ink.Text color={colors.gray}>{choices}</Ink.Text>
         </Parens>
       </Ink.Box>
     </Ink.Box>

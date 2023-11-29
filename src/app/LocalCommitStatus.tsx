@@ -3,6 +3,7 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import * as CommitMetadata from "../core/CommitMetadata.js";
+import { colors } from "../core/colors.js";
 import { invariant } from "../core/invariant.js";
 import * as json from "../core/json.js";
 
@@ -18,7 +19,7 @@ export function LocalCommitStatus(props: Props) {
   invariant(argv, "argv must exist");
 
   const fallback = (
-    <Ink.Text color="yellow">Fetching PR status from Github...</Ink.Text>
+    <Ink.Text color={colors.yellow}>Fetching PR status from Github...</Ink.Text>
   );
 
   if (argv["mock-metadata"]) {
