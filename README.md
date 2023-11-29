@@ -16,5 +16,5 @@ git stack
 npm run dev
 npm link
 
-git stack --debug
+git stack --verbose
 ```
