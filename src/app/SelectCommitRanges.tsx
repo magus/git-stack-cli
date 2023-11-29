@@ -119,7 +119,7 @@ function SelectCommitRangesInternal(props: Props) {
 
         for (const [sha, id] of commit_map.entries()) {
           if (id) {
-            const group = new_group_list.find((g) => g.id === id);
+            const group = group_list.find((g) => g.id === id);
             // console.debug({ sha, id, group });
             if (group) {
               state.commit_map[sha] = group;

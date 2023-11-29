@@ -6,16 +6,6 @@
 
 - allow toggling multiselect with spacebar too
 
-- bug in ManualRebase, only searching new groups not full list of groups
-
-```tsx
-const group = new_group_list.find((g) => g.id === id);
-const group = group_list.find((g) => g.id === id);
-if (group) {
-  state.commit_map[sha] = group;
-}
-```
-
 - replace no-verify everywhere with verify === false
 - the no-verify check is invalid, why isn’t it throwing a type error? Or is it and we ignored it? Setup a publish flow that checks types and tests before publishing?
 
