@@ -44,7 +44,7 @@ async function run(args: Args) {
 
   for (let i = 0; i < commit_range.commit_list.length; i++) {
     const commit = commit_range.commit_list[i];
-    const commit_pr = commit_range.pr_map.get(commit.branch_id || "");
+    const commit_pr = commit_range.pr_lookup[commit.branch_id || ""];
 
     if (commit.branch_id && !commit_pr) {
       needs_rebase = true;

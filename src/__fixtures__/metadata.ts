@@ -5,40 +5,16 @@ export const METADATA = {
     "invalid": false,
     "group_list": [
       {
-        "id": "79402548-a996-4c2a-a338-86633040358e",
-        "pr": {
-          "baseRefName": "d9fc206e-70ce-4b1c-b950-1f54cf1fe112",
-          "commits": [
-            {
-              "authoredDate": "2023-10-29T21:58:16Z",
-              "authors": [
-                {
-                  "email": "noah@iamnoah.com",
-                  "id": "MDQ6VXNlcjI5MDA4NA==",
-                  "login": "magus",
-                  "name": "magus"
-                }
-              ],
-              "committedDate": "2023-11-17T10:43:34Z",
-              "messageBody": "git-multi-diff-id: 79402548-a996-4c2a-a338-86633040358e",
-              "messageHeadline": "orange color",
-              "oid": "3dcc44fbe1f293d0c212e71dfcd459e9d88879a8"
-            }
-          ],
-          "headRefName": "79402548-a996-4c2a-a338-86633040358e",
-          "number": 32,
-          "state": "OPEN",
-          "title": "orange color",
-          "url": "https://github.com/magus/git-multi-diff-playground/pull/32"
-        },
-        "base": "d9fc206e-70ce-4b1c-b950-1f54cf1fe112",
-        "dirty": false,
+        "id": "unassigned",
+        "pr": null,
+        "base": null,
+        "dirty": true,
         "commits": [
           {
             "sha": "3dcc44fbe1f293d0c212e71dfcd459e9d88879a8",
             "message": "orange color",
-            "raw_message": "orange color\n\ngit-multi-diff-id: 79402548-a996-4c2a-a338-86633040358e",
-            "branch_id": "79402548-a996-4c2a-a338-86633040358e"
+            "raw_message": "orange color",
+            "branch_id": null
           }
         ]
       },
@@ -422,6 +398,7 @@ export const METADATA = {
         "branch_id": "79402548-a996-4c2a-a338-86633040358e"
       }
     ],
+    "pr_lookup": {},
     "UNASSIGNED": "unassigned"
   },
   "pr": {

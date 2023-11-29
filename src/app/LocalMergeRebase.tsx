@@ -48,7 +48,7 @@ async function run() {
 
     for (let i = 0; i < commit_range.commit_list.length; i++) {
       const commit = commit_range.commit_list[i];
-      const commit_pr = commit_range.pr_map.get(commit.branch_id || "");
+      const commit_pr = commit_range.pr_lookup[commit.branch_id || ""];
 
       // drop commits that are in groups of merged PRs
       const merged_pr = commit_pr?.state === "MERGED";
