@@ -9,7 +9,7 @@ type Props<T extends BaseRow> = {
   columns: ColumnComponentMap<T>;
   columnGap?: number;
   fillColumn?: Column<T>;
-  maxWidth?: Partial<{ [key in Column<T>]: number }>;
+  maxWidth?: Partial<{ [key in Column<T>]: (maxWidth: number) => number }>;
 };
 
 export function Table<T extends BaseRow>(props: Props<T>) {
@@ -34,10 +34,13 @@ export function Table<T extends BaseRow>(props: Props<T>) {
     for (const col of RowColumnList) {
       const row_col = row[col];
       max_col_width[col] = Math.max(String(row_col).length, max_col_width[col]);
-      const maxWidth = props.maxWidth?.[col];
-      if (is_finite_value(maxWidth)) {
-        max_col_width[col] = Math.min(maxWidth, max_col_width[col]);
-      }
+    }
+  }
+
+  for (const col of RowColumnList) {
+    const maxWidth = props.maxWidth?.[col];
+    if (maxWidth) {
+      max_col_width[col] = maxWidth(max_col_width[col]);
     }
   }
 
@@ -74,7 +77,7 @@ export function Table<T extends BaseRow>(props: Props<T>) {
     }
   }
 
-  // console.debug({ available_width, remaining_space, max_col_width });
+  // console.debug({ available_width, max_col_width });
 
   return (
     <Container>
