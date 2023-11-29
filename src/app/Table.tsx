@@ -36,7 +36,7 @@ export function Table<T extends BaseRow>(props: Props<T>) {
       max_col_width[col] = Math.max(String(row_col).length, max_col_width[col]);
       const maxWidth = props.maxWidth?.[col];
       if (is_finite_value(maxWidth)) {
-        max_col_width[col] = Math.min(maxWidth - 1, max_col_width[col]);
+        max_col_width[col] = Math.min(maxWidth, max_col_width[col]);
       }
     }
   }
