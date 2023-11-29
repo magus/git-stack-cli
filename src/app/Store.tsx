@@ -24,6 +24,7 @@ export type State = {
   cwd: null | string;
   username: null | string;
   repo_path: null | string;
+  master_branch: string;
   head: null | string;
   merge_base: null | string;
   branch_name: null | string;
@@ -80,6 +81,7 @@ const BaseStore = createStore<State>()(
     cwd: null,
     username: null,
     repo_path: null,
+    master_branch: "master",
     head: null,
     merge_base: null,
     branch_name: null,

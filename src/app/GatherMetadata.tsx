@@ -8,6 +8,8 @@ import { invariant } from "../core/invariant.js";
 import { match_group } from "../core/match_group.js";
 
 import { Await } from "./Await.js";
+import { Brackets } from "./Brackets.js";
+import { FormatText } from "./FormatText.js";
 import { Store } from "./Store.js";
 
 type Props = {
@@ -33,12 +35,51 @@ export function GatherMetadata(props: Props) {
 
 async function gather_metadata() {
   const actions = Store.getState().actions;
+  const argv = Store.getState().argv;
+
+  invariant(argv, "argv must exist");
 
   try {
+    // default to master branch, fallback to main
+    let master_branch: string;
+
+    if (argv.branch) {
+      actions.debug(
+        <FormatText
+          message="Setting master branch to {branch}"
+          values={{
+            branch: <Brackets>{argv.branch}</Brackets>,
+          }}
+        />
+      );
+
+      master_branch = argv.branch;
+    } else {
+      const detect_master = await cli(
+        `git branch --list "${BRANCH.master}" --color=never`
+      );
+
+      if (detect_master.stdout !== "") {
+        master_branch = BRANCH.master;
+      } else {
+        actions.debug(
+          <FormatText
+            message="Could not find {master} branch, falling back to {main}"
+            values={{
+              master: <Brackets>{BRANCH.master}</Brackets>,
+              main: <Brackets>{BRANCH.main}</Brackets>,
+            }}
+          />
+        );
+
+        master_branch = BRANCH.main;
+      }
+    }
+
     const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
 
     // handle when there are no detected changes
-    if (branch_name === "master") {
+    if (branch_name === master_branch) {
       actions.newline();
       actions.error("Must run within a branch.");
       actions.exit(0);
@@ -46,7 +87,8 @@ async function gather_metadata() {
     }
 
     const head = (await cli("git rev-parse HEAD")).stdout;
-    const merge_base = (await cli("git merge-base HEAD master")).stdout;
+    const merge_base = (await cli(`git merge-base HEAD ${master_branch}`))
+      .stdout;
 
     // handle when there are no detected changes
     if (head === merge_base) {
@@ -65,6 +107,7 @@ async function gather_metadata() {
 
     Store.setState((state) => {
       state.repo_path = repo_path;
+      state.master_branch = master_branch;
       state.head = head;
       state.merge_base = merge_base;
       state.branch_name = branch_name;
@@ -77,6 +120,8 @@ async function gather_metadata() {
         actions.error(err.message);
       }
     }
+
+    actions.exit(7);
   }
 }
 
@@ -84,4 +129,9 @@ const RE = {
   // git@github.com:magus/git-multi-diff-playground.git
   // https://github.com/magus/git-multi-diff-playground.git
   repo_path: /(?<repo_path>[^:^/]+\/[^/]+)\.git/,
+};
+
+const BRANCH = {
+  master: "master",
+  main: "main",
 };

@@ -29,6 +29,7 @@ async function run() {
   const actions = state.actions;
   const branch_name = state.branch_name;
   const commit_range = state.commit_range;
+  const master_branch = state.master_branch;
 
   invariant(branch_name, "branch_name must exist");
   invariant(commit_range, "commit_range must exist");
@@ -39,8 +40,11 @@ async function run() {
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
   try {
-    await cli(`git fetch --no-tags -v origin master:master`);
-    const master_sha = (await cli(`git rev-parse master`)).stdout;
+    await cli(
+      `git fetch --no-tags -v origin ${master_branch}:${master_branch}`
+    );
+
+    const master_sha = (await cli(`git rev-parse ${master_branch}`)).stdout;
 
     const rebase_merge_base = master_sha;
 
@@ -166,6 +170,6 @@ async function run() {
       </Ink.Text>
     );
 
-    actions.exit(5);
+    actions.exit(6);
   }
 }

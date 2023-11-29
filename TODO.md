@@ -2,10 +2,6 @@
 
 - setup a publish flow that checks types and tests before publishing?
 
-- default to main and fallback to master
-- automatically detect by default
-- add `--branch` param to command to override
-
 
 - interactive PR status table
   - ▶ Unassigned (8 commits)

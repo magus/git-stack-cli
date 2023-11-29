@@ -37,6 +37,12 @@ export async function command() {
           "Enable verbose mode with more detailed output for debugging",
       })
 
+      .option("branch", {
+        type: "string",
+        alias: ["b"],
+        description: `Set the master branch name, defaults to "master" (or "main" if "master" is not found)`,
+      })
+
       .option("write-state-json", {
         hidden: true,
         type: "boolean",

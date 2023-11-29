@@ -1,3 +1,5 @@
+import { Store } from "../app/Store.js";
+
 import * as Metadata from "./Metadata.js";
 import { cli } from "./cli.js";
 import * as github from "./github.js";
@@ -20,6 +22,8 @@ type SimpleGroup = { id: string; title: string };
 type CommitGroupMap = { [sha: string]: SimpleGroup };
 
 export async function range(commit_group_map?: CommitGroupMap) {
+  const master_branch = Store.getState().master_branch;
+
   // gather all open prs in repo first
   // cheaper query to populate cache
   await github.pr_list();
@@ -112,7 +116,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
     }
 
     if (i === 0) {
-      group.base = "master";
+      group.base = master_branch;
     } else {
       const last_group = group_value_list[i - 1];
       // console.debug("  ", "last_group", last_group.pr?.title.substring(0, 40));
