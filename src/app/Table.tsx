@@ -21,8 +21,7 @@ export function Table<T extends BaseRow>(props: Props<T>) {
     );
   }
 
-  const sample_row = props.data[0];
-  const RowColumnList = Object.keys(sample_row) as Array<Column<T>>;
+  const RowColumnList = Object.keys(props.columns) as Array<Column<T>>;
 
   // walk data and discover max width for each column
   const max_col_width = {} as { [key in Column<T>]: number };
