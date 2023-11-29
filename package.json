@@ -21,7 +21,8 @@
     "dev": "tsc --watch",
     "lint": "eslint . --fix",
     "prettier": "prettier ./src --write",
-    "test": "npm run prettier && npm run lint && npm run build"
+    "test": "npm run prettier && npm run lint && npm run build",
+    "prepublishOnly": "npm test"
   },
   "dependencies": {
     "chalk": "^5.3.0",
