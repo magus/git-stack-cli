@@ -1,5 +1,36 @@
 # TODO
 
+- Style MERGED state (currently it’s not purple but should be the same GitHub purple as GitHub merged state)
+- Match colors to GitHub colors
+
+- Blinking cursor (without layout shift)
+- Blank space with inverted colors via caret_visible toggling periodically
+
+```tsx
+React.createElement(
+  Ink.Text,
+  { color: "yellow", dimColor: true, inverse: caret_visible },
+  " "
+)
+```
+
+- allow toggling multiselect with spacebar too
+
+- bug in ManualRebase, only searching new groups not full list of groups
+
+```tsx
+const group = new_group_list.find((g) => g.id === id);
+const group = group_list.find((g) => g.id === id);
+if (group) {
+  state.commit_map[sha] = group;
+}
+```
+
+- replace no-verify everywhere with verify === false
+- the no-verify check is invalid, why isn’t it throwing a type error? Or is it and we ignored it? Setup a publish flow that checks types and tests before publishing?
+
+
+
 - default to main and fallback to master
 - automatically detect by default
 - add `--branch` param to command to override
