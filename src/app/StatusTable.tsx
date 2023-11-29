@@ -20,7 +20,6 @@ export function StatusTable() {
 
   for (const group of commit_range.group_list) {
     const row: Row = {
-      icon: "",
       count: "",
       status: "NEW",
       title: "",
@@ -28,23 +27,19 @@ export function StatusTable() {
     };
 
     if (group.id === commit_range.UNASSIGNED) {
-      row.icon = "⭑";
       row.status = "NEW";
       row.title = "Unassigned";
       row.count = `0/${group.commits.length}`;
       row.url = "";
     } else {
       if (group.dirty) {
-        row.icon = "!";
         row.status = "OUTDATED";
       } else {
-        row.icon = "✔";
         row.status = "SYNCED";
       }
 
       if (group.pr) {
         if (group.pr.state === "MERGED") {
-          row.icon = "↗";
           row.status = "MERGED";
         }
 
@@ -64,12 +59,11 @@ export function StatusTable() {
     <Table
       data={row_list}
       fillColumn="title"
-      // maxWidth={{
-      //   title: 30,
-      // }}
+      maxWidth={{
+        status: (v) => v + 2,
+      }}
       columnGap={3}
       columns={{
-        icon: IconColumn,
         status: StatusColumn,
         count: CountColumn,
         title: TitleColumn,
@@ -80,25 +74,11 @@ export function StatusTable() {
 }
 
 type Row = {
-  icon: string;
   status: "NEW" | "OUTDATED" | "MERGED" | "SYNCED";
   count: string;
   title: string;
   url: string;
 };
-
-function IconColumn(props: TableColumnProps<Row>) {
-  const value = props.row[props.column];
-
-  return (
-    <Ink.Text
-      color={get_status_color(props.row)}
-      bold={get_status_bold(props.row)}
-    >
-      {value}
-    </Ink.Text>
-  );
-}
 
 function StatusColumn(props: TableColumnProps<Row>) {
   const value = props.row[props.column];
@@ -108,7 +88,7 @@ function StatusColumn(props: TableColumnProps<Row>) {
       color={get_status_color(props.row)}
       bold={get_status_bold(props.row)}
     >
-      {value}
+      {get_status_icon(props.row)} {value}
     </Ink.Text>
   );
 }
@@ -129,6 +109,23 @@ function UrlColumn(props: TableColumnProps<Row>) {
   const value = props.row[props.column];
 
   return <Url dimColor>{value}</Url>;
+}
+
+function get_status_icon(row: Row) {
+  switch (row.status) {
+    case "NEW":
+      return "⭑";
+    case "OUTDATED":
+      return "!";
+    case "MERGED":
+      return "↗";
+    case "SYNCED":
+      return "✔";
+    default:
+      assertNever(row.status);
+      return "?";
+    // unicode question mark in box
+  }
 }
 
 function get_status_color(row: Row) {
