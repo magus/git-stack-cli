@@ -2,6 +2,8 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
+import { colors } from "../core/colors.js";
+
 type Props = InkTextProps & {
   children: React.ReactNode;
 };
@@ -9,10 +11,8 @@ type Props = InkTextProps & {
 type InkTextProps = React.ComponentProps<typeof Ink.Text>;
 
 export function Url(props: Props) {
-  const text_color = "#38bdf8";
-
   return (
-    <Ink.Text bold color={text_color} {...props}>
+    <Ink.Text bold color={colors.blue} {...props}>
       {props.children}
     </Ink.Text>
   );

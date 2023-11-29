@@ -3,6 +3,7 @@ import * as React from "react";
 import * as Ink from "ink";
 
 import { assertNever } from "../core/assertNever.js";
+import { colors } from "../core/colors.js";
 import { invariant } from "../core/invariant.js";
 
 import { Store } from "./Store.js";
@@ -131,16 +132,16 @@ function get_status_icon(row: Row) {
 function get_status_color(row: Row) {
   switch (row.status) {
     case "NEW":
-      return "yellow";
+      return colors.yellow;
     case "OUTDATED":
-      return "red";
+      return colors.red;
     case "MERGED":
-      return "purple";
+      return colors.purple;
     case "SYNCED":
-      return "green";
+      return colors.green;
     default:
       assertNever(row.status);
-      return "gray";
+      return colors.lightGray;
   }
 }
 

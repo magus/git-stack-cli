@@ -1,12 +1,6 @@
 # TODO
 
-- Style MERGED state (currently it’s not purple but should be the same GitHub purple as GitHub merged state)
-- Match colors to GitHub colors
-
-
 - setup a publish flow that checks types and tests before publishing?
-
-
 
 - default to main and fallback to master
 - automatically detect by default
