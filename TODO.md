@@ -3,9 +3,6 @@
 - Style MERGED state (currently it’s not purple but should be the same GitHub purple as GitHub merged state)
 - Match colors to GitHub colors
 
-
-- allow toggling multiselect with spacebar too
-
 - replace no-verify everywhere with verify === false
 - the no-verify check is invalid, why isn’t it throwing a type error? Or is it and we ignored it? Setup a publish flow that checks types and tests before publishing?
 

@@ -95,13 +95,15 @@ export function MultiSelect<T>(props: Props<T>) {
     props.onSelect({ item, selected, state });
   }, [selected_set]);
 
-  Ink.useInput((_input, key) => {
+  Ink.useInput((input, key) => {
     if (props.disabled) {
       // console.debug("[MultiSelect] disabled, ignoring input");
       return;
     }
 
-    if (key.return) {
+    const space = input === " ";
+
+    if (key.return || space) {
       selectRef.current = true;
       const item = props.items[index];
       if (!item.disabled) {
