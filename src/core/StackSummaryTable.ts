@@ -23,9 +23,13 @@ export function write(args: WriteArgs) {
     }
   }
 
-  const stack_table = TEMPLATE.stack_table(
-    ["", ...stack_list, "", ""].join("\n")
-  );
+  let stack_table;
+
+  if (stack_list.length > 1) {
+    stack_table = TEMPLATE.stack_table(["", ...stack_list, "", ""].join("\n"));
+  } else {
+    stack_table = "";
+  }
 
   let result = args.body;
 
