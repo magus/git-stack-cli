@@ -76,10 +76,14 @@ async function run(props: Props) {
     // create temporary branch based on merge base
     await cli(`git checkout -b ${temp_branch_name} ${rebase_merge_base}`);
 
+    const pr_url_list = commit_range.group_list.map(get_group_url);
+
     for (let i = rebase_group_index; i < commit_range.group_list.length; i++) {
       const group = commit_range.group_list[i];
 
       invariant(group.base, "group.base must exist");
+
+      const selected_url = get_group_url(group);
 
       // cherry-pick and amend commits one by one
       for (const commit of group.commits) {
@@ -120,8 +124,8 @@ async function run(props: Props) {
             base: group.base,
             body: StackSummaryTable.write({
               body: group.pr.body,
-              commit_range,
-              selected_group_id: group.id,
+              pr_url_list,
+              selected_url,
             }),
           });
         } else {
@@ -132,20 +136,58 @@ async function run(props: Props) {
           await cli(`git checkout -b ${group.id}`);
 
           // create pr in github
-          await github.pr_create({
+          const pr_url = await github.pr_create({
             branch: group.id,
             base: group.base,
             title: group.title,
-            body: StackSummaryTable.write({
-              body: "",
-              commit_range,
-              selected_group_id: group.id,
-            }),
+            body: "",
           });
+
+          if (!pr_url) {
+            throw new Error("unable to create pr");
+          }
+
+          // update pr_url_list with created pr_url
+          for (let i = 0; i < pr_url_list.length; i++) {
+            const url = pr_url_list[i];
+            if (url === selected_url) {
+              pr_url_list[i] = pr_url;
+            }
+          }
 
           // move back to temp branch
           await cli(`git checkout ${temp_branch_name}`);
         }
+      }
+    }
+
+    // finally, ensure all prs have the updated stack table from updated pr_url_list
+    for (let i = 0; i < commit_range.group_list.length; i++) {
+      const group = commit_range.group_list[i];
+
+      // use the updated pr_url_list to get the actual selected_url
+      const selected_url = pr_url_list[i];
+
+      invariant(group.base, "group.base must exist");
+
+      const body = group.pr?.body || "";
+
+      const update_body = StackSummaryTable.write({
+        body,
+        pr_url_list,
+        selected_url,
+      });
+
+      if (update_body === body) {
+        actions.debug(`Skipping body update for ${selected_url}`);
+      } else {
+        actions.debug(`Update body for ${selected_url}`);
+
+        await github.pr_edit({
+          branch: group.id,
+          base: group.base,
+          body: update_body,
+        });
       }
     }
 
@@ -210,3 +252,6 @@ async function run(props: Props) {
     actions.exit(5);
   }
 }
+
+type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
+const get_group_url = (group: CommitMetadataGroup) => group.pr?.url || group.id;

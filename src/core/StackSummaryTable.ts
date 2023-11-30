@@ -1,25 +1,19 @@
-import type { State } from "../app/Store.js";
-
 type WriteArgs = {
   body: string;
-  commit_range: State["commit_range"];
-  selected_group_id: string;
+  pr_url_list: Array<string>;
+  selected_url: string;
 };
 
 export function write(args: WriteArgs) {
-  const group_list = args.commit_range?.group_list;
-
-  if (!Array.isArray(group_list) || group_list.length === 0) {
-    return "";
-  }
-
   const stack_list = [];
 
-  for (const group of group_list) {
-    if (group.pr?.url) {
-      const selected = args.selected_group_id === group.id;
+  for (const pr_url of args.pr_url_list) {
+    if (pr_url) {
+      const selected = args.selected_url === pr_url;
+
       const icon = selected ? "👉" : "⏳";
-      stack_list.push(`- ${icon} ${group.pr.url}`);
+
+      stack_list.push(`- ${icon} ${pr_url}`);
     }
   }
 
