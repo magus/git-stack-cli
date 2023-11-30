@@ -143,7 +143,10 @@ export async function pr_create(args: CreatePullRequestArgs) {
 
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
+    return null;
   }
+
+  return cli_result.stdout;
 }
 
 type EditPullRequestArgs = {
