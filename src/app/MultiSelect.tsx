@@ -4,6 +4,7 @@ import * as Ink from "ink";
 
 import { clamp } from "../core/clamp.js";
 import { colors } from "../core/colors.js";
+import { is_finite_value } from "../core/is_finite_value.js";
 import { wrap_index } from "../core/wrap_index.js";
 
 type Props<T> = {
@@ -58,21 +59,22 @@ export function MultiSelect<T>(props: Props<T>) {
     },
     0,
     function find_initial_index() {
-      let firstEnabled;
+      let last_enabled;
 
       for (let i = props.items.length - 1; i >= 0; i--) {
         const item = props.items[i];
-        if (!item.disabled && firstEnabled === undefined) {
-          firstEnabled = i;
+
+        if (!item.disabled) {
+          last_enabled = i;
         }
 
-        if (item.selected && !item.disabled) {
+        if (!item.selected && !item.disabled) {
           return i;
         }
       }
 
-      if (typeof firstEnabled === "number") {
-        return firstEnabled;
+      if (is_finite_value(last_enabled)) {
+        return last_enabled;
       }
 
       return 0;
