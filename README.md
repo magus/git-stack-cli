@@ -11,7 +11,7 @@
 
 ## Demo
 
-> <img src="https://github.com/magus/git-multi-diff-playground/assets/290084/cc583c01-4c3b-4416-b6a5-9702e5401c1b" width="720">
+> <img src="https://github.com/magus/git-multi-diff-playground/assets/290084/069c304b-80cb-49a9-9dc6-4ed3b061a5bc">
 
 ## Install
 
@@ -24,17 +24,17 @@ git stack
 
 ## Why?
 
-Most developers might not see much reason to **preserve commit history** or **create multiple pull requests of smaller changes**.
+The goal of `git stack` is to combine the **simplicity of developing in a single branch** in order to **preserve your commit history** while also **grouping commits into pull requests for code review**.
+
 Often pushing all your commits to a single pull request is the simplest and fastest approach to development.
-However, there is a cost to this, your teammates have to review larger, less related pieces of code and you will lose some of your atomic commit history if you squahs and merge.
+This comes at a price, your teammates have to review larger, less related pieces of code and you will lose some of your atomic commit history if you "Squash and merge".
 
-
-Okay, so you decide to break changes up. This process is commonly referred to as **[stacked diffs](https://graphite.dev/guides/stacked-diffs)** (pull requests that depend on other pull requests).
-Manually this means managing multiple local branches, jumping between them, rebasing, etc.
+When you decide to break changes up into multiple diffs that depend on one another this process is commonly referred to as **[stacked diffs](https://graphite.dev/guides/stacked-diffs)** (pull requests that depend on other pull requests).
+This appraoch is popular at many major comparnies such as Twitter, Facebook, etc.
+Managing stacked diffs manually involves managing multiple local branches, jumping between them, rebasing, etc.
 This process gets even more complicated when you start getting feedback in code review and have to update individual branches.
 Managing even a few stacked diffs requires a relatively strong knowledge of `git`, even with tricks like [`--update-refs`](https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---update-refs).
 
-The goal of `git stack` is to combine the **simplicity of developing in a single branch** in order to **preserve your commit history** while also **grouping commits into pull requests for code review**.
 
 ## How is this different than **`x`**
 
