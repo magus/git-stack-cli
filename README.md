@@ -19,10 +19,19 @@
 
 ```bash
 npm i -g git-stack-cli
-
-git stack
 ```
 
+## Usage
+
+
+```bash
+git stack
+
+git stack --verbose   # print more detailed logs for debugging internals
+git stack --no-verify # skip git hooks such as pre-commit and pre-push
+
+git-stack --help      # print a table of all command-line arguments
+```
 
 ## Why?
 
