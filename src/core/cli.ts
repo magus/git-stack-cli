@@ -17,12 +17,19 @@ type Return = {
 };
 
 export async function cli(
-  command: string,
+  unsafe_command: string | Array<string | number>,
   unsafe_options?: Options
 ): Promise<Return> {
   const state = Store.getState();
 
   const options = Object.assign({}, unsafe_options);
+
+  let command: string;
+  if (Array.isArray(unsafe_command)) {
+    command = unsafe_command.join(" ");
+  } else {
+    command = unsafe_command;
+  }
 
   return new Promise((resolve, reject) => {
     const childProcess = child.spawn("sh", ["-c", command], options);

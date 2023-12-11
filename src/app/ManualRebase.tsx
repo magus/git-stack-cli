@@ -115,7 +115,7 @@ async function run(props: Props) {
           git_push_command.push("--no-verify");
         }
 
-        await cli(git_push_command.join(" "));
+        await cli(git_push_command);
 
         if (group.pr) {
           // ensure base matches pr in github
