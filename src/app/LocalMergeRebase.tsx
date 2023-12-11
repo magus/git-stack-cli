@@ -27,10 +27,12 @@ export function LocalMergeRebase() {
 async function run() {
   const state = Store.getState();
   const actions = state.actions;
+  const argv = state.argv;
   const branch_name = state.branch_name;
   const commit_range = state.commit_range;
   const master_branch = state.master_branch;
 
+  invariant(argv, "argv must exist");
   invariant(branch_name, "branch_name must exist");
   invariant(commit_range, "commit_range must exist");
 
@@ -88,7 +90,13 @@ async function run() {
         );
       }
 
-      await cli(`git cherry-pick ${commit.sha}`);
+      const git_cherry_pick_command = [`git cherry-pick ${commit.sha}`];
+
+      if (argv.verify === false) {
+        git_cherry_pick_command.push("--no-verify");
+      }
+
+      await cli(git_cherry_pick_command);
 
       if (commit.branch_id && !commit_pr) {
         if (actions.isDebug()) {

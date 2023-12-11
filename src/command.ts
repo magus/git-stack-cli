@@ -26,15 +26,14 @@ export async function command() {
       .option("verify", {
         type: "boolean",
         default: true,
-        description: "Disable the pre-push hook, bypassing it completely",
+        description: "Skip git hooks such as pre-commit and pre-push",
       })
 
       .option("verbose", {
         type: "boolean",
         alias: ["v"],
         default: false,
-        description:
-          "Enable verbose mode with more detailed output for debugging",
+        description: "Print more detailed logs for debugging internals",
       })
 
       .option("branch", {

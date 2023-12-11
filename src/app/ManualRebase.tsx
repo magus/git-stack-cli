@@ -87,7 +87,13 @@ async function run(props: Props) {
 
       // cherry-pick and amend commits one by one
       for (const commit of group.commits) {
-        await cli(`git cherry-pick ${commit.sha}`);
+        const git_cherry_pick_command = [`git cherry-pick ${commit.sha}`];
+
+        if (argv.verify === false) {
+          git_cherry_pick_command.push("--no-verify");
+        }
+
+        await cli(git_cherry_pick_command);
 
         if (commit.branch_id !== group.id) {
           const new_message = await Metadata.write(commit.message, group.id);
