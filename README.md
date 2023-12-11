@@ -1,13 +1,15 @@
 # git-stack-cli
 
+- ✨ **[Stacked diffs](https://graphite.dev/guides/stacked-diffs) for `git`**
 - 🚀 **Simple one-branch workflow**
 - 🎯 **Interactively select commits for each pull request**
-- 📚 **Preserve your detailed commit history**
-- ♻️ **Automatically synchronize each pull request in the stack**
 - 💬 **Group commits for focused code review**
-- 🚫 **Avoid mutiple branch juggling and complex rebasing**
+- 🌐 **Use the [official GitHub CLI](https://cli.github.com/)**
+- ♻️ **Automatically synchronize each pull request in the stack**
 - 💪 **Work seamlessly with GitHub's interface**
-- 🌐 **Leverage the [official GitHub CLI](https://cli.github.com/)**
+- 🚫 **Avoid juggling mutiple branches and complex rebasing**
+- 📚 **Preserve your detailed commit history**
+
 
 ## Demo
 
