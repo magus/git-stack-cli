@@ -90,13 +90,25 @@ async function run() {
         );
       }
 
-      const git_cherry_pick_command = [`git cherry-pick ${commit.sha}`];
+      await cli(`git format-patch -1 ${commit.sha} --stdout > mypatch.patch`);
+      await cli(`git apply mypatch.patch`);
+      await cli(`rm mypatch.patch`);
+      await cli(`git add --all`);
 
-      if (argv.verify === false) {
-        git_cherry_pick_command.push("--no-verify");
+      let new_message;
+      if (commit.branch_id) {
+        new_message = await Metadata.write(commit.message, commit.branch_id);
+      } else {
+        new_message = commit.message;
       }
 
-      await cli(git_cherry_pick_command);
+      const git_commit_comand = [`git commit -m "${new_message}"`];
+
+      if (argv.verify === false) {
+        git_commit_comand.push("--no-verify");
+      }
+
+      await cli(git_commit_comand);
 
       if (commit.branch_id && !commit_pr) {
         if (actions.isDebug()) {

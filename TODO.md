@@ -3,18 +3,7 @@
 - when rebase fails we should show the output of the command that failed (eg git push output)
 - it would be nice to stream outputs from cli as they come in so we can see real time progress of things like push
 
-- remove no verify from cherry pick it doesn’t work
-- instead do ...
-
-```bash
-git show sha | git apply
-git add .
-git commit —no-verify -m “message”
-```
-
 - detect rebase and offer a y/n prompt to abort rebase before proceeding
-
-
 
 
 
