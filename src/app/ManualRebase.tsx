@@ -87,9 +87,9 @@ async function run(props: Props) {
 
       // cherry-pick and amend commits one by one
       for (const commit of group.commits) {
-        await cli(`git format-patch -1 ${commit.sha} --stdout > mypatch.patch`);
-        await cli(`git apply mypatch.patch`);
-        await cli(`rm mypatch.patch`);
+        await cli(`git format-patch -1 ${commit.sha} --stdout > ${PATCH_FILE}`);
+        await cli(`git apply ${PATCH_FILE}`);
+        await cli(`rm ${PATCH_FILE}`);
         await cli(`git add --all`);
         const new_message = await Metadata.write(commit.message, group.id);
         const git_commit_comand = [`git commit -m "${new_message}"`];
@@ -226,6 +226,9 @@ async function run(props: Props) {
     // all children processes receive the SIGINT signal
     const spawn_options = { ignoreExitCode: true };
 
+    // always clean up any patch files
+    cli.sync(`rm ${PATCH_FILE}`, spawn_options);
+
     // always put self back in original branch
     cli.sync(`git checkout ${branch_name}`, spawn_options);
 
@@ -261,3 +264,5 @@ async function run(props: Props) {
 
 type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
 const get_group_url = (group: CommitMetadataGroup) => group.pr?.url || group.id;
+
+const PATCH_FILE = "mypatch.patch";

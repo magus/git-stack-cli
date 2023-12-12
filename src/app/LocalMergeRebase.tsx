@@ -90,9 +90,9 @@ async function run() {
         );
       }
 
-      await cli(`git format-patch -1 ${commit.sha} --stdout > mypatch.patch`);
-      await cli(`git apply mypatch.patch`);
-      await cli(`rm mypatch.patch`);
+      await cli(`git format-patch -1 ${commit.sha} --stdout > ${PATCH_FILE}`);
+      await cli(`git apply ${PATCH_FILE}`);
+      await cli(`rm ${PATCH_FILE}`);
       await cli(`git add --all`);
 
       let new_message;
@@ -161,6 +161,9 @@ async function run() {
     // all children processes receive the SIGINT signal
     const spawn_options = { ignoreExitCode: true };
 
+    // always clean up any patch files
+    cli.sync(`rm ${PATCH_FILE}`, spawn_options);
+
     // always put self back in original branch
     cli.sync(`git checkout ${branch_name}`, spawn_options);
 
@@ -193,3 +196,5 @@ async function run() {
     actions.exit(6);
   }
 }
+
+const PATCH_FILE = "mypatch.patch";
