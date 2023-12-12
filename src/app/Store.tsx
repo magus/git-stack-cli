@@ -17,6 +17,12 @@ type Setter = (state: State) => void;
 
 type CommitMap = Parameters<typeof CommitMetadata.range>[0];
 
+type MutateOutputArgs = {
+  node: React.ReactNode;
+  id?: string;
+  debug?: boolean;
+};
+
 export type State = {
   argv: null | Argv;
   ink: null | InkInstance;
@@ -44,6 +50,7 @@ export type State = {
     | "post-rebase-status";
 
   output: Array<React.ReactNode>;
+  pending_output: Record<string, Array<React.ReactNode>>;
 
   pr: { [branch: string]: PullRequest };
 
@@ -55,7 +62,7 @@ export type State = {
     json(value: object): void;
     error(message: string): void;
     output(node: React.ReactNode): void;
-    debug(node: React.ReactNode): void;
+    debug(node: React.ReactNode, id?: string): void;
 
     isDebug(): boolean;
 
@@ -65,7 +72,9 @@ export type State = {
   };
 
   mutate: {
-    output(state: State, node: React.ReactNode): void;
+    output(state: State, args: MutateOutputArgs): void;
+    pending_output(state: State, args: MutateOutputArgs): void;
+    end_pending_output(state: State, id: string): void;
   };
 
   select: {
@@ -91,13 +100,15 @@ const BaseStore = createStore<State>()(
     step: "loading",
 
     output: [],
+    pending_output: {},
 
     pr: {},
 
     actions: {
       exit(code, clear = true) {
         set((state) => {
-          state.mutate.output(state, <Exit clear={clear} code={code} />);
+          const node = <Exit clear={clear} code={code} />;
+          state.mutate.output(state, { node });
         });
       },
 
@@ -111,35 +122,41 @@ const BaseStore = createStore<State>()(
 
       newline() {
         set((state) => {
-          state.mutate.output(state, "‎");
+          const node = "‎";
+          state.mutate.output(state, { node });
         });
       },
 
       json(value) {
         set((state) => {
-          state.mutate.output(state, JSON.stringify(value, null, 2));
+          const node = JSON.stringify(value, null, 2);
+          state.mutate.output(state, { node });
         });
       },
 
       error(message) {
         set((state) => {
-          state.mutate.output(
-            state,
-            <Ink.Text color={colors.red}>{message}</Ink.Text>
-          );
+          const node = <Ink.Text color={colors.red}>{message}</Ink.Text>;
+          state.mutate.output(state, { node });
         });
       },
 
       output(node) {
         set((state) => {
-          state.mutate.output(state, node);
+          state.mutate.output(state, { node });
         });
       },
 
-      debug(node) {
+      debug(node, id) {
         if (get().actions.isDebug()) {
+          const debug = true;
+
           set((state) => {
-            state.mutate.output(state, <Ink.Text dimColor>{node}</Ink.Text>);
+            if (id) {
+              state.mutate.pending_output(state, { id, node, debug });
+            } else {
+              state.mutate.output(state, { node, debug });
+            }
           });
         }
       },
@@ -163,16 +180,47 @@ const BaseStore = createStore<State>()(
     },
 
     mutate: {
-      output(state, node) {
-        switch (typeof node) {
+      output(state, args) {
+        switch (typeof args.node) {
           case "boolean":
           case "number":
           case "string":
-            state.output.push(<Ink.Text>{String(node)}</Ink.Text>);
+            state.output.push(
+              <Ink.Text dimColor={args.debug}>{String(args.node)}</Ink.Text>
+            );
             return;
         }
 
-        state.output.push(node);
+        state.output.push(args.node);
+      },
+
+      pending_output(state, args) {
+        const { id } = args;
+
+        if (!id) {
+          return;
+        }
+
+        if (!state.pending_output[id]) {
+          state.pending_output[id] = [];
+        }
+
+        switch (typeof args.node) {
+          case "boolean":
+          case "number":
+          case "string": {
+            state.pending_output[id].push(
+              <Ink.Text dimColor={args.debug}>{String(args.node)}</Ink.Text>
+            );
+            return;
+          }
+        }
+
+        state.pending_output[id].push(args.node);
+      },
+
+      end_pending_output(state, id) {
+        delete state.pending_output[id];
       },
     },
 

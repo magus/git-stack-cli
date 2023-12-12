@@ -29,6 +29,11 @@ export function DependencyCheck(props: Props) {
         </Ink.Text>
       }
       function={async () => {
+        // await Promise.all([
+        //   cli(`for i in $(seq 1 5); do echo $i; sleep 1; done`),
+        //   cli(`for i in $(seq 5 1); do printf "$i "; sleep 1; done; echo`),
+        // ]);
+
         if (is_command_available("git")) {
           return;
         }

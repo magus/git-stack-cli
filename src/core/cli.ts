@@ -16,6 +16,8 @@ type Return = {
   output: string;
 };
 
+let i = 0;
+
 export async function cli(
   unsafe_command: string | Array<string | number>,
   unsafe_options?: Options
@@ -32,22 +34,31 @@ export async function cli(
   }
 
   return new Promise((resolve, reject) => {
-    state.actions.debug(`[start] ${command}`);
-
     const childProcess = child.spawn("sh", ["-c", command], options);
 
     let stdout = "";
     let stderr = "";
     let output = "";
 
+    const id = `${++i}-${command}`;
+    state.actions.debug(`[start] ${command}`);
+    state.actions.debug(`[start] ${command}\n`, id);
+
+    function write_output(value: string) {
+      output += value;
+      state.actions.debug(value, id);
+    }
+
     childProcess.stdout?.on("data", (data: Buffer) => {
-      stdout += data.toString();
-      output += data.toString();
+      const value = String(data);
+      stdout += value;
+      write_output(value);
     });
 
     childProcess.stderr?.on("data", (data: Buffer) => {
-      stderr += data.toString();
-      output += data.toString();
+      const value = String(data);
+      stderr += value;
+      write_output(value);
     });
 
     childProcess.on("close", (code) => {
@@ -59,6 +70,7 @@ export async function cli(
         output: output.trimEnd(),
       };
 
+      state.actions.set((state) => state.mutate.end_pending_output(state, id));
       state.actions.debug(`[end] ${command}`);
       state.actions.debug(result.output);
 
