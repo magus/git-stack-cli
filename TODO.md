@@ -1,5 +1,20 @@
 # TODO
 
+- remove no verify from cherry pick it doesn’t work
+- instead do ...
+
+```bash
+git show sha | git apply
+git add .
+git commit —no-verify -m “message”
+```
+
+
+- when rebase fails we should show the output of the last command (eg git push output)
+- it would be nice to stream outputs from cli as they come in so we can see real time progress of things like push
+- run git stack should detect rebase and offer a y/n prompt to abort rebase before proceeding
+
+
 
 - multiselect with more items than terminal rows needs pagination
   - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
