@@ -32,6 +32,8 @@ export async function cli(
   }
 
   return new Promise((resolve, reject) => {
+    state.actions.debug(`[start] ${command}`);
+
     const childProcess = child.spawn("sh", ["-c", command], options);
 
     let stdout = "";
@@ -49,20 +51,20 @@ export async function cli(
     });
 
     childProcess.on("close", (code) => {
+      const result = {
+        command,
+        code: code || 0,
+        stdout: stdout.trimEnd(),
+        stderr: stderr.trimEnd(),
+        output: output.trimEnd(),
+      };
+
+      state.actions.debug(`[end] ${command}`);
+      state.actions.debug(result.output);
+
       if (!options.ignoreExitCode && code !== 0) {
         reject(new Error(`[${command}] (${code})`));
       } else {
-        const result = {
-          command,
-          code: code || 0,
-          stdout: stdout.trimEnd(),
-          stderr: stderr.trimEnd(),
-          output: output.trimEnd(),
-        };
-
-        state.actions.debug(`$ ${command}`);
-        state.actions.debug(result.output);
-
         resolve(result);
       }
     });
