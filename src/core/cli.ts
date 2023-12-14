@@ -22,9 +22,9 @@ export async function cli(
   unsafe_command: string | Array<string | number>,
   unsafe_options?: Options
 ): Promise<Return> {
-  const state = Store.getState();
-
   const options = Object.assign({}, unsafe_options);
+
+  const state = Store.getState();
 
   let command: string;
   if (Array.isArray(unsafe_command)) {
@@ -61,21 +61,21 @@ export async function cli(
       write_output(value);
     });
 
-    childProcess.on("close", (code) => {
+    childProcess.on("close", (unsafe_code) => {
       const result = {
         command,
-        code: code || 0,
+        code: unsafe_code || 0,
         stdout: stdout.trimEnd(),
         stderr: stderr.trimEnd(),
         output: output.trimEnd(),
       };
 
       state.actions.set((state) => state.mutate.end_pending_output(state, id));
-      state.actions.debug(`[end] ${command}`);
+      state.actions.debug(`[end] ${command} (${result.code})`);
       state.actions.debug(result.output);
 
-      if (!options.ignoreExitCode && code !== 0) {
-        reject(new Error(`[${command}] (${code})`));
+      if (!options.ignoreExitCode && result.code !== 0) {
+        reject(new Error(`[${command}] (${result.code})`));
       } else {
         resolve(result);
       }
@@ -88,17 +88,40 @@ export async function cli(
 }
 
 cli.sync = function cli_sync(
-  command: string,
+  unsafe_command: string | Array<string | number>,
   unsafe_options?: Options
 ): Return {
   const options = Object.assign({}, unsafe_options);
 
+  const state = Store.getState();
+
+  let command: string;
+  if (Array.isArray(unsafe_command)) {
+    command = unsafe_command.join(" ");
+  } else {
+    command = unsafe_command;
+  }
+
+  state.actions.debug(`[start] ${command}`);
   const spawn_return = child.spawnSync("sh", ["-c", command], options);
 
   const stdout = String(spawn_return.stdout);
   const stderr = String(spawn_return.stderr);
-  const output = String(spawn_return.output);
-  const code = spawn_return.status || 0;
 
-  return { command, code, stdout, stderr, output };
+  const result = {
+    command,
+    code: spawn_return.status || 0,
+    stdout,
+    stderr,
+    output: [stdout, stderr].join(""),
+  };
+
+  state.actions.debug(`[end] ${command} (${result.code})`);
+  state.actions.debug(result.output);
+
+  if (!options.ignoreExitCode && result.code !== 0) {
+    throw new Error(`[${command}] (${result.code})`);
+  }
+
+  return result;
 };
