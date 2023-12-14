@@ -9,6 +9,7 @@ import { LocalCommitStatus } from "./LocalCommitStatus.js";
 import { Main } from "./Main.js";
 import { Output } from "./Output.js";
 import { Providers } from "./Providers.js";
+import { RebaseCheck } from "./RebaseCheck.js";
 import { Store } from "./Store.js";
 
 export function App() {
@@ -47,15 +48,17 @@ export function App() {
           }
         }}
       >
-        <DependencyCheck>
-          {!argv.verbose ? null : <GithubApiError />}
+        <RebaseCheck>
+          <DependencyCheck>
+            {!argv.verbose ? null : <GithubApiError />}
 
-          <GatherMetadata>
-            <LocalCommitStatus>
-              <Main />
-            </LocalCommitStatus>
-          </GatherMetadata>
-        </DependencyCheck>
+            <GatherMetadata>
+              <LocalCommitStatus>
+                <Main />
+              </LocalCommitStatus>
+            </GatherMetadata>
+          </DependencyCheck>
+        </RebaseCheck>
       </AutoUpdate>
     </Providers>
   );
