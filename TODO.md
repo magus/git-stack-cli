@@ -1,10 +1,5 @@
 # TODO
 
-- order of bullets in comment should be reversed
-- match git history direction
-- add number wrapped in code ticks as well to further reduce ambiguity on order
-
-
 - multiselect with more items than terminal rows needs pagination
   - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
   - allow typing to filder the list based on regex match?
