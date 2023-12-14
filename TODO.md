@@ -1,11 +1,19 @@
 # TODO
 
+- `--update` cli option to force check for update without timeout
+
 - when rebase fails we should show the output of the command that failed (eg git push output)
 - it would be nice to stream outputs from cli as they come in so we can see real time progress of things like push
 
 - detect rebase and offer a y/n prompt to abort rebase before proceeding
 
 
+- failure during merge local rebase dropped into temporary branch
+- should clean up branch on error and restore original branch
+
+- order of bullets in comment should be reversed
+- match git history direction
+- add number wrapped in code ticks as well to further reduce ambiguity on order
 
 
 - multiselect with more items than terminal rows needs pagination
