@@ -8,21 +8,23 @@ import * as Ink from "ink";
 import { cli } from "../core/cli.js";
 import { colors } from "../core/colors.js";
 import { fetch_json } from "../core/fetch_json.js";
+import { is_finite_value } from "../core/is_finite_value.js";
 import { read_json } from "../core/read_json.js";
 import { semver_compare } from "../core/semver_compare.js";
 import { sleep } from "../core/sleep.js";
 
 import { Brackets } from "./Brackets.js";
 import { FormatText } from "./FormatText.js";
-import { Parens } from "./Parens.js";
 import { YesNoPrompt } from "./YesNoPrompt.js";
 
 type Props = {
   name: string;
   children: React.ReactNode;
   verbose?: boolean;
+  timeoutMs?: number;
   onError?: (error: Error) => void;
   onOutput?: (output: React.ReactNode) => void;
+  onDone?: () => void;
 };
 
 type State = {
@@ -67,26 +69,26 @@ export function AutoUpdate(props: Props) {
     async function auto_update() {
       if (props_ref.current.verbose) {
         handle_output(
-          <Ink.Text key="init" dimColor>
-            Checking for latest version...
-          </Ink.Text>
+          <Ink.Text key="init">Checking for latest version...</Ink.Text>
         );
       }
 
-      const timeout_ms = 2 * 1000;
+      const timeout_ms = is_finite_value(props.timeoutMs)
+        ? props.timeoutMs
+        : 2 * 1000;
 
       const npm_json = await Promise.race([
         fetch_json(`https://registry.npmjs.org/${props.name}`),
 
         sleep(timeout_ms).then(() => {
-          throw new Error("timeout");
+          throw new Error("Timeout");
         }),
       ]);
 
       latest_version = npm_json?.["dist-tags"]?.latest;
 
       if (!latest_version) {
-        throw new Error("unable to retrieve latest version from npm");
+        throw new Error("Unable to retrieve latest version from npm");
       }
 
       const script_dir = path.dirname(fs.realpathSync(process.argv[1]));
@@ -96,7 +98,7 @@ export function AutoUpdate(props: Props) {
       if (!package_json) {
         // unable to find read package.json, skip auto update
         throw new Error(
-          `unable to find read package.json [${package_json_path}]`
+          `Unable to find read package.json [${package_json_path}]`
         );
       }
 
@@ -106,11 +108,11 @@ export function AutoUpdate(props: Props) {
         handle_output(
           <FormatText
             key="versions"
-            wrapper={<Ink.Text dimColor />}
+            wrapper={<Ink.Text />}
             message="Auto update found latest version {latest_version} and current local version {local_version}"
             values={{
               latest_version: <Brackets>{latest_version}</Brackets>,
-              local_version: <Parens>{local_version}</Parens>,
+              local_version: <Brackets>{local_version}</Brackets>,
             }}
           />
         );
@@ -145,11 +147,14 @@ export function AutoUpdate(props: Props) {
 
         if (props_ref.current.verbose) {
           handle_output(
-            <Ink.Text key="error" dimColor color={colors.red}>
+            <Ink.Text key="error" color={colors.red}>
               {error?.message}
             </Ink.Text>
           );
         }
+      })
+      .finally(() => {
+        props.onDone?.();
       });
   }, []);
 
@@ -191,11 +196,7 @@ export function AutoUpdate(props: Props) {
 
               patch({ status: "exit" });
 
-              handle_output(
-                <Ink.Text key="done" dimColor>
-                  Auto update done.
-                </Ink.Text>
-              );
+              handle_output(<Ink.Text key="done">Auto update done.</Ink.Text>);
             }}
             onNo={() => {
               patch({ status: "done" });

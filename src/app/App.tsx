@@ -41,8 +41,14 @@ export function App() {
       <DependencyCheck>
         <AutoUpdate
           name="git-stack-cli"
-          verbose={argv.verbose}
+          verbose={argv.verbose || argv.update}
+          timeoutMs={argv.update ? 30 * 1000 : 2 * 1000}
           onOutput={actions.output}
+          onDone={() => {
+            if (argv.update) {
+              actions.exit(0);
+            }
+          }}
         >
           <GatherMetadata>
             <LocalCommitStatus>

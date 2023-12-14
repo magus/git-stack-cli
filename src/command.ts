@@ -36,6 +36,13 @@ export async function command() {
         description: "Print more detailed logs for debugging internals",
       })
 
+      .option("update", {
+        type: "boolean",
+        alias: ["u"],
+        default: false,
+        description: "Check for updates",
+      })
+
       .option("branch", {
         type: "string",
         alias: ["b"],

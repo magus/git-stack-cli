@@ -1,7 +1,5 @@
 # TODO
 
-- `--update` cli option to force check for update without timeout
-
 - when rebase fails we should show the output of the command that failed (eg git push output)
 - it would be nice to stream outputs from cli as they come in so we can see real time progress of things like push
 
