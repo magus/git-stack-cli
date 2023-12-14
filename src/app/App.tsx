@@ -36,27 +36,27 @@ export function App() {
       <Debug />
       <Output />
 
-      {!argv.verbose ? null : <GithubApiError />}
+      <AutoUpdate
+        name="git-stack-cli"
+        verbose={argv.verbose || argv.update}
+        timeoutMs={argv.update ? 30 * 1000 : 2 * 1000}
+        onOutput={actions.output}
+        onDone={() => {
+          if (argv.update) {
+            actions.exit(0);
+          }
+        }}
+      >
+        <DependencyCheck>
+          {!argv.verbose ? null : <GithubApiError />}
 
-      <DependencyCheck>
-        <AutoUpdate
-          name="git-stack-cli"
-          verbose={argv.verbose || argv.update}
-          timeoutMs={argv.update ? 30 * 1000 : 2 * 1000}
-          onOutput={actions.output}
-          onDone={() => {
-            if (argv.update) {
-              actions.exit(0);
-            }
-          }}
-        >
           <GatherMetadata>
             <LocalCommitStatus>
               <Main />
             </LocalCommitStatus>
           </GatherMetadata>
-        </AutoUpdate>
-      </DependencyCheck>
+        </DependencyCheck>
+      </AutoUpdate>
     </Providers>
   );
 }
