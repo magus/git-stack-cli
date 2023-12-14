@@ -42,7 +42,7 @@ export async function cli(
 
     const id = `${++i}-${command}`;
     state.actions.debug(`[start] ${command}`);
-    state.actions.debug(`[start] ${command}\n`, id);
+    state.actions.debug(`[⏳] ${command}\n`, id);
 
     function write_output(value: string) {
       output += value;
