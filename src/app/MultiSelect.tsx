@@ -150,7 +150,7 @@ export function MultiSelect<T>(props: Props<T>) {
 
         return (
           <ItemRow
-            key={item.label}
+            key={i}
             label={item.label}
             active={active}
             selected={selected}
