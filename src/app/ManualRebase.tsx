@@ -83,6 +83,18 @@ async function run(props: Props) {
 
       invariant(group.base, "group.base must exist");
 
+      actions.output(
+        <FormatText
+          wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
+          message="Rebasing {group}…"
+          values={{
+            group: (
+              <Brackets>{group.pr?.title || group.title || group.id}</Brackets>
+            ),
+          }}
+        />
+      );
+
       const selected_url = get_group_url(group);
 
       // cherry-pick and amend commits one by one
