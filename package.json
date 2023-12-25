@@ -19,9 +19,11 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "lint": "eslint . --fix",
-    "prettier": "prettier ./src --write",
-    "test": "npm run prettier && npm run lint && npm run build",
+    "lint:check": "eslint .",
+    "lint": "npm run lint:check -- --fix",
+    "prettier:check": "prettier ./src --check",
+    "prettier": "npm run prettier:check -- --write",
+    "test": "npm run prettier:check && npm run lint:check && npm run build",
     "prepublishOnly": "npm test"
   },
   "dependencies": {
