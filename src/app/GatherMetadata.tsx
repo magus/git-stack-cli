@@ -78,6 +78,14 @@ async function gather_metadata() {
 
     const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
 
+    // handle detahed head state
+    if (branch_name === "HEAD") {
+      actions.newline();
+      actions.error("Must run within a branch.");
+      actions.exit(0);
+      return;
+    }
+
     // handle when there are no detected changes
     if (branch_name === master_branch) {
       actions.newline();
