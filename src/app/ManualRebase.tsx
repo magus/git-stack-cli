@@ -99,10 +99,17 @@ async function run(props: Props) {
 
       // cherry-pick and amend commits one by one
       for (const commit of group.commits) {
+        // ensure clean base to avoid conflicts when applying patch
+        await cli(`git clean -fd`);
+
+        // create, apply and cleanup patch
         await cli(`git format-patch -1 ${commit.sha} --stdout > ${PATCH_FILE}`);
         await cli(`git apply ${PATCH_FILE}`);
         await cli(`rm ${PATCH_FILE}`);
+
+        // add all changes to stage
         await cli(`git add --all`);
+
         const new_message = await Metadata.write(commit.message, group.id);
         const git_commit_comand = [`git commit -m "${new_message}"`];
 
@@ -282,4 +289,4 @@ async function run(props: Props) {
 type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
 const get_group_url = (group: CommitMetadataGroup) => group.pr?.url || group.id;
 
-const PATCH_FILE = "mypatch.patch";
+const PATCH_FILE = "git-stack-cli-patch.patch";

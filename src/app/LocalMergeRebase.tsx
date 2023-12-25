@@ -90,9 +90,15 @@ async function run() {
         );
       }
 
+      // ensure clean base to avoid conflicts when applying patch
+      await cli(`git clean -fd`);
+
+      // create, apply and cleanup patch
       await cli(`git format-patch -1 ${commit.sha} --stdout > ${PATCH_FILE}`);
       await cli(`git apply ${PATCH_FILE}`);
       await cli(`rm ${PATCH_FILE}`);
+
+      // add all changes to stage
       await cli(`git add --all`);
 
       let new_message;
@@ -202,4 +208,4 @@ async function run() {
   }
 }
 
-const PATCH_FILE = "mypatch.patch";
+const PATCH_FILE = "git-stack-cli-patch.patch";
