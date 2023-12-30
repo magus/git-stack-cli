@@ -113,8 +113,11 @@ async function gather_metadata() {
     const origin_url = (await cli(`git config --get remote.origin.url`)).stdout;
     const repo_path = match_group(origin_url, RE.repo_path, "repo_path");
 
+    const repo_root = (await cli(`git rev-parse --show-toplevel`)).stdout;
+
     Store.setState((state) => {
       state.repo_path = repo_path;
+      state.repo_root = repo_root;
       state.master_branch = master_branch;
       state.head = head;
       state.merge_base = merge_base;

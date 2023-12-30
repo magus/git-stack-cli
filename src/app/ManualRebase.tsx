@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import fs from "node:fs";
+
 import * as Ink from "ink";
 
 import * as CommitMetadata from "../core/CommitMetadata.js";
@@ -36,11 +38,15 @@ async function run(props: Props) {
   const branch_name = state.branch_name;
   const merge_base = state.merge_base;
   const commit_map = state.commit_map;
+  const cwd = state.cwd;
+  const repo_root = state.repo_root;
 
   invariant(argv, "argv must exist");
   invariant(branch_name, "branch_name must exist");
   invariant(merge_base, "merge_base must exist");
   invariant(commit_map, "commit_map must exist");
+  invariant(cwd, "cwd must exist");
+  invariant(repo_root, "repo_root must exist");
 
   // always listen for SIGINT event and restore git state
   process.once("SIGINT", handle_exit);
@@ -73,6 +79,10 @@ async function run(props: Props) {
   }
 
   try {
+    // must perform rebase from repo root for applying git patch
+    process.chdir(repo_root);
+    await cli(`pwd`);
+
     // create temporary branch based on merge base
     await cli(`git checkout -b ${temp_branch_name} ${rebase_merge_base}`);
 
@@ -265,6 +275,13 @@ async function run(props: Props) {
         cli.sync(`git branch -D ${group.id}`, spawn_options);
       }
     }
+
+    // restore back to original dir
+    invariant(cwd, "cwd must exist");
+    if (fs.existsSync(cwd)) {
+      process.chdir(cwd);
+    }
+    cli.sync(`pwd`, spawn_options);
   }
 
   function handle_exit() {
