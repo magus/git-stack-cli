@@ -11,6 +11,14 @@
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
 
+    "types": [
+      // add bun-types for resolving imports
+      //
+      //   import { test, expect } from "bun:test";
+      //
+      "bun-types"
+    ],
+
     // provide backwards compatibility
     // nodejs allows you to import most commonjs packages with a default import
     // this flag tells typescript that it's okay to use import on commonjs modules
