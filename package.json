@@ -19,9 +19,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "lint:check": "eslint .",
+    "lint:check": "eslint . --cache",
     "lint": "npm run lint:check -- --fix",
-    "prettier:check": "prettier ./src --check",
+    "prettier:check": "prettier ./src --check --cache",
     "prettier": "npm run prettier:check -- --write",
     "test": "bun test src",
     "test:watch": "npm run test -- --watch",
