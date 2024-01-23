@@ -14,7 +14,39 @@ test("blank", () => {
 
 test("no prs does not modify body", () => {
   const args = {
-    body: `## Problem\n\nDescription of the problem\n\n## Solution\n\nSolved problem by doing x, y, z.`,
+    body: [
+      "## Problem,",
+      "",
+      ",Description of the problem,",
+      "",
+      ",## Solution,",
+      "",
+      ",Solved problem by doing x, y, z.",
+    ].join("\n"),
+    pr_url_list: [],
+    selected_url: "",
+  };
+
+  const output = StackSummaryTable.write(args);
+
+  expect(output).toBe(args.body);
+});
+
+test("handles bulleted lists", () => {
+  const body = [
+    "## Problem",
+    "",
+    "Description of the problem",
+    "",
+    "## Solution",
+    "",
+    "- keyboard modality escape key",
+    "- centralize settings",
+    "- move logic inside if branch",
+  ].join("\n");
+
+  const args = {
+    body,
     pr_url_list: [],
     selected_url: "",
   };
@@ -26,7 +58,15 @@ test("no prs does not modify body", () => {
 
 test("builds list of prs with selected emoji", () => {
   const args = {
-    body: "## Problem\n\nDescription of the problem\n\n## Solution\n\nSolved problem by doing x, y, z.",
+    body: [
+      "## Problem,",
+      "",
+      ",Description of the problem,",
+      "",
+      ",## Solution,",
+      "",
+      ",Solved problem by doing x, y, z.",
+    ].join("\n"),
     pr_url_list: [
       "https://github.com/magus/git-multi-diff-playground/pull/43",
       "https://github.com/magus/git-multi-diff-playground/pull/47",
