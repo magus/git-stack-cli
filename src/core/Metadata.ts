@@ -33,7 +33,7 @@ export function remove(message: string) {
   let result = message;
 
   // remove metadata
-  result = result.replace(new RegExp(RE.stack_id, "g"), "");
+  result = result.replace(new RegExp(RE.stack_id, "gmi"), "");
 
   result = result.trimEnd();
 
