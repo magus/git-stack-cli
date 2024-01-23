@@ -85,8 +85,7 @@ export function parse(body: string): Map<string, StackTableRow> {
     const parsed_row = row_match?.groups as StackTableRow;
 
     if (!parsed_row) {
-      // eslint-disable-next-line no-console
-      console.error(`parse row [${row}]`);
+      // skip invalid row
       continue;
     }
 
