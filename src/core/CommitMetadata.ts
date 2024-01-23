@@ -188,19 +188,19 @@ async function get_commit_list() {
 }
 
 export async function commit(sha: string) {
-  const raw_message = (await cli(`git show -s --format=%B ${sha}`)).stdout;
-  const branch_id = await Metadata.read(raw_message);
-  const message = display_message(raw_message);
+  const full_message = (await cli(`git show -s --format=%B ${sha}`)).stdout;
+  const branch_id = await Metadata.read(full_message);
+  const subject_line = get_subject_line(full_message);
 
   return {
     sha,
-    message,
-    raw_message,
+    full_message,
+    subject_line,
     branch_id,
   };
 }
 
-function display_message(message: string) {
+function get_subject_line(message: string) {
   const line_list = lines(message);
   const first_line = line_list[0];
   return Metadata.remove(first_line);

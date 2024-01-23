@@ -172,7 +172,7 @@ function SelectCommitRangesInternal(props: Props) {
     }
 
     return {
-      label: commit.message,
+      label: commit.subject_line,
       value: commit,
       selected,
       disabled,

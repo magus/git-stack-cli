@@ -77,7 +77,7 @@ async function run() {
               wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
               message="Dropping {commit_message} {pr_status}"
               values={{
-                commit_message: <Brackets>{commit.message}</Brackets>,
+                commit_message: <Brackets>{commit.subject_line}</Brackets>,
                 pr_status: <Parens>MERGED</Parens>,
               }}
             />
@@ -94,7 +94,7 @@ async function run() {
             wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
             message="Picking {commit_message}"
             values={{
-              commit_message: <Brackets>{commit.message}</Brackets>,
+              commit_message: <Brackets>{commit.subject_line}</Brackets>,
             }}
           />
         );
@@ -113,9 +113,12 @@ async function run() {
 
       let new_message;
       if (commit.branch_id) {
-        new_message = await Metadata.write(commit.message, commit.branch_id);
+        new_message = await Metadata.write(
+          commit.full_message,
+          commit.branch_id
+        );
       } else {
-        new_message = commit.message;
+        new_message = commit.full_message;
       }
 
       const git_commit_comand = [`git commit -m "${new_message}"`];
@@ -140,7 +143,7 @@ async function run() {
         }
 
         // missing PR, clear branch id from commit
-        const new_message = await Metadata.remove(commit.message);
+        const new_message = await Metadata.remove(commit.full_message);
         await cli(`git commit --amend -m "${new_message}"`);
       }
     }
