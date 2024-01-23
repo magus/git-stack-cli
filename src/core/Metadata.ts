@@ -1,7 +1,7 @@
 import { invariant } from "../core/invariant.js";
 import { safe_quote } from "../core/safe_quote.js";
 
-export function write(message: string, branch_id: string) {
+export function write(message: string, stack_id: string) {
   let result = message;
 
   // escape double-quote for cli
@@ -10,14 +10,14 @@ export function write(message: string, branch_id: string) {
   // remove any previous metadata lines
   result = remove(result);
 
-  const line_list = [result, "", TEMPLATE.branch_id(branch_id)];
+  const line_list = [result, "", TEMPLATE.stack_id(stack_id)];
   const new_message = line_list.join("\n");
 
   return new_message;
 }
 
 export function read(message: string): null | string {
-  const match = message.match(RE.branch_id);
+  const match = message.match(RE.stack_id);
 
   if (!match?.groups) {
     return null;
@@ -33,7 +33,7 @@ export function remove(message: string) {
   let result = message;
 
   // remove metadata
-  result = result.replace(new RegExp(RE.branch_id, "g"), "");
+  result = result.replace(new RegExp(RE.stack_id, "g"), "");
 
   result = result.trimEnd();
 
@@ -41,11 +41,11 @@ export function remove(message: string) {
 }
 
 const TEMPLATE = {
-  branch_id(id: string) {
+  stack_id(id: string) {
     return `git-stack-id: ${id}`;
   },
 };
 
 const RE = {
-  branch_id: new RegExp(TEMPLATE.branch_id("(?<id>[a-z0-9-+=]+)"), "i"),
+  stack_id: new RegExp(TEMPLATE.stack_id("(?<id>[a-z0-9-+=]+)"), "i"),
 };
