@@ -183,17 +183,8 @@ const BaseStore = createStore<State>()(
 
     mutate: {
       output(state, args) {
-        switch (typeof args.node) {
-          case "boolean":
-          case "number":
-          case "string":
-            state.output.push(
-              <Ink.Text dimColor={args.debug}>{String(args.node)}</Ink.Text>
-            );
-            return;
-        }
-
-        state.output.push(args.node);
+        const renderOutput = renderOutputArgs(args);
+        state.output.push(renderOutput);
       },
 
       pending_output(state, args) {
@@ -207,18 +198,8 @@ const BaseStore = createStore<State>()(
           state.pending_output[id] = [];
         }
 
-        switch (typeof args.node) {
-          case "boolean":
-          case "number":
-          case "string": {
-            state.pending_output[id].push(
-              <Ink.Text dimColor={args.debug}>{String(args.node)}</Ink.Text>
-            );
-            return;
-          }
-        }
-
-        state.pending_output[id].push(args.node);
+        const renderOutput = renderOutputArgs(args);
+        state.pending_output[id].push(renderOutput);
       },
 
       end_pending_output(state, id) {
@@ -233,6 +214,17 @@ const BaseStore = createStore<State>()(
     },
   }))
 );
+
+function renderOutputArgs(args: MutateOutputArgs) {
+  switch (typeof args.node) {
+    case "boolean":
+    case "number":
+    case "string":
+      return <Ink.Text dimColor={args.debug}>{String(args.node)}</Ink.Text>;
+  }
+
+  return args.node;
+}
 
 function useState<R>(selector: (state: State) => R): R {
   return useStore(BaseStore, selector);
