@@ -80,7 +80,6 @@ async function gather_metadata() {
 
     // handle detahed head state
     if (branch_name === "HEAD") {
-      actions.newline();
       actions.error("Must run within a branch.");
       actions.exit(0);
       return;
@@ -88,7 +87,6 @@ async function gather_metadata() {
 
     // handle when there are no detected changes
     if (branch_name === master_branch) {
-      actions.newline();
       actions.error("Must run within a branch.");
       actions.exit(0);
       return;
