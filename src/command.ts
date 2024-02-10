@@ -38,9 +38,9 @@ export async function command() {
 
       .option("update", {
         type: "boolean",
-        alias: ["u"],
+        alias: ["u", "upgrade"],
         default: false,
-        description: "Check for updates",
+        description: "Check and install the latest version",
       })
 
       .option("branch", {
