@@ -7,6 +7,7 @@ import { immer } from "zustand/middleware/immer";
 import { colors } from "../core/colors.js";
 
 import { Exit } from "./Exit.js";
+import { LogTimestamp } from "./LogTimestamp.js";
 
 import type { Argv } from "../command.js";
 import type * as CommitMetadata from "../core/CommitMetadata.js";
@@ -216,14 +217,25 @@ const BaseStore = createStore<State>()(
 );
 
 function renderOutputArgs(args: MutateOutputArgs) {
+  let output = args.node;
+
   switch (typeof args.node) {
     case "boolean":
     case "number":
     case "string":
-      return <Ink.Text dimColor={args.debug}>{String(args.node)}</Ink.Text>;
+      output = <Ink.Text dimColor={args.debug}>{String(args.node)}</Ink.Text>;
   }
 
-  return args.node;
+  if (args.debug) {
+    return (
+      <React.Fragment>
+        <LogTimestamp />
+        {output}
+      </React.Fragment>
+    );
+  }
+
+  return output;
 }
 
 function useState<R>(selector: (state: State) => R): R {
