@@ -1,6 +1,7 @@
 import * as child from "node:child_process";
 
 import { Store } from "../app/Store.js";
+import { Timer } from "../core/Timer.js";
 
 type SpawnOptions = Parameters<typeof child.spawn>[2];
 
@@ -14,6 +15,7 @@ type Return = {
   stdout: string;
   stderr: string;
   output: string;
+  duration: string;
 };
 
 let i = 0;
@@ -41,8 +43,10 @@ export async function cli(
     let output = "";
 
     const id = `${++i}-${command}`;
-    state.actions.debug(`[start] ${command}`);
-    state.actions.debug(`[⏳] ${command}\n`, id);
+    state.actions.debug(log.start(command));
+    state.actions.debug(log.pending(command), id);
+
+    const timer = Timer();
 
     function write_output(value: string) {
       output += value;
@@ -62,20 +66,23 @@ export async function cli(
     });
 
     childProcess.on("close", (unsafe_code) => {
+      const duration = timer.duration();
+
       const result = {
         command,
         code: unsafe_code || 0,
         stdout: stdout.trimEnd(),
         stderr: stderr.trimEnd(),
         output: output.trimEnd(),
+        duration,
       };
 
       state.actions.set((state) => state.mutate.end_pending_output(state, id));
-      state.actions.debug(`[end] ${command} (${result.code})`);
+      state.actions.debug(log.end(result));
       state.actions.debug(result.output);
 
       if (!options.ignoreExitCode && result.code !== 0) {
-        reject(new Error(`[${command}] (${result.code})`));
+        reject(new Error(log.error(result)));
       } else {
         resolve(result);
       }
@@ -102,8 +109,13 @@ cli.sync = function cli_sync(
     command = unsafe_command;
   }
 
-  state.actions.debug(`[start] ${command}`);
+  state.actions.debug(log.start(command));
+
+  const timer = Timer();
+
   const spawn_return = child.spawnSync("sh", ["-c", command], options);
+
+  const duration = timer.duration();
 
   const stdout = String(spawn_return.stdout);
   const stderr = String(spawn_return.stderr);
@@ -114,14 +126,35 @@ cli.sync = function cli_sync(
     stdout,
     stderr,
     output: [stdout, stderr].join(""),
+    duration,
   };
 
-  state.actions.debug(`[end] ${command} (${result.code})`);
+  state.actions.debug(log.end(result));
   state.actions.debug(result.output);
 
   if (!options.ignoreExitCode && result.code !== 0) {
-    throw new Error(`[${command}] (${result.code})`);
+    throw new Error(log.error(result));
   }
 
   return result;
+};
+
+const log = {
+  start(command: string) {
+    return `[start] ${command}`;
+  },
+
+  pending(command: string) {
+    return `[⏳] ${command}\n`;
+  },
+
+  end(result: Return) {
+    const { command, code, duration } = result;
+    return `[end] ${command} (exit_code=${code} duration=${duration})`;
+  },
+
+  error(result: Return) {
+    const { command, code, duration } = result;
+    return `${command} (exit_code=${code} duration=${duration})`;
+  },
 };
