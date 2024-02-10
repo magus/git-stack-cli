@@ -10,7 +10,6 @@
 - 🚫 **Avoid juggling mutiple branches and complex rebasing**
 - 📚 **Preserve your detailed commit history**
 
-
 ## Demo
 
 > <img src="https://github.com/magus/git-multi-diff-playground/assets/290084/069c304b-80cb-49a9-9dc6-4ed3b061a5bc">
@@ -22,7 +21,6 @@ npm i -g git-stack-cli
 ```
 
 ## Usage
-
 
 ```bash
 git stack
@@ -46,7 +44,6 @@ Managing stacked diffs manually involves managing multiple local branches, jumpi
 This process gets even more complicated when you start getting feedback in code review and have to update individual branches.
 Managing even a few stacked diffs requires a relatively strong knowledge of `git`, even with tricks like [`--update-refs`](https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---update-refs).
 
-
 ## How is this different than **`x`**
 
 ### [`ghstack`](https://github.com/ezyang/ghstack)
@@ -65,7 +62,8 @@ Managing even a few stacked diffs requires a relatively strong knowledge of `git
 npm run dev
 npm link
 
+# navigate to project to test within
+npm link git-stack-cli
+
 git stack --verbose
 ```
-
-
