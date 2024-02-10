@@ -80,6 +80,7 @@ export async function cli(
       state.actions.set((state) => state.mutate.end_pending_output(state, id));
       state.actions.debug(log.end(result));
       state.actions.debug(result.output);
+      state.actions.debug("\n");
 
       if (!options.ignoreExitCode && result.code !== 0) {
         reject(new Error(log.error(result)));
