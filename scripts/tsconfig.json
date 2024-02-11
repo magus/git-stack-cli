@@ -7,6 +7,11 @@
     "jsx": "react-jsx",
     "allowJs": true,
 
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    },
+
     "types": [
       // add bun-types for resolving imports
       //
