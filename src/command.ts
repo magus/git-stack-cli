@@ -69,6 +69,10 @@ export async function command() {
       // disallow unknown options
       .strict()
       .version(process.env.CLI_VERSION || "unknown")
-      .help("help").argv
+      .showHidden(
+        "show-hidden",
+        "Show hidden options via `git stack help --show-hidden`"
+      )
+      .help("help", "Show usage via `git stack help`").argv
   );
 }
