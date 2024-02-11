@@ -96,5 +96,5 @@ npm run release:npm
 ### Homebrew + Github
 
 ```bash
-npm run release:github
+npm run release:brew
 ```
