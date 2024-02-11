@@ -13,7 +13,12 @@
     "git-stack": "dist/cjs/index.cjs"
   },
   "files": [
-    "dist/cjs"
+    "dist/cjs",
+    "scripts",
+    "src",
+    "package-lock.json",
+    "rollup.config.mjs",
+    "tsconfig.json"
   ],
   "scripts": {
     "dev": "npm run build -- --watch",
