@@ -1,5 +1,15 @@
 # TODO
 
+- **homebrew formula**
+
+  - build from source to get bottles
+  - create brew formula from npm / github tarball and node
+  - https://registry.npmjs.org/git-stack-cli/-/git-stack-cli-1.0.2.tgz
+
+  - create version backups for homebrw
+  - mv `git-stack.rb` to `git-stack@version` for easily installing via explicit version
+  - see https://github.com/oven-sh/homebrew-bun
+
 - **multiselect with more items than terminal rows needs pagination**
 
   - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
