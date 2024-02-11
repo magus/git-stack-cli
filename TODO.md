@@ -1,16 +1,5 @@
 # TODO
 
-- **automating publish**
-
-  - pull `package.json` `version` first and ensure tag for `version` does not already exist
-  - automate `npm i`, `git commit` and `git tag`
-  - run `npm run build:standalone`
-  - publish release to github
-  - update `homebrew/git-stack.rb` formula
-  - use `shasum -a 256 git-stack-cli-[linux|macos]` to update `sha256` field
-  - update `version` field
-  - update `url` to github release download url
-
 - **multiselect with more items than terminal rows needs pagination**
 
   - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
