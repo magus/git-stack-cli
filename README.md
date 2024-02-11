@@ -59,6 +59,8 @@ Managing even a few stacked diffs requires a relatively strong knowledge of `git
 ## Development
 
 ```bash
+git submodule update --init --recursive
+npm i
 npm run dev
 npm link
 
