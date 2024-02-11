@@ -3,7 +3,7 @@
   "exclude": ["node_modules"],
 
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "dist/ts",
 
     "module": "node16",
     "moduleResolution": "node16",

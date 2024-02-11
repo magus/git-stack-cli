@@ -8,11 +8,15 @@ import { App } from "./app/App.js";
 import { Store } from "./app/Store.js";
 import { command } from "./command.js";
 
-const argv = await command();
-const ink = Ink.render(<App />);
+command()
+  .then((argv) => {
+    const ink = Ink.render(<App />);
 
-Store.setState((state) => {
-  state.ink = ink;
-  state.argv = argv;
-  state.cwd = process.cwd();
-});
+    Store.setState((state) => {
+      state.ink = ink;
+      state.argv = argv;
+      state.cwd = process.cwd();
+    });
+  })
+  // eslint-disable-next-line no-console
+  .catch(console.error);

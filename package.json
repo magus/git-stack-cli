@@ -11,27 +11,28 @@
   "type": "module",
   "preferGlobal": true,
   "bin": {
-    "git-stack": "dist/index.js"
+    "git-stack": "dist/ts/index.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
     "dev": "tsc --watch",
+    "build": "tsc",
+    "build:standalone": "bun run scripts/prepare-standalone.ts",
     "lint:check": "eslint . --cache",
     "lint": "npm run lint:check -- --fix",
     "prettier:check": "prettier ./src --check --cache",
     "prettier": "npm run prettier:check -- --write",
     "test": "bun test src",
     "test:watch": "npm run test -- --watch",
-    "test:all": "npm run prettier:check && npm run lint:check && npm run build",
+    "test:all": "npm run prettier:check && npm run lint:check && npm run build:standalone",
     "prepublishOnly": "npm run test:all"
   },
   "dependencies": {
     "chalk": "^5.3.0",
     "immer": "^10.0.3",
-    "ink": "^4.4.1",
+    "ink": "git://github.com/magus/ink-cjs.git#28e0ab1",
     "luxon": "^3.4.4",
     "react": "^18.2.0",
     "react-devtools-core": "^4.19.1",
@@ -40,6 +41,9 @@
     "zustand": "^4.4.4"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "@types/chalk": "^2.2.0",
     "@types/luxon": "^3.4.2",
     "@types/node": "^20.8.7",
@@ -47,12 +51,15 @@
     "@types/yargs": "^17.0.29",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.9.0",
+    "bun": "^1.0.26",
     "bun-types": "^1.0.21",
     "eslint": "^8.52.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-react": "^7.33.2",
+    "pkg": "^5.8.1",
     "prettier": "^3.0.3",
+    "rollup": "^4.10.0",
     "typescript": "^5.2.2"
   }
 }

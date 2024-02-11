@@ -67,3 +67,21 @@ npm link git-stack-cli
 
 git stack --verbose
 ```
+
+## Build standalone executable
+
+```bash
+npm run build:standalone
+```
+
+## Publishing
+
+> [!IMPORTANT]
+>
+> **You must update the `version` in `package.json` and commit all changes first!**
+
+```bash
+npm i
+git commit
+npm publish
+```

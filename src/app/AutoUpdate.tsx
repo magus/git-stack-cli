@@ -92,14 +92,20 @@ export function AutoUpdate(props: Props) {
       }
 
       const script_dir = path.dirname(fs.realpathSync(process.argv[1]));
-      const package_json_path = path.join(script_dir, "..", "package.json");
+
+      // dist/ts/index.js
+      const package_json_path = path.join(
+        script_dir,
+        "..",
+        "..",
+        "package.json"
+      );
+
       const package_json = read_json<{ version: string }>(package_json_path);
 
       if (!package_json) {
         // unable to find read package.json, skip auto update
-        throw new Error(
-          `Unable to find read package.json [${package_json_path}]`
-        );
+        throw new Error(`Unable to read package.json [${package_json_path}]`);
       }
 
       local_version = package_json.version;

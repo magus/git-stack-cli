@@ -16,6 +16,17 @@ module.exports = {
     },
 
     {
+      files: ["rollup.config.js"],
+
+      parserOptions: {
+        ecmaVersion: 2015,
+        sourceType: "module",
+      },
+
+      extends: ["eslint:recommended"],
+    },
+
+    {
       files: ["src/**/*.{ts,tsx}"],
 
       parser: "@typescript-eslint/parser",

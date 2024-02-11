@@ -40,3 +40,11 @@ export default {
   ],
 };
 ```
+
+it seems `pkg` works if we use `commonjs` format in a single file including all third party dependencies.
+so we use `rollup` to instead compile down to `format: "cjs"`.
+
+unfortunately `ink` dependency and it's `yoga` dependency both are using top-level `await` which is not
+supported in commonjs. so we fork and remove this to allow us to create the build.
+
+after this we are finally able to then compile the commonjs output into the final executable using `pkg`.
