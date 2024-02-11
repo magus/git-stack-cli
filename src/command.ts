@@ -68,7 +68,7 @@ export async function command() {
       .wrap(null)
       // disallow unknown options
       .strict()
-      .version()
+      .version(process.env.CLI_VERSION || "unknown")
       .help("help").argv
   );
 }

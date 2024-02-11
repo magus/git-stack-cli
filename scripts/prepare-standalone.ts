@@ -46,6 +46,8 @@ await Bun.write(
 
 process.chdir(PROJECT_DIR);
 
+Bun.env["NODE_ENV"] = "production";
+
 // run typescript build to generate module output
 const ts_build_cmd = Bun.spawn(["npm", "run", "build"], {
   stdout: "inherit",
@@ -66,7 +68,7 @@ const rollup_cmd = Bun.spawn(
 await rollup_cmd.exited;
 
 await fs.cp(
-  path.join(CJS_DIR, "index.js"),
+  path.join(CJS_DIR, "index.cjs"),
   path.join(STANDALONE_DIR, "index.js")
 );
 

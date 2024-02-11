@@ -11,7 +11,7 @@
   "type": "module",
   "preferGlobal": true,
   "bin": {
-    "git-stack": "dist/ts/index.js"
+    "git-stack": "dist/cjs/index.cjs"
   },
   "files": [
     "dist"
@@ -44,6 +44,8 @@
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/chalk": "^2.2.0",
     "@types/luxon": "^3.4.2",
     "@types/node": "^20.8.7",
