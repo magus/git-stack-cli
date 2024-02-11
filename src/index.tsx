@@ -4,9 +4,9 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { App } from "./app/App.js";
-import { Store } from "./app/Store.js";
-import { command } from "./command.js";
+import { App } from "~/app/App";
+import { Store } from "~/app/Store";
+import { command } from "~/command";
 
 command()
   .then((argv) => {

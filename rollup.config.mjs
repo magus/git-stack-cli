@@ -4,6 +4,7 @@ import * as fs from "node:fs/promises";
 import path from "node:path";
 import * as url from "node:url";
 
+import alias from "@rollup/plugin-alias";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import nodeResolve from "@rollup/plugin-node-resolve";
@@ -28,6 +29,9 @@ export default {
   plugins: [
     // force line break
     typescript(),
+    alias({
+      entries: [{ find: /^~\//, replacement: "./src/" }],
+    }),
     nodeResolve({ exportConditions: ["node"] }),
     commonjs(),
     json(),

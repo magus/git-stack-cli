@@ -16,8 +16,8 @@
     "dist"
   ],
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc",
+    "dev": "npm run build -- --watch",
+    "build": "rollup -c rollup.config.mjs",
     "build:standalone": "bun run scripts/prepare-standalone.ts",
     "lint:check": "eslint . --cache",
     "lint": "npm run lint:check -- --fix",
@@ -40,6 +40,7 @@
     "zustand": "^4.4.4"
   },
   "devDependencies": {
+    "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",

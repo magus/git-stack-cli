@@ -13,6 +13,11 @@
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
 
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"]
+    },
+
     "types": [
       // add bun-types for resolving imports
       //
