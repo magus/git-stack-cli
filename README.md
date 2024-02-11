@@ -17,7 +17,12 @@
 ## Install
 
 ```bash
+# node
 npm i -g git-stack-cli
+
+# homebrew
+brew tap magus/git-stack
+brew install git-stack
 ```
 
 ## Usage
@@ -88,7 +93,7 @@ npm run build:standalone
 npm run release:npm
 ```
 
-### Homebrew
+### Homebrew + Github
 
 ```bash
 npm run release:github
