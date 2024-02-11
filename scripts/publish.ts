@@ -28,6 +28,8 @@ if (git_tag.stdout) {
   process.exit(1);
 }
 
+await spawn(`npm run test:all`);
+
 await spawn(`npm run build:standalone`);
 
 process.chdir(STANDALONE_DIR);
