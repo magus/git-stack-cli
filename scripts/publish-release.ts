@@ -30,6 +30,16 @@ if (git_tag.stdout) {
   }
 }
 
+// confirm all files specified exist
+for (const filepath of package_json.files) {
+  if (!(await file.exists(filepath))) {
+    console.error("missing required file in package.json files", filepath);
+    if (!FORCE) {
+      process.exit(2);
+    }
+  }
+}
+
 await spawn(`npm run test:all`);
 
 await spawn(`npm run build:standalone`);
