@@ -13,7 +13,7 @@
     "git-stack": "dist/cjs/index.cjs"
   },
   "files": [
-    "dist"
+    "dist/cjs"
   ],
   "scripts": {
     "dev": "npm run build -- --watch",
