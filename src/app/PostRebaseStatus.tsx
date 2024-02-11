@@ -2,12 +2,11 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import * as CommitMetadata from "../core/CommitMetadata.js";
-import { invariant } from "../core/invariant.js";
-
-import { Await } from "./Await.js";
-import { StatusTable } from "./StatusTable.js";
-import { Store } from "./Store.js";
+import { Await } from "~/app/Await";
+import { StatusTable } from "~/app/StatusTable";
+import { Store } from "~/app/Store";
+import * as CommitMetadata from "~/core/CommitMetadata";
+import { invariant } from "~/core/invariant";
 
 export function PostRebaseStatus() {
   const argv = Store.useState((state) => state.argv);

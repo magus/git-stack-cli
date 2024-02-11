@@ -2,9 +2,8 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { colors } from "../core/colors.js";
-
-import { Parens } from "./Parens.js";
+import { Parens } from "~/app/Parens";
+import { colors } from "~/core/colors";
 
 type Props = {
   message: React.ReactNode;

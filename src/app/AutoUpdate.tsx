@@ -5,17 +5,16 @@ import path from "node:path";
 
 import * as Ink from "ink";
 
-import { cli } from "../core/cli.js";
-import { colors } from "../core/colors.js";
-import { fetch_json } from "../core/fetch_json.js";
-import { is_finite_value } from "../core/is_finite_value.js";
-import { read_json } from "../core/read_json.js";
-import { semver_compare } from "../core/semver_compare.js";
-import { sleep } from "../core/sleep.js";
-
-import { Brackets } from "./Brackets.js";
-import { FormatText } from "./FormatText.js";
-import { YesNoPrompt } from "./YesNoPrompt.js";
+import { Brackets } from "~/app/Brackets";
+import { FormatText } from "~/app/FormatText";
+import { YesNoPrompt } from "~/app/YesNoPrompt";
+import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
+import { fetch_json } from "~/core/fetch_json";
+import { is_finite_value } from "~/core/is_finite_value";
+import { read_json } from "~/core/read_json";
+import { semver_compare } from "~/core/semver_compare";
+import { sleep } from "~/core/sleep";
 
 type Props = {
   name: string;

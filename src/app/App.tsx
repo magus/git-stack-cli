@@ -1,16 +1,16 @@
 import * as React from "react";
 
-import { AutoUpdate } from "./AutoUpdate.js";
-import { Debug } from "./Debug.js";
-import { DependencyCheck } from "./DependencyCheck.js";
-import { GatherMetadata } from "./GatherMetadata.js";
-import { GithubApiError } from "./GithubApiError.js";
-import { LocalCommitStatus } from "./LocalCommitStatus.js";
-import { Main } from "./Main.js";
-import { Output } from "./Output.js";
-import { Providers } from "./Providers.js";
-import { RebaseCheck } from "./RebaseCheck.js";
-import { Store } from "./Store.js";
+import { AutoUpdate } from "~/app/AutoUpdate";
+import { Debug } from "~/app/Debug";
+import { DependencyCheck } from "~/app/DependencyCheck";
+import { GatherMetadata } from "~/app/GatherMetadata";
+import { GithubApiError } from "~/app/GithubApiError";
+import { LocalCommitStatus } from "~/app/LocalCommitStatus";
+import { Main } from "~/app/Main";
+import { Output } from "~/app/Output";
+import { Providers } from "~/app/Providers";
+import { RebaseCheck } from "~/app/RebaseCheck";
+import { Store } from "~/app/Store";
 
 export function App() {
   const actions = Store.useActions();

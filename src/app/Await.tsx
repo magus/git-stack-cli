@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { cache } from "../core/cache.js";
-import { invariant } from "../core/invariant.js";
+import { cache } from "~/core/cache";
+import { invariant } from "~/core/invariant";
 
 type Cache = ReturnType<typeof cache>;
 

@@ -5,13 +5,12 @@ import path from "node:path";
 
 import * as Ink from "ink";
 
-import { cli } from "../core/cli.js";
-import { colors } from "../core/colors.js";
-import { invariant } from "../core/invariant.js";
-
-import { Await } from "./Await.js";
-import { Store } from "./Store.js";
-import { YesNoPrompt } from "./YesNoPrompt.js";
+import { Await } from "~/app/Await";
+import { Store } from "~/app/Store";
+import { YesNoPrompt } from "~/app/YesNoPrompt";
+import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
 
 type Props = {
   children: React.ReactNode;

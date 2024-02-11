@@ -4,18 +4,18 @@ import fs from "node:fs";
 
 import * as Ink from "ink";
 
-import * as CommitMetadata from "../core/CommitMetadata.js";
-import * as Metadata from "../core/Metadata.js";
-import { cli } from "../core/cli.js";
-import { colors } from "../core/colors.js";
-import { invariant } from "../core/invariant.js";
-import { short_id } from "../core/short_id.js";
+import { Await } from "~/app/Await";
+import { Brackets } from "~/app/Brackets";
+import { FormatText } from "~/app/FormatText";
+import { Parens } from "~/app/Parens";
+import { Store } from "~/app/Store";
+import * as CommitMetadata from "~/core/CommitMetadata";
+import * as Metadata from "~/core/Metadata";
+import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
+import { short_id } from "~/core/short_id";
 
-import { Await } from "./Await.js";
-import { Brackets } from "./Brackets.js";
-import { FormatText } from "./FormatText.js";
-import { Parens } from "./Parens.js";
-import { Store } from "./Store.js";
 
 export function LocalMergeRebase() {
   return (

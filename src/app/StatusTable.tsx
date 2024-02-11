@@ -2,15 +2,15 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { assertNever } from "../core/assertNever.js";
-import { colors } from "../core/colors.js";
-import { invariant } from "../core/invariant.js";
 
-import { Store } from "./Store.js";
-import { Table } from "./Table.js";
-import { Url } from "./Url.js";
+import { Store } from "~/app/Store";
+import { Table } from "~/app/Table";
+import { Url } from "~/app/Url";
+import { assertNever } from "~/core/assertNever";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
 
-import type { TableColumnProps } from "./Table.js";
+import type { TableColumnProps } from "~/app/Table";
 
 export function StatusTable() {
   const commit_range = Store.useState((state) => state.commit_range);

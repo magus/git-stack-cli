@@ -2,10 +2,9 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { sleep } from "../core/sleep.js";
-
-import { Await } from "./Await.js";
-import { Store } from "./Store.js";
+import { Await } from "~/app/Await";
+import { Store } from "~/app/Store";
+import { sleep } from "~/core/sleep";
 
 export function Waterfall() {
   return (

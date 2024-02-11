@@ -2,7 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { is_finite_value } from "../core/is_finite_value.js";
+import { is_finite_value } from "~/core/is_finite_value";
 
 type Props<T extends BaseRow> = {
   data: Array<T>;

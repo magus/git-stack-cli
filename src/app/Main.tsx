@@ -1,16 +1,16 @@
 import * as React from "react";
 
-import { assertNever } from "../core/assertNever.js";
 
-import { GithubApiError } from "./GithubApiError.js";
-import { LocalMergeRebase } from "./LocalMergeRebase.js";
-import { ManualRebase } from "./ManualRebase.js";
-import { PostRebaseStatus } from "./PostRebaseStatus.js";
-import { PreLocalMergeRebase } from "./PreLocalMergeRebase.js";
-import { PreSelectCommitRanges } from "./PreSelectCommitRanges.js";
-import { SelectCommitRanges } from "./SelectCommitRanges.js";
-import { Status } from "./Status.js";
-import { Store } from "./Store.js";
+import { GithubApiError } from "~/app/GithubApiError";
+import { LocalMergeRebase } from "~/app/LocalMergeRebase";
+import { ManualRebase } from "~/app/ManualRebase";
+import { PostRebaseStatus } from "~/app/PostRebaseStatus";
+import { PreLocalMergeRebase } from "~/app/PreLocalMergeRebase";
+import { PreSelectCommitRanges } from "~/app/PreSelectCommitRanges";
+import { SelectCommitRanges } from "~/app/SelectCommitRanges";
+import { Status } from "~/app/Status";
+import { Store } from "~/app/Store";
+import { assertNever } from "~/core/assertNever";
 
 export function Main() {
   const step = Store.useState((state) => state.step);

@@ -2,7 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { colors } from "../core/colors.js";
+import { colors } from "~/core/colors";
 
 type Props = InkTextProps & {
   children: React.ReactNode;

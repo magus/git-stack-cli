@@ -2,15 +2,14 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { cli } from "../core/cli.js";
-import { colors } from "../core/colors.js";
-import { invariant } from "../core/invariant.js";
-import { match_group } from "../core/match_group.js";
-
-import { Await } from "./Await.js";
-import { Brackets } from "./Brackets.js";
-import { FormatText } from "./FormatText.js";
-import { Store } from "./Store.js";
+import { Await } from "~/app/Await";
+import { Brackets } from "~/app/Brackets";
+import { FormatText } from "~/app/FormatText";
+import { Store } from "~/app/Store";
+import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
+import { match_group } from "~/core/match_group";
 
 type Props = {
   children: React.ReactNode;

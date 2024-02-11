@@ -2,10 +2,10 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { clamp } from "../core/clamp.js";
-import { colors } from "../core/colors.js";
-import { is_finite_value } from "../core/is_finite_value.js";
-import { wrap_index } from "../core/wrap_index.js";
+import { clamp } from "~/core/clamp";
+import { colors } from "~/core/colors";
+import { is_finite_value } from "~/core/is_finite_value";
+import { wrap_index } from "~/core/wrap_index";
 
 type Props<T> = {
   items: Array<Item<T>>;

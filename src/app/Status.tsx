@@ -2,14 +2,14 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { colors } from "../core/colors.js";
-import { invariant } from "../core/invariant.js";
 
-import { Await } from "./Await.js";
-import { StatusTable } from "./StatusTable.js";
-import { Store } from "./Store.js";
+import { Await } from "~/app/Await";
+import { StatusTable } from "~/app/StatusTable";
+import { Store } from "~/app/Store";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
 
-import type { Argv } from "../command.js";
+import type { Argv } from "~/command";
 
 export function Status() {
   const argv = Store.useState((state) => state.argv);

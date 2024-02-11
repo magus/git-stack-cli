@@ -1,7 +1,7 @@
 import * as child from "node:child_process";
 
-import { Store } from "../app/Store.js";
-import { Timer } from "../core/Timer.js";
+import { Store } from "~/app/Store";
+import { Timer } from "~/core/Timer";
 
 type SpawnOptions = Parameters<typeof child.spawn>[2];
 

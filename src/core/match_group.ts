@@ -1,4 +1,4 @@
-import { invariant } from "./invariant.js";
+import { invariant } from "~/core/invariant";
 
 export function match_group(value: string, re: RegExp, group: string) {
   const match = value.match(re);

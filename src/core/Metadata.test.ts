@@ -1,6 +1,6 @@
 import { test, expect } from "bun:test";
 
-import * as Metadata from "./Metadata.js";
+import * as Metadata from "~/core/Metadata";
 
 test("read handles bulleted lists", () => {
   const body = [

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { invariant } from "./invariant.js";
+import { invariant } from "~/core/invariant";
 
 export function is_command_available(command: string) {
   const PATH = process.env["PATH"];

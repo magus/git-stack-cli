@@ -1,8 +1,7 @@
-import { Store } from "../app/Store.js";
-
-import * as Metadata from "./Metadata.js";
-import { cli } from "./cli.js";
-import * as github from "./github.js";
+import { Store } from "~/app/Store";
+import * as Metadata from "~/core/Metadata";
+import { cli } from "~/core/cli";
+import * as github from "~/core/github";
 
 export type CommitMetadata = Awaited<ReturnType<typeof commit>>;
 export type CommitRange = Awaited<ReturnType<typeof range>>;

@@ -2,15 +2,14 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { cli } from "../core/cli.js";
-import { colors } from "../core/colors.js";
-import * as date from "../core/date.js";
-import { invariant } from "../core/invariant.js";
-
-import { Await } from "./Await.js";
-import { Brackets } from "./Brackets.js";
-import { Parens } from "./Parens.js";
-import { Store } from "./Store.js";
+import { Await } from "~/app/Await";
+import { Brackets } from "~/app/Brackets";
+import { Parens } from "~/app/Parens";
+import { Store } from "~/app/Store";
+import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
+import * as date from "~/core/date";
+import { invariant } from "~/core/invariant";
 
 export function GithubApiError() {
   const argv = Store.useState((state) => state.argv);

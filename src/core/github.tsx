@@ -6,13 +6,13 @@ import path from "node:path";
 
 import * as Ink from "ink";
 
-import { Brackets } from "../app/Brackets.js";
-import { Store } from "../app/Store.js";
-import { colors } from "../core/colors.js";
+import { Brackets } from "~/app/Brackets";
+import { Store } from "~/app/Store";
+import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
+import { safe_quote } from "~/core/safe_quote";
 
-import { cli } from "./cli.js";
-import { invariant } from "./invariant.js";
-import { safe_quote } from "./safe_quote.js";
 
 // prettier-ignore
 const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,body,url";

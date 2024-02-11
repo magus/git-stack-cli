@@ -4,15 +4,15 @@ import * as Ink from "ink";
 import { createStore, useStore } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
-import { colors } from "../core/colors.js";
+import { Exit } from "~/app/Exit";
+import { LogTimestamp } from "~/app/LogTimestamp";
+import { colors } from "~/core/colors";
 
-import { Exit } from "./Exit.js";
-import { LogTimestamp } from "./LogTimestamp.js";
-
-import type { Argv } from "../command.js";
-import type * as CommitMetadata from "../core/CommitMetadata.js";
-import type { PullRequest } from "../core/github.js";
 import type { Instance as InkInstance } from "ink";
+import type { Argv } from "~/command";
+import type * as CommitMetadata from "~/core/CommitMetadata";
+import type { PullRequest } from "~/core/github";
+
 
 type Setter = (state: State) => void;
 

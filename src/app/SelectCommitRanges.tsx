@@ -2,19 +2,19 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { colors } from "../core/colors.js";
-import { invariant } from "../core/invariant.js";
-import { short_id } from "../core/short_id.js";
-import { wrap_index } from "../core/wrap_index.js";
 
-import { Brackets } from "./Brackets.js";
-import { FormatText } from "./FormatText.js";
-import { MultiSelect } from "./MultiSelect.js";
-import { Parens } from "./Parens.js";
-import { Store } from "./Store.js";
-import { TextInput } from "./TextInput.js";
+import { Brackets } from "~/app/Brackets";
+import { FormatText } from "~/app/FormatText";
+import { MultiSelect } from "~/app/MultiSelect";
+import { Parens } from "~/app/Parens";
+import { Store } from "~/app/Store";
+import { TextInput } from "~/app/TextInput";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
+import { short_id } from "~/core/short_id";
+import { wrap_index } from "~/core/wrap_index";
 
-import type { State } from "./Store.js";
+import type { State } from "~/app/Store";
 
 export function SelectCommitRanges() {
   const commit_range = Store.useState((state) => state.commit_range);

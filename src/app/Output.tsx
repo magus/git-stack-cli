@@ -2,7 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { Store } from "./Store.js";
+import { Store } from "~/app/Store";
 
 export function Output() {
   const output = Store.useState((state) => state.output);

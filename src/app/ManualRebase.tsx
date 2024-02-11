@@ -4,19 +4,18 @@ import fs from "node:fs";
 
 import * as Ink from "ink";
 
-import * as CommitMetadata from "../core/CommitMetadata.js";
-import * as Metadata from "../core/Metadata.js";
-import * as StackSummaryTable from "../core/StackSummaryTable.js";
-import { cli } from "../core/cli.js";
-import { colors } from "../core/colors.js";
-import * as github from "../core/github.js";
-import { invariant } from "../core/invariant.js";
-import { short_id } from "../core/short_id.js";
-
-import { Await } from "./Await.js";
-import { Brackets } from "./Brackets.js";
-import { FormatText } from "./FormatText.js";
-import { Store } from "./Store.js";
+import { Await } from "~/app/Await";
+import { Brackets } from "~/app/Brackets";
+import { FormatText } from "~/app/FormatText";
+import { Store } from "~/app/Store";
+import * as CommitMetadata from "~/core/CommitMetadata";
+import * as Metadata from "~/core/Metadata";
+import * as StackSummaryTable from "~/core/StackSummaryTable";
+import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
+import * as github from "~/core/github";
+import { invariant } from "~/core/invariant";
+import { short_id } from "~/core/short_id";
 
 type Props = {
   skipSync?: boolean;

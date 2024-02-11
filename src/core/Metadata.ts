@@ -1,5 +1,5 @@
-import { invariant } from "../core/invariant.js";
-import { safe_quote } from "../core/safe_quote.js";
+import { invariant } from "~/core/invariant";
+import { safe_quote } from "~/core/safe_quote";
 
 export function write(message: string, stack_id: string) {
   let result = message;

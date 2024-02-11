@@ -1,6 +1,6 @@
 import { test, expect } from "bun:test";
 
-import * as StackSummaryTable from "./StackSummaryTable.js";
+import * as StackSummaryTable from "~/core/StackSummaryTable";
 
 test("blank", () => {
   const output = StackSummaryTable.write({

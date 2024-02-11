@@ -5,11 +5,10 @@ import path from "node:path";
 
 import * as Ink from "ink";
 
-import { colors } from "../core/colors.js";
-import { invariant } from "../core/invariant.js";
-import * as json from "../core/json.js";
-
-import { Store } from "./Store.js";
+import { Store } from "~/app/Store";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
+import * as json from "~/core/json";
 
 export function Debug() {
   const actions = Store.useActions();

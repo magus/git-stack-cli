@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Store } from "./Store.js";
+import { Store } from "~/app/Store";
 
 type Props = {
   clear: boolean;

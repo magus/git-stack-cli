@@ -2,13 +2,12 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import * as CommitMetadata from "../core/CommitMetadata.js";
-import { colors } from "../core/colors.js";
-import { invariant } from "../core/invariant.js";
-import * as json from "../core/json.js";
-
-import { Await } from "./Await.js";
-import { Store } from "./Store.js";
+import { Await } from "~/app/Await";
+import { Store } from "~/app/Store";
+import * as CommitMetadata from "~/core/CommitMetadata";
+import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
+import * as json from "~/core/json";
 
 type Props = {
   children: React.ReactNode;
@@ -38,7 +37,7 @@ export function LocalCommitStatus(props: Props) {
 }
 
 async function mock_metadata() {
-  const module = await import("../__fixtures__/metadata.js");
+  const module = await import("../__fixtures__/metadata");
 
   const deserialized = json.deserialize(module.METADATA);
 

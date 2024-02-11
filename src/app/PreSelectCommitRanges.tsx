@@ -1,9 +1,9 @@
 import * as React from "react";
 
-import { invariant } from "../core/invariant.js";
 
-import { Store } from "./Store.js";
-import { YesNoPrompt } from "./YesNoPrompt.js";
+import { Store } from "~/app/Store";
+import { YesNoPrompt } from "~/app/YesNoPrompt";
+import { invariant } from "~/core/invariant";
 
 export function PreSelectCommitRanges() {
   const actions = Store.useActions();

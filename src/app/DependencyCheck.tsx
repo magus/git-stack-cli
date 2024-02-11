@@ -2,17 +2,16 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-import { cli } from "../core/cli.js";
-import { colors } from "../core/colors.js";
-import { is_command_available } from "../core/is_command_available.js";
-import { match_group } from "../core/match_group.js";
-import { semver_compare } from "../core/semver_compare.js";
-
-import { Await } from "./Await.js";
-import { Command } from "./Command.js";
-import { Parens } from "./Parens.js";
-import { Store } from "./Store.js";
-import { Url } from "./Url.js";
+import { Await } from "~/app/Await";
+import { Command } from "~/app/Command";
+import { Parens } from "~/app/Parens";
+import { Store } from "~/app/Store";
+import { Url } from "~/app/Url";
+import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
+import { is_command_available } from "~/core/is_command_available";
+import { match_group } from "~/core/match_group";
+import { semver_compare } from "~/core/semver_compare";
 
 type Props = {
   children: React.ReactNode;
