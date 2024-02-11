@@ -7,6 +7,7 @@ module.exports = {
       files: [".eslintrc.{js,cjs}"],
 
       parserOptions: {
+        ecmaVersion: 13, // ES2022
         sourceType: "script",
       },
 
@@ -19,7 +20,7 @@ module.exports = {
       files: ["rollup.config.js"],
 
       parserOptions: {
-        ecmaVersion: 2015,
+        ecmaVersion: 13, // ES2022
         sourceType: "module",
       },
 
