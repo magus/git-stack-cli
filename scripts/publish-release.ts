@@ -77,11 +77,17 @@ await spawn.sync(`gh release upload ${version} ${linux_asset.name}`);
 await spawn.sync(`gh release upload ${version} ${macos_asset.name}`);
 await spawn.sync(`gh release upload ${version} ${win_asset.name}`);
 
-await spawn(`npm publish`);
-
 console.debug();
 console.debug("✅", "published", version);
-console.debug("https://github.com/magus/git-stack-cli/releases");
+console.debug();
+console.debug("  https://github.com/magus/git-stack-cli/releases");
+console.debug();
+
+console.debug();
+console.debug("Don't forget to run `npm publish` to update the NPM registry!");
+console.debug();
+console.debug("  npm publish");
+console.debug();
 
 // https://github.com/magus/git-stack-cli/releases/download/0.8.9/git-stack-cli-linux
 async function create_asset(name: string) {

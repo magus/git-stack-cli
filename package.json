@@ -19,6 +19,8 @@
     "dev": "npm run build -- --watch",
     "build": "rollup -c rollup.config.mjs",
     "build:standalone": "bun run scripts/prepare-standalone.ts",
+    "release:github": "bun run scripts/publish-release.ts",
+    "release:npm": "npm publish",
     "lint:check": "eslint . --cache",
     "lint": "npm run lint:check -- --fix",
     "prettier:check": "prettier ./src --check --cache",
