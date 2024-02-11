@@ -58,7 +58,7 @@ await ts_build_cmd.exited;
 
 // run rollup to generate commonjs for building standalone
 const rollup_cmd = Bun.spawn(
-  [path.join(NODE_MODULES_BIN, "rollup"), "-c", "rollup.config.js"],
+  [path.join(NODE_MODULES_BIN, "rollup"), "-c", "rollup.config.mjs"],
   {
     stdout: "inherit",
     stderr: "inherit",

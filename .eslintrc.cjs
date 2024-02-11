@@ -19,7 +19,7 @@ module.exports = {
     },
 
     {
-      files: ["rollup.config.js"],
+      files: ["rollup.config.mjs"],
 
       parserOptions: {
         ecmaVersion: 13, // ES2022
