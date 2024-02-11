@@ -3,10 +3,12 @@
   "exclude": ["node_modules"],
 
   "compilerOptions": {
-    "outDir": "dist/ts",
+    // prevent outputting any files, rollup will handle that
+    "noEmit": true,
 
-    "module": "node16",
-    "moduleResolution": "node16",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+
     "moduleDetection": "force",
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],

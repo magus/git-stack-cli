@@ -9,7 +9,6 @@
     "url": "https://github.com/magus/git-stack-cli.git"
   },
   "type": "module",
-  "preferGlobal": true,
   "bin": {
     "git-stack": "dist/cjs/index.cjs"
   },
