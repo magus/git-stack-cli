@@ -1,8 +1,7 @@
 import * as fs from "node:fs/promises";
 import path from "node:path";
 
-import * as json from "~/core/json";
-
+import * as file from "~/core/file";
 import { spawn } from "~/core/spawn";
 
 // get paths relative to this script
@@ -17,7 +16,9 @@ const STANDALONE_DIR = path.join(DIST_DIR, "standalone");
 await fs.rmdir(DIST_DIR, { recursive: true });
 await fs.mkdir(DIST_DIR, { recursive: true });
 
-const package_json = await json.read(path.join(PROJECT_DIR, "package.json"));
+const package_json = await file.read_json(
+  path.join(PROJECT_DIR, "package.json")
+);
 
 // prettier-ignore
 const { name, version, description, author, license, repository } = package_json;
@@ -35,7 +36,7 @@ const standalone_package_json = {
   },
 };
 
-await json.write(
+await file.write_json(
   path.join(STANDALONE_DIR, "package.json"),
   standalone_package_json
 );
