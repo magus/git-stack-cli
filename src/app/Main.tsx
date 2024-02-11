@@ -1,6 +1,5 @@
 import * as React from "react";
 
-
 import { GithubApiError } from "~/app/GithubApiError";
 import { LocalMergeRebase } from "~/app/LocalMergeRebase";
 import { ManualRebase } from "~/app/ManualRebase";

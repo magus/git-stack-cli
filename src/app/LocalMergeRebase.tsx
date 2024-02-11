@@ -16,7 +16,6 @@ import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 import { short_id } from "~/core/short_id";
 
-
 export function LocalMergeRebase() {
   return (
     <Await

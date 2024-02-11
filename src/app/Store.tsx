@@ -13,7 +13,6 @@ import type { Argv } from "~/command";
 import type * as CommitMetadata from "~/core/CommitMetadata";
 import type { PullRequest } from "~/core/github";
 
-
 type Setter = (state: State) => void;
 
 type CommitMap = Parameters<typeof CommitMetadata.range>[0];

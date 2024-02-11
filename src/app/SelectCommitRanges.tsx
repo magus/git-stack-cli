@@ -2,7 +2,6 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-
 import { Brackets } from "~/app/Brackets";
 import { FormatText } from "~/app/FormatText";
 import { MultiSelect } from "~/app/MultiSelect";

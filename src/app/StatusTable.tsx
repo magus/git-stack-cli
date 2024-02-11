@@ -2,7 +2,6 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-
 import { Store } from "~/app/Store";
 import { Table } from "~/app/Table";
 import { Url } from "~/app/Url";

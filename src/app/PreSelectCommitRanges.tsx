@@ -1,6 +1,5 @@
 import * as React from "react";
 
-
 import { Store } from "~/app/Store";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
 import { invariant } from "~/core/invariant";

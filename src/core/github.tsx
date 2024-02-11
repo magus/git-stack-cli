@@ -13,7 +13,6 @@ import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 import { safe_quote } from "~/core/safe_quote";
 
-
 // prettier-ignore
 const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,body,url";
 

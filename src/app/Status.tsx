@@ -2,7 +2,6 @@ import * as React from "react";
 
 import * as Ink from "ink";
 
-
 import { Await } from "~/app/Await";
 import { StatusTable } from "~/app/StatusTable";
 import { Store } from "~/app/Store";
