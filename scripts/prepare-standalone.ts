@@ -2,8 +2,8 @@ import path from "node:path";
 import * as fs from "node:fs/promises";
 
 // get paths relative to this script
-const SCRIPT_PATH = new URL(import.meta.url).pathname;
-const PROJECT_DIR = path.join(SCRIPT_PATH, "..", "..");
+const SCRIPT_DIR = path.dirname(new URL(import.meta.url).pathname);
+const PROJECT_DIR = path.join(SCRIPT_DIR, "..");
 const NODE_MODULES_BIN = path.join(PROJECT_DIR, "node_modules", ".bin");
 const DIST_DIR = path.join(PROJECT_DIR, "dist");
 const CJS_DIR = path.join(DIST_DIR, "cjs");
