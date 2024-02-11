@@ -27,7 +27,7 @@
     "prettier": "npm run prettier:check -- --write",
     "test": "bun test src",
     "test:watch": "npm run test -- --watch",
-    "test:all": "npm run prettier:check && npm run lint:check && npm run build:standalone",
+    "test:all": "npm run prettier:check && npm run lint:check && npm run build",
     "prepublishOnly": "npm run test:all"
   },
   "dependencies": {
