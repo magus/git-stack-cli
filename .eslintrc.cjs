@@ -1,3 +1,5 @@
+const import_eslint = require("./config/eslint/import.eslint.cjs");
+
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
   ignorePatterns: ["dist/*", "node_modules/*"],
@@ -25,6 +27,10 @@ module.exports = {
       },
 
       extends: ["eslint:recommended"],
+
+      rules: {
+        ...import_eslint.rules,
+      },
     },
 
     {
@@ -75,40 +81,7 @@ module.exports = {
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-floating-promises": ["error"],
 
-        "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
-        "import/newline-after-import": ["error"],
-        "import/order": [
-          "error",
-          {
-            "newlines-between": "always",
-
-            "alphabetize": {
-              order: "asc",
-              orderImportKind: "asc",
-            },
-
-            "groups": [
-              "builtin",
-              "external",
-              "internal",
-              "parent",
-              "sibling",
-              "index",
-              "object",
-              "type",
-            ],
-
-            "pathGroups": [
-              {
-                pattern: "react",
-                group: "builtin",
-                position: "before",
-              },
-            ],
-
-            "pathGroupsExcludedImportTypes": ["react"],
-          },
-        ],
+        ...import_eslint.rules,
       },
     },
   ],
