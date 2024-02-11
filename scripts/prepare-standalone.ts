@@ -1,5 +1,5 @@
-import path from "node:path";
 import * as fs from "node:fs/promises";
+import path from "node:path";
 
 // get paths relative to this script
 const SCRIPT_DIR = path.dirname(new URL(import.meta.url).pathname);
