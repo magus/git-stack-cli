@@ -4,8 +4,8 @@ import * as file from "~/core/file";
 import { spawn } from "~/core/spawn";
 
 // cli args
-// const args = process.argv.slice(2);
-// const SAVE = args.includes("--save");
+const args = process.argv.slice(2);
+const FORCE = args.includes("--force");
 
 // get paths relative to this script
 const SCRIPT_DIR = path.dirname(new URL(import.meta.url).pathname);
@@ -24,8 +24,10 @@ const version = package_json.version;
 const git_tag = await spawn.sync(`git tag -l ${version}`);
 
 if (git_tag.stdout) {
-  console.error(`tag [${version}] already exists, skipping publish`);
-  process.exit(1);
+  console.error(`tag [${version}] already exists`);
+  if (!FORCE) {
+    process.exit(1);
+  }
 }
 
 await spawn(`npm run test:all`);
