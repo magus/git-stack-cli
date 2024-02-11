@@ -3,7 +3,7 @@ import * as React from "react";
 import fs from "node:fs";
 import path from "node:path";
 
-import * as Ink from "ink";
+import * as Ink from "ink-cjs";
 
 import { Brackets } from "~/app/Brackets";
 import { FormatText } from "~/app/FormatText";

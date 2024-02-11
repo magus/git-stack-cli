@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import * as Ink from "ink";
+import * as Ink from "ink-cjs";
 
 import { App } from "~/app/App";
 import { Store } from "~/app/Store";

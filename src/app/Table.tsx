@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import * as Ink from "ink";
+import * as Ink from "ink-cjs";
 
 import { is_finite_value } from "~/core/is_finite_value";
 

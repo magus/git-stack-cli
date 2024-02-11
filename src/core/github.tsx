@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import * as Ink from "ink";
+import * as Ink from "ink-cjs";
 
 import { Brackets } from "~/app/Brackets";
 import { Store } from "~/app/Store";

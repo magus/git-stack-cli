@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import * as Ink from "ink";
+import * as Ink from "ink-cjs";
 import { createStore, useStore } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
@@ -8,7 +8,7 @@ import { Exit } from "~/app/Exit";
 import { LogTimestamp } from "~/app/LogTimestamp";
 import { colors } from "~/core/colors";
 
-import type { Instance as InkInstance } from "ink";
+import type { Instance as InkInstance } from "ink-cjs";
 import type { Argv } from "~/command";
 import type * as CommitMetadata from "~/core/CommitMetadata";
 import type { PullRequest } from "~/core/github";

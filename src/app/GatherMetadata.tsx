@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import * as Ink from "ink";
+import * as Ink from "ink-cjs";
 
 import { Await } from "~/app/Await";
 import { Brackets } from "~/app/Brackets";
