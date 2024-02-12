@@ -94,20 +94,22 @@ core = core.replace(re_token("linux_sha256"), linux_asset.sha256);
 
 await file.write_text(path.join("Formula", "git-stack.core.rb"), core);
 
-// // commit homebrew repo changes
-// await spawn.sync(`git commit -a -m ${version}`);
-// await spawn.sync(`git push`);
+// finally upload the assets to the github release
+process.chdir(STANDALONE_DIR);
+await spawn.sync(`gh release upload ${version} ${linux_asset.filepath}`);
+await spawn.sync(`gh release upload ${version} ${macos_asset.filepath}`);
+await spawn.sync(`gh release upload ${version} ${win_asset.filepath}`);
 
-// // commmit changes to main repo
-// process.chdir(PROJECT_DIR);
-// await spawn.sync(`git commit -a -m "homebrew-git-stack ${version}"`);
-// await spawn.sync(`git push`);
+// commit homebrew repo changes
+process.chdir(HOMEBREW_DIR);
+await spawn.sync(`git add .`);
+await spawn.sync(`git commit -m ${version}`);
+await spawn.sync(`git push`);
 
-// // finally upload the assets to the github release
-// process.chdir(STANDALONE_DIR);
-// await spawn.sync(`gh release upload ${version} ${linux_asset.filepath}`);
-// await spawn.sync(`gh release upload ${version} ${macos_asset.filepath}`);
-// await spawn.sync(`gh release upload ${version} ${win_asset.filepath}`);
+// commmit changes to main repo
+process.chdir(PROJECT_DIR);
+await spawn.sync(`git commit -a -m "homebrew-git-stack ${version}"`);
+await spawn.sync(`git push`);
 
 console.debug();
 console.debug("✅", "published", version);
