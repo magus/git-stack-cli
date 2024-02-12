@@ -56,4 +56,4 @@ await fs.cp(
 process.chdir(STANDALONE_DIR);
 
 // run pkg to build standalone executable
-await spawn(`${path.join(NODE_MODULES_BIN, "pkg")} package.json`);
+await spawn([path.join(NODE_MODULES_BIN, "pkg"), "package.json"]);
