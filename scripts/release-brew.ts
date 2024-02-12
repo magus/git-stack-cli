@@ -50,7 +50,7 @@ previous_formula = previous_formula.replace(
 );
 
 await file.write_text(
-  path.join(HOMEBREW_DIR, "Formula", `git-stack@${previous_version}`),
+  path.join(HOMEBREW_DIR, "Formula", `git-stack@${previous_version}.rb`),
   previous_formula
 );
 
