@@ -1,16 +1,5 @@
 # TODO
 
-- **homebrew formula**
-
-  - submit PR to homebrew/core
-  - build from source to get bottles
-
-  - create formula from template for build version of git-stack
-
-  - create version backups for each homebrew formula in repo
-  - mv `git-stack.rb` to `git-stack@version` for easily installing via explicit version
-  - see https://github.com/oven-sh/homebrew-bun
-
 - **multiselect with more items than terminal rows needs pagination**
 
   - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
