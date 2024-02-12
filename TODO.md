@@ -5,6 +5,8 @@
   - submit PR to homebrew/core
   - build from source to get bottles
 
+  - create formula from template for build version of git-stack
+
   - create version backups for each homebrew formula in repo
   - mv `git-stack.rb` to `git-stack@version` for easily installing via explicit version
   - see https://github.com/oven-sh/homebrew-bun
