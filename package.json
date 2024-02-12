@@ -23,7 +23,7 @@
   "scripts": {
     "dev": "npm run build -- --watch",
     "build": "rollup -c rollup.config.mjs",
-    "build:standalone": "bun run scripts/prepare-standalone.ts",
+    "build:standalone": "bun run scripts/build-standalone.ts",
     "release:npm": "bun run scripts/release-npm.ts",
     "release:github": "bun run scripts/release-github.ts",
     "release:brew": "bun run scripts/release-brew.ts",
