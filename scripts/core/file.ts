@@ -32,5 +32,9 @@ export async function exists(filepath: string) {
 }
 
 export async function rm(filepath: string) {
-  await fs.rm(filepath);
+  return fs.rm(filepath);
+}
+
+export async function mv(source: string, destination: string) {
+  return fs.rename(source, destination);
 }
