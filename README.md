@@ -44,7 +44,7 @@ Often pushing all your commits to a single pull request is the simplest and fast
 This comes at a price, your teammates have to review larger, less related pieces of code and you will lose some of your atomic commit history if you "Squash and merge".
 
 When you decide to break changes up into multiple diffs that depend on one another this process is commonly referred to as **[stacked diffs](https://graphite.dev/guides/stacked-diffs)** (pull requests that depend on other pull requests).
-This appraoch is popular at many major comparnies such as Twitter, Facebook, etc.
+This approach is popular at many major companies such as Twitter, Facebook, etc.
 Managing stacked diffs manually involves managing multiple local branches, jumping between them, rebasing, etc.
 This process gets even more complicated when you start getting feedback in code review and have to update individual branches.
 Managing even a few stacked diffs requires a relatively strong knowledge of `git`, even with tricks like [`--update-refs`](https://git-scm.com/docs/git-rebase#Documentation/git-rebase.txt---update-refs).
