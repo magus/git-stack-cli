@@ -10,8 +10,8 @@ import { Url } from "~/app/Url";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { is_command_available } from "~/core/is_command_available";
-import { match_group } from "~/core/match_group";
 import { semver_compare } from "~/core/semver_compare";
+import * as gh from "~/github/gh";
 
 type Props = {
   children: React.ReactNode;
@@ -112,22 +112,23 @@ export function DependencyCheck(props: Props) {
               </Ink.Text>
             }
             function={async () => {
-              const auth_status = await cli(`gh auth status`, {
-                ignoreExitCode: true,
-              });
+              const options = { ignoreExitCode: true };
+              const auth_status = await cli(`gh auth status`, options);
 
               if (auth_status.code === 0) {
-                const username = match_group(
-                  auth_status.stdout,
-                  RE.auth_username,
-                  "username"
-                );
+                const username = gh.auth_status(auth_status.stdout);
 
-                actions.set((state) => {
-                  state.username = username;
-                });
+                if (username) {
+                  actions.set((state) => {
+                    state.username = username;
+                  });
 
-                return;
+                  return;
+                }
+              }
+
+              if (actions.isDebug()) {
+                actions.error("gh auth status could not find username");
               }
 
               actions.output(
@@ -148,8 +149,3 @@ export function DependencyCheck(props: Props) {
     </Await>
   );
 }
-
-const RE = {
-  // Logged in to github.com as magus
-  auth_username: /Logged in to github.com as (?<username>[^\s]+)/,
-};

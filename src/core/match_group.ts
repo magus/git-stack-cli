@@ -8,3 +8,11 @@ export function match_group(value: string, re: RegExp, group: string) {
   invariant(result, `match.groups must contain [${group}] ${debug}`);
   return result;
 }
+
+match_group.safe = (value: string, re: RegExp, group: string) => {
+  try {
+    return match_group(value, re, group);
+  } catch (err) {
+    return null;
+  }
+};
