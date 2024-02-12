@@ -24,16 +24,17 @@
     "dev": "npm run build -- --watch",
     "build": "rollup -c rollup.config.mjs",
     "build:standalone": "bun run scripts/prepare-standalone.ts",
-    "release:brew": "bun run scripts/publish-release.ts",
-    "release:npm": "npm publish",
+    "release:brew": "bun run scripts/release-brew.ts",
+    "release:npm": "bun run scripts/release-npm.ts",
     "lint:check": "eslint . --cache",
     "lint": "npm run lint:check -- --fix",
     "prettier:check": "prettier ./src --check --cache",
     "prettier": "npm run prettier:check -- --write",
-    "test": "bun test src",
+    "test": "bun test",
     "test:watch": "npm run test -- --watch",
-    "test:all": "npm run prettier:check && npm run lint:check && npm run build",
-    "prepublishOnly": "npm run test:all"
+    "test:types": "tsc",
+    "test:all": "npm run prettier:check && npm run lint:check && npm run test:types",
+    "prepublishOnly": "bun run scripts/npm-prepublishOnly.ts"
   },
   "dependencies": {
     "chalk": "^5.3.0",
