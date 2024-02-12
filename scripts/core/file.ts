@@ -30,3 +30,7 @@ export async function exists(filepath: string) {
     return false;
   }
 }
+
+export async function rm(filepath: string) {
+  await fs.rm(filepath);
+}
