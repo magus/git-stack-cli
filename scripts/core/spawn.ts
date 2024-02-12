@@ -2,7 +2,7 @@ export async function spawn(unsafe_cmd: CommandLike) {
   const cmd = get_cmd(unsafe_cmd);
 
   console.debug();
-  console.debug("[spawn]", cmd);
+  console.debug("[spawn]", cmd.str);
 
   const env = process.env;
   const proc = await Bun.spawn(cmd.parts, {
@@ -14,14 +14,14 @@ export async function spawn(unsafe_cmd: CommandLike) {
   await proc.exited;
 
   if (proc.exitCode) {
-    console.error(`(${proc.exitCode})`, cmd);
+    console.error(`(${proc.exitCode})`, cmd.str);
 
     if (!process.env.GS_NO_CHECK) {
       process.exit(proc.exitCode);
     }
   }
 
-  console.debug("[end]", cmd);
+  console.debug("[end]", cmd.str);
 
   return { proc };
 }
@@ -30,7 +30,7 @@ spawn.sync = async function spawnSync(unsafe_cmd: CommandLike) {
   const cmd = get_cmd(unsafe_cmd);
 
   console.debug();
-  console.debug("[spawn.sync]", cmd);
+  console.debug("[spawn.sync]", cmd.str);
 
   const env = process.env;
   const proc = await Bun.spawnSync(cmd.parts, { env });
@@ -38,7 +38,7 @@ spawn.sync = async function spawnSync(unsafe_cmd: CommandLike) {
   const stdout = String(proc.stdout).trim();
   const stderr = String(proc.stderr).trim();
 
-  console.debug("[end]", cmd);
+  console.debug("[end]", cmd.str);
   console.debug({ stdout, stderr });
 
   return { proc, stdout, stderr };
