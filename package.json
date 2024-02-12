@@ -27,6 +27,7 @@
     "release:npm": "bun run scripts/release-npm.ts",
     "release:github": "bun run scripts/release-github.ts",
     "release:brew": "bun run scripts/release-brew.ts",
+    "release": "npm run release:npm && npm run release:github && npm run release:brew",
     "lint:check": "eslint . --cache",
     "lint": "npm run lint:check -- --fix",
     "prettier:check": "prettier ./src --check --cache",
