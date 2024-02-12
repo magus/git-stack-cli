@@ -12,6 +12,16 @@ const DIST_DIR = path.join(PROJECT_DIR, "dist");
 const CJS_DIR = path.join(DIST_DIR, "cjs");
 const STANDALONE_DIR = path.join(DIST_DIR, "standalone");
 
+const ARG_LIST = process.argv.slice(2);
+const [maybe_target] = ARG_LIST;
+
+let TARGET = "node18-linux-x64,node18-macos-x64,node18-win-x64";
+if (maybe_target) {
+  TARGET = maybe_target;
+}
+
+console.debug(`Building for target [${TARGET}]`);
+
 // clear entire dist output directory
 await fs.rmdir(DIST_DIR, { recursive: true });
 await fs.mkdir(DIST_DIR, { recursive: true });
@@ -56,4 +66,8 @@ await fs.cp(
 process.chdir(STANDALONE_DIR);
 
 // run pkg to build standalone executable
-await spawn([path.join(NODE_MODULES_BIN, "pkg"), "package.json"]);
+await spawn([
+  path.join(NODE_MODULES_BIN, "pkg"),
+  "package.json",
+  `--targets=${TARGET}`,
+]);
