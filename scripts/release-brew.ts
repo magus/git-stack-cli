@@ -17,6 +17,47 @@ const package_json = await file.read_json(
 
 const version = package_json.version;
 
+process.chdir(HOMEBREW_DIR);
+
+// before creating new formula, mv the previous into a versioned formula name
+const previous_formula_path = path.join(
+  HOMEBREW_DIR,
+  "Formula",
+  "git-stack.rb"
+);
+
+// match either version format from core or tap formula
+//
+//   version "1.0.4"
+//   version = "1.0.4"
+//
+let previous_formula = await file.read_text(previous_formula_path);
+const re_version = /version(?: =)? "(?<version>\d+\.\d+\.\d+)"/m;
+const previous_version_match = previous_formula.match(re_version);
+
+if (!previous_version_match?.groups) {
+  console.error("previous version missing in formula", previous_formula_path);
+  process.exit(3);
+}
+
+const previous_version = previous_version_match.groups.version;
+// convert `1.0.4` to `104`
+const not_dot_version = previous_version.replace(/\./g, "");
+const previous_class = `GitStackAt${not_dot_version}`;
+previous_formula = previous_formula.replace(
+  "class GitStack",
+  `class ${previous_class}`
+);
+
+await file.write_text(
+  path.join(HOMEBREW_DIR, "Formula", `git-stack@${previous_version}`),
+  previous_formula
+);
+
+process.chdir(PROJECT_DIR);
+
+await spawn(`npm run build:standalone`);
+
 process.chdir(STANDALONE_DIR);
 
 const linux_asset = await create_asset("git-stack-cli-linux", { version });
@@ -29,32 +70,44 @@ const re_token = (name: string) => new RegExp(`{{ ${name} }}`, "g");
 
 process.chdir(HOMEBREW_DIR);
 
-let formula = await file.read_text(
+let tap = await file.read_text(
   path.join("templates", "git-stack.tap.rb.template")
 );
 
-formula = formula.replace(re_token("version"), version);
-formula = formula.replace(re_token("mac_bin"), macos_asset.filepath);
-formula = formula.replace(re_token("mac_sha256"), macos_asset.sha256);
-formula = formula.replace(re_token("linux_bin"), linux_asset.filepath);
-formula = formula.replace(re_token("linux_sha256"), linux_asset.sha256);
+tap = tap.replace(re_token("version"), version);
+tap = tap.replace(re_token("mac_bin"), macos_asset.filepath);
+tap = tap.replace(re_token("mac_sha256"), macos_asset.sha256);
+tap = tap.replace(re_token("linux_bin"), linux_asset.filepath);
+tap = tap.replace(re_token("linux_sha256"), linux_asset.sha256);
 
-await file.write_text(path.join("Formula", "git-stack.rb"), formula);
+await file.write_text(path.join("Formula", "git-stack.rb"), tap);
 
-// commit homebrew repo changes
-await spawn.sync(`git commit -a -m ${version}`);
-await spawn.sync(`git push`);
+let core = await file.read_text(
+  path.join("templates", "git-stack.core.rb.template")
+);
 
-// commmit changes to main repo
-process.chdir(PROJECT_DIR);
-await spawn.sync(`git commit -a -m "homebrew-git-stack ${version}"`);
-await spawn.sync(`git push`);
+core = core.replace(re_token("version"), version);
+core = core.replace(re_token("mac_bin"), macos_asset.filepath);
+core = core.replace(re_token("mac_sha256"), macos_asset.sha256);
+core = core.replace(re_token("linux_bin"), linux_asset.filepath);
+core = core.replace(re_token("linux_sha256"), linux_asset.sha256);
 
-// finally upload the assets to the github release
-process.chdir(STANDALONE_DIR);
-await spawn.sync(`gh release upload ${version} ${linux_asset.filepath}`);
-await spawn.sync(`gh release upload ${version} ${macos_asset.filepath}`);
-await spawn.sync(`gh release upload ${version} ${win_asset.filepath}`);
+await file.write_text(path.join("Formula", "git-stack.core.rb"), core);
+
+// // commit homebrew repo changes
+// await spawn.sync(`git commit -a -m ${version}`);
+// await spawn.sync(`git push`);
+
+// // commmit changes to main repo
+// process.chdir(PROJECT_DIR);
+// await spawn.sync(`git commit -a -m "homebrew-git-stack ${version}"`);
+// await spawn.sync(`git push`);
+
+// // finally upload the assets to the github release
+// process.chdir(STANDALONE_DIR);
+// await spawn.sync(`gh release upload ${version} ${linux_asset.filepath}`);
+// await spawn.sync(`gh release upload ${version} ${macos_asset.filepath}`);
+// await spawn.sync(`gh release upload ${version} ${win_asset.filepath}`);
 
 console.debug();
 console.debug("✅", "published", version);
