@@ -43,7 +43,7 @@ await file.write_json(
 
 process.chdir(PROJECT_DIR);
 
-Bun.env["NODE_ENV"] = "production";
+process.env.NODE_ENV = "production";
 
 // run typescript build to generate module output
 await spawn("npm run build");

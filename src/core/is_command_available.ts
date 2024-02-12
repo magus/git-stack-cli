@@ -4,7 +4,7 @@ import path from "node:path";
 import { invariant } from "~/core/invariant";
 
 export function is_command_available(command: string) {
-  const PATH = process.env["PATH"];
+  const PATH = process.env.PATH;
 
   invariant(PATH, "PATH env must exist");
 
