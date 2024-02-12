@@ -82,7 +82,7 @@ export function RebaseCheck(props: Props) {
       const status = is_rebase ? "prompt" : "done";
       patch({ status });
     } catch (err) {
-      actions.error("Unable to check for rebase.");
+      actions.error("Must be run from within a git repository.");
 
       if (err instanceof Error) {
         if (actions.isDebug()) {
