@@ -5,7 +5,7 @@ import * as file from "~/core/file";
 import { spawn } from "~/core/spawn";
 
 // get paths relative to this script
-const SCRIPT_DIR = path.dirname(new URL(import.meta.url).pathname);
+const SCRIPT_DIR = import.meta.dir;
 const PROJECT_DIR = path.join(SCRIPT_DIR, "..");
 const NODE_MODULES_BIN = path.join(PROJECT_DIR, "node_modules", ".bin");
 const DIST_DIR = path.join(PROJECT_DIR, "dist");

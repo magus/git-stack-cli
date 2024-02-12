@@ -9,7 +9,7 @@ const NO_CHECK = args.includes("--no-check");
 const COMMIT = args.includes("--commit");
 
 // get paths relative to this script
-const SCRIPT_DIR = path.dirname(new URL(import.meta.url).pathname);
+const SCRIPT_DIR = import.meta.dir;
 const PROJECT_DIR = path.join(SCRIPT_DIR, "..");
 const DIST_DIR = path.join(PROJECT_DIR, "dist");
 const STANDALONE_DIR = path.join(DIST_DIR, "standalone");

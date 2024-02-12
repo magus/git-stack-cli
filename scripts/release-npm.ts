@@ -7,7 +7,7 @@ import { spawn } from "~/core/spawn";
 process.env.NODE_ENV = "production";
 
 // get paths relative to this script
-const SCRIPT_DIR = path.dirname(new URL(import.meta.url).pathname);
+const SCRIPT_DIR = import.meta.dir;
 const PROJECT_DIR = path.join(SCRIPT_DIR, "..");
 const DIST_DIR = path.join(PROJECT_DIR, "dist");
 
