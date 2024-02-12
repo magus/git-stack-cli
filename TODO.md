@@ -2,11 +2,10 @@
 
 - **homebrew formula**
 
+  - submit PR to homebrew/core
   - build from source to get bottles
-  - create brew formula from npm / github tarball and node
-  - https://registry.npmjs.org/git-stack-cli/-/git-stack-cli-1.0.2.tgz
 
-  - create version backups for homebrw
+  - create version backups for each homebrew formula in repo
   - mv `git-stack.rb` to `git-stack@version` for easily installing via explicit version
   - see https://github.com/oven-sh/homebrew-bun
 
