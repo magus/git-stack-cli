@@ -67,7 +67,7 @@ await spawn.sync(`git push origin ${version}`);
 console.debug();
 console.debug("✅", "published", version);
 console.debug();
-console.debug("https://github.com/magus/git-stack-cli/releases");
+console.debug("https://www.npmjs.com/package/git-stack-cli");
 console.debug();
 
 // // https://github.com/magus/git-stack-cli/releases/download/0.8.9/git-stack-cli-linux
