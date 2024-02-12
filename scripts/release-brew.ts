@@ -108,7 +108,13 @@ await spawn.sync(`git push`);
 
 // commmit changes to main repo
 process.chdir(PROJECT_DIR);
-await spawn.sync(`git commit -a -m "homebrew-git-stack ${version}"`);
+await spawn.sync([
+  "git",
+  "commit",
+  "-a",
+  "-m",
+  `homebrew-git-stack ${version}`,
+]);
 await spawn.sync(`git push`);
 
 console.debug();
