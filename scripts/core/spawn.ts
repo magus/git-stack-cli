@@ -1,9 +1,11 @@
-export async function spawn(cmd: string) {
+export async function spawn(unsafe_cmd: CommandLike) {
+  const cmd = get_cmd(unsafe_cmd);
+
   console.debug();
   console.debug("[spawn]", cmd);
 
   const env = process.env;
-  const proc = await Bun.spawn(cmd.split(" "), {
+  const proc = await Bun.spawn(cmd.parts, {
     env,
     stdout: "inherit",
     stderr: "inherit",
@@ -24,12 +26,14 @@ export async function spawn(cmd: string) {
   return { proc };
 }
 
-spawn.sync = async function spawnSync(cmd: string) {
+spawn.sync = async function spawnSync(unsafe_cmd: CommandLike) {
+  const cmd = get_cmd(unsafe_cmd);
+
   console.debug();
   console.debug("[spawn.sync]", cmd);
 
   const env = process.env;
-  const proc = await Bun.spawnSync(cmd.split(" "), { env });
+  const proc = await Bun.spawnSync(cmd.parts, { env });
 
   const stdout = String(proc.stdout).trim();
   const stderr = String(proc.stderr).trim();
@@ -39,3 +43,20 @@ spawn.sync = async function spawnSync(cmd: string) {
 
   return { proc, stdout, stderr };
 };
+
+type CommandLike = string | Array<string>;
+
+function get_cmd(unsafe_cmd: CommandLike) {
+  let str;
+  let parts;
+
+  if (Array.isArray(unsafe_cmd)) {
+    parts = unsafe_cmd;
+    str = unsafe_cmd.join(" ");
+  } else {
+    parts = unsafe_cmd.split(" ");
+    str = unsafe_cmd;
+  }
+
+  return { parts, str };
+}
