@@ -21,6 +21,7 @@ type MutateOutputArgs = {
   node: React.ReactNode;
   id?: string;
   debug?: boolean;
+  withoutTimestamp?: boolean;
 };
 
 export type State = {
@@ -194,11 +195,22 @@ const BaseStore = createStore<State>()(
           return;
         }
 
+        // set `withoutTimestamp` to skip <LogTimestamp> for all subsequent pending outputs
+        // we only want to timestamp for the first part (when we initialize the [])
+        // if we have many incremental outputs on the same line we do not want multiple timestamps
+        //
+        // await Promise.all([
+        //   cli(`for i in $(seq 1 5); do echo $i; sleep 1; done`),
+        //   cli(`for i in $(seq 5 1); do printf "$i "; sleep 1; done; echo`),
+        // ]);
+        //
+        let withoutTimestamp = true;
         if (!state.pending_output[id]) {
+          withoutTimestamp = false;
           state.pending_output[id] = [];
         }
 
-        const renderOutput = renderOutputArgs(args);
+        const renderOutput = renderOutputArgs({ ...args, withoutTimestamp });
         state.pending_output[id].push(renderOutput);
       },
 
@@ -228,7 +240,7 @@ function renderOutputArgs(args: MutateOutputArgs) {
   if (args.debug) {
     return (
       <React.Fragment>
-        <LogTimestamp />
+        {args.withoutTimestamp ? null : <LogTimestamp />}
         {output}
       </React.Fragment>
     );
