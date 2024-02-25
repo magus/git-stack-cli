@@ -17,24 +17,36 @@
 
 ## Install
 
-```bash
-# node
-npm i -g git-stack-cli
+> [!TIP]
+>
+> Install via **[Homebrew](https://brew.sh/)** to ensure the **[official Github CLI](https://cli.github.com/)** and **[git revise](https://github.com/mystor/git-revise)** dependencies are installed automatically
 
-# homebrew
+```bash
 brew tap magus/git-stack
 brew install git-stack
+```
+
+### `npm`
+
+Installing via **[npm](https://www.npmjs.com/)** requires installing the **[official Github CLI](https://cli.github.com/)** and **[git revise](https://github.com/mystor/git-revise)** dependencies separarely
+
+```bash
+brew install gh
+brew install git-revise
+
+npm i -g git-stack-cli
 ```
 
 ## Usage
 
 ```bash
-git stack
+git stack             # group and sync commits in branch to Github
 
+git stack --check     # print status only, skipping rebase and sync to Github
 git stack --verbose   # print more detailed logs for debugging internals
 git stack --no-verify # skip git hooks such as pre-commit and pre-push
 
-git-stack --help      # print a table of all command-line arguments
+git stack help        # print a table of all CLI arguments
 ```
 
 ## Why?
@@ -59,7 +71,7 @@ Managing even a few stacked diffs requires a relatively strong knowledge of `git
 - `ghstack` requires rebasing and squashing since each commit creates a pull request, which means you lose commit history
 - `git stack` allows developing in a single local branch and selecting groups of commits for each pull request
 - `git stack` adds a clear comment to each pull request in the stack showing the entire stack
-- `git stack` does not break if you land pull requests through Github directly, `ghstack` requires landing from the command-line interface
+- `git stack` does not break if you land pull requests through Github directly, `ghstack` requires landing from the CLI interface
 - `git stack` uses the [official GitHub CLI](https://cli.github.com/) (`gh`) instead of personal access tokens
 
 ## Development
