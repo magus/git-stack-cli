@@ -18,18 +18,20 @@ type Props = {
 
 export function DependencyCheck(props: Props) {
   return (
-    <EnsureGit>
+    <CheckGit>
       <CheckGithubCli>
         <CheckGithubCliAuth>
-          {/* force line break */}
-          {props.children}
+          <CheckGitRevise>
+            {/* force line break */}
+            {props.children}
+          </CheckGitRevise>
         </CheckGithubCliAuth>
       </CheckGithubCli>
-    </EnsureGit>
+    </CheckGit>
   );
 }
 
-function EnsureGit(props: Props) {
+function CheckGit(props: Props) {
   const actions = Store.useActions();
 
   return (
@@ -147,6 +149,55 @@ function CheckGithubCliAuth(props: Props) {
         );
 
         actions.exit(4);
+      }}
+    >
+      {props.children}
+    </Await>
+  );
+}
+
+function CheckGitRevise(props: Props) {
+  const actions = Store.useActions();
+  const argv = Store.useState((state) => state.argv);
+
+  // skip git revise check when `--git-revise` flag is not present
+  if (!argv?.["git-revise"]) {
+    return props.children;
+  }
+
+  return (
+    <Await
+      fallback={
+        <Ink.Text color={colors.yellow}>
+          <Ink.Text>
+            Checking <Command>git-revise</Command> install...
+          </Ink.Text>
+        </Ink.Text>
+      }
+      function={async () => {
+        if (is_command_available("git-revise")) {
+          return;
+        }
+
+        actions.output(
+          <Ink.Text color={colors.yellow}>
+            <Command>git-revise</Command> must be installed.
+          </Ink.Text>
+        );
+
+        actions.output(
+          <Ink.Text color={colors.yellow}>
+            <Ink.Text>{"Visit "}</Ink.Text>
+            <Url>https://github.com/mystor/git-revise#install</Url>
+            <Ink.Text>{" to install the git revise cli "}</Ink.Text>
+
+            <Parens>
+              <Command>git-revise</Command>
+            </Parens>
+          </Ink.Text>
+        );
+
+        actions.exit(10);
       }}
     >
       {props.children}
