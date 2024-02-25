@@ -35,7 +35,11 @@ export async function command() {
         type: "string",
         choices: [Rebase["git-revise"], Rebase["cherry-pick"]],
         default: Rebase["git-revise"],
-        description: `Rebase implementation, "${Rebase["git-revise"]}" by default to perform in-memory rebase. "${Rebase["cherry-pick"]}" can be used to use disk and incrementally rebase each commit`,
+        description: [
+          "Strategy used for syncing branches",
+          `${Rebase["git-revise"]}: perform faster in-memory rebase`,
+          `${Rebase["cherry-pick"]}: use disk and incrementally rebase each commit`,
+        ].join(" | "),
       })
 
       .option("verbose", {
@@ -55,7 +59,8 @@ export async function command() {
       .option("branch", {
         type: "string",
         alias: ["b"],
-        description: `Set the master branch name, defaults to "master" (or "main" if "master" is not found)`,
+        description:
+          'Set the master branch name, defaults to "master" (or "main" if "master" is not found)',
       })
 
       .option("write-state-json", {
@@ -72,10 +77,10 @@ export async function command() {
         description: "Mock local store metadata for testing",
       })
 
-      // do not wrap to 80 columns (yargs default)
-      // 140 seems to look decent so lets do that instead
+      // yargs default wraps to 80 columns
       // passing null will wrap to terminal width
-      .wrap(140)
+      // value below if what seems to look decent
+      .wrap(123)
 
       // disallow unknown options
       .strict()
