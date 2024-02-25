@@ -89,7 +89,7 @@ async function run(props: Props) {
     process.chdir(repo_root);
     await cli(`pwd`);
 
-    if (argv["git-revise"]) {
+    if (argv["rebase"] === "git-revise") {
       await rebase_git_revise();
     } else {
       await rebase_cherry_pick();

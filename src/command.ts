@@ -1,7 +1,9 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-export type Argv = Awaited<ReturnType<typeof command>>;
+export type Argv = Awaited<ReturnType<typeof command>> & {
+  ["rebase"]: keyof typeof Rebase;
+};
 
 export async function command() {
   // https://yargs.js.org/docs/#api-reference-optionkey-opt
@@ -29,10 +31,11 @@ export async function command() {
         description: "Skip git hooks such as pre-commit and pre-push",
       })
 
-      .option("git-revise", {
-        type: "boolean",
-        default: false,
-        description: `Use git-revise to perform in-memory rebase, (macOS + Linux only)`,
+      .option("rebase", {
+        type: "string",
+        choices: [Rebase["git-revise"], Rebase["cherry-pick"]],
+        default: Rebase["git-revise"],
+        description: `Rebase implementation, "${Rebase["git-revise"]}" by default to perform in-memory rebase. "${Rebase["cherry-pick"]}" can be used to use disk and incrementally rebase each commit`,
       })
 
       .option("verbose", {
@@ -84,3 +87,8 @@ export async function command() {
       .help("help", "Show usage via `git stack help`").argv
   );
 }
+
+const Rebase = Object.freeze({
+  "git-revise": "git-revise",
+  "cherry-pick": "cherry-pick",
+});

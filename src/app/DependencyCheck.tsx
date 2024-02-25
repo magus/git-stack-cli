@@ -160,8 +160,8 @@ function CheckGitRevise(props: Props) {
   const actions = Store.useActions();
   const argv = Store.useState((state) => state.argv);
 
-  // skip git revise check when `--git-revise` flag is not present
-  if (!argv?.["git-revise"]) {
+  // skip git revise check when `rebase` is not git-revise
+  if (argv?.["rebase"] !== "git-revise") {
     return props.children;
   }
 
