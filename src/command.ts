@@ -70,8 +70,10 @@ export async function command() {
       })
 
       // do not wrap to 80 columns (yargs default)
-      // .wrap(yargs().terminalWidth()) will fill terminal (maximuize)
-      .wrap(null)
+      // 140 seems to look decent so lets do that instead
+      // passing null will wrap to terminal width
+      .wrap(140)
+
       // disallow unknown options
       .strict()
       .version(process.env.CLI_VERSION || "unknown")
