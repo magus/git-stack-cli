@@ -119,7 +119,7 @@ async function run(props: Props) {
         // add all changes to stage
         await cli(`git add --all`);
 
-        const new_message = await Metadata.write(commit.full_message, group.id);
+        const new_message = Metadata.write(commit.full_message, group.id);
         const git_commit_comand = [`git commit -m "${new_message}"`];
 
         if (argv.verify === false) {
