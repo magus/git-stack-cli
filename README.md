@@ -87,14 +87,11 @@ npm run build:standalone
 >
 > **You must update the `version` in `package.json` and commit all changes first!**
 
-### NPM
-
 ```bash
+npm run release
+
+# release individually
 npm run release:npm
-```
-
-### Homebrew + Github
-
-```bash
+npm run release:github
 npm run release:brew
 ```
