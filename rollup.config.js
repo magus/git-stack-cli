@@ -12,10 +12,16 @@ import replace from "@rollup/plugin-replace";
 import typescript from "@rollup/plugin-typescript";
 
 const SCRIPT_DIR = path.dirname(url.fileURLToPath(import.meta.url));
-const PACKAGE_JSON_PATH = path.join(SCRIPT_DIR, "package.json");
 
-const package_json_str = await fs.readFile(PACKAGE_JSON_PATH, "utf-8");
-const package_json = JSON.parse(package_json_str);
+const PACKAGE_JSON_PATH = path.join(SCRIPT_DIR, "package.json");
+const PACKAGE_JSON = JSON.parse(await fs.readFile(PACKAGE_JSON_PATH, "utf-8"));
+
+// prettier-ignore
+const GIT_SEQUENCE_EDITOR_SCRIPT_PATH = path.join(SCRIPT_DIR, "scripts", "git-sequence-editor.sh");
+// prettier-ignore
+const UNSAFE_GIT_SEQUENCE_EDITOR_SCRIPT = await fs.readFile(GIT_SEQUENCE_EDITOR_SCRIPT_PATH, "utf-8");
+// prettier-ignore
+const GIT_SEQUENCE_EDITOR_SCRIPT = UNSAFE_GIT_SEQUENCE_EDITOR_SCRIPT.replace(/`/g, "\\`");
 
 export default {
   input: "src/index.tsx",
@@ -39,8 +45,9 @@ export default {
       preventAssignment: true,
       values: {
         "process.env.NODE_ENV": JSON.stringify("production"),
-        "process.env.CLI_VERSION": JSON.stringify(String(package_json.version)),
+        "process.env.CLI_VERSION": JSON.stringify(String(PACKAGE_JSON.version)),
         "process.env.GIT_STACK_STANDALONE": process.env.GIT_STACK_STANDALONE,
+        "process.env.GIT_SEQUENCE_EDITOR_SCRIPT": GIT_SEQUENCE_EDITOR_SCRIPT,
       },
     }),
   ],
