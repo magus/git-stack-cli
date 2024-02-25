@@ -4,6 +4,7 @@ import * as Ink from "ink-cjs";
 
 import { Await } from "~/app/Await";
 import { Command } from "~/app/Command";
+import { FormatText } from "~/app/FormatText";
 import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import { Url } from "~/app/Url";
@@ -89,15 +90,15 @@ function CheckGithubCli(props: Props) {
         );
 
         actions.output(
-          <Ink.Text color={colors.yellow}>
-            <Ink.Text>{"Visit "}</Ink.Text>
-            <Url>https://cli.github.com</Url>
-            <Ink.Text>{" to install the github cli "}</Ink.Text>
+          <FormatText
+            wrapper={<Ink.Text color={colors.yellow} />}
+            message="Visit {url} to install the official Github CLI {command}"
+            values={{
+              url: <Url>https://cli.github.com</Url>,
 
-            <Parens>
-              <Command>gh</Command>
-            </Parens>
-          </Ink.Text>
+              command: <Command>gh</Command>,
+            }}
+          />
         );
 
         actions.exit(3);
@@ -141,11 +142,15 @@ function CheckGithubCliAuth(props: Props) {
         }
 
         actions.output(
-          <Ink.Text color={colors.yellow}>
-            <Command>gh</Command>
-            <Ink.Text>{" requires login, please run "}</Ink.Text>
-            <Command>gh auth login</Command>
-          </Ink.Text>
+          <FormatText
+            wrapper={<Ink.Text color={colors.yellow} />}
+            message="{gh} requires login, please run {command}"
+            values={{
+              gh: <Command>gh</Command>,
+
+              command: <Command>gh auth login</Command>,
+            }}
+          />
         );
 
         actions.exit(4);
@@ -186,15 +191,21 @@ function CheckGitRevise(props: Props) {
         );
 
         actions.output(
-          <Ink.Text color={colors.yellow}>
-            <Ink.Text>{"Visit "}</Ink.Text>
-            <Url>https://github.com/mystor/git-revise#install</Url>
-            <Ink.Text>{" to install the git revise cli "}</Ink.Text>
+          <FormatText
+            wrapper={<Ink.Text color={colors.yellow} />}
+            message="Visit {url} to install the {git_revise} CLI for faster, in-memory rebasing {command}"
+            values={{
+              url: <Url>https://github.com/mystor/git-revise#install</Url>,
 
-            <Parens>
-              <Command>git-revise</Command>
-            </Parens>
-          </Ink.Text>
+              git_revise: <Command>git revise</Command>,
+
+              command: (
+                <Parens>
+                  <Command>git-revise</Command>
+                </Parens>
+              ),
+            }}
+          />
         );
 
         actions.exit(10);
