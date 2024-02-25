@@ -18,6 +18,21 @@ type Props = {
 };
 
 export function DependencyCheck(props: Props) {
+  return (
+    <EnsureGit>
+      <EnsureNode>
+        <CheckGithubCli>
+          <CheckGithubCliAuth>
+            {/* force line break */}
+            {props.children}
+          </CheckGithubCliAuth>
+        </CheckGithubCli>
+      </EnsureNode>
+    </EnsureGit>
+  );
+}
+
+function EnsureGit(props: Props) {
   const actions = Store.useActions();
 
   return (
@@ -46,106 +61,130 @@ export function DependencyCheck(props: Props) {
         actions.exit(2);
       }}
     >
-      <Await
-        fallback={
-          <Ink.Text color={colors.yellow}>
-            Checking <Command>node</Command> install...
-          </Ink.Text>
-        }
-        function={async () => {
-          const process_version = process.version.substring(1);
-          const semver_result = semver_compare(process_version, "14.0.0");
+      {props.children}
+    </Await>
+  );
+}
 
-          if (semver_result >= 0) {
+function EnsureNode(props: Props) {
+  const actions = Store.useActions();
+
+  return (
+    <Await
+      fallback={
+        <Ink.Text color={colors.yellow}>
+          Checking <Command>node</Command> install...
+        </Ink.Text>
+      }
+      function={async () => {
+        const process_version = process.version.substring(1);
+        const semver_result = semver_compare(process_version, "14.0.0");
+
+        if (semver_result >= 0) {
+          return;
+        }
+
+        actions.output(
+          <Ink.Text color={colors.yellow}>
+            <Command>node</Command> must be installed.
+          </Ink.Text>
+        );
+
+        actions.exit(2);
+      }}
+    >
+      {props.children}
+    </Await>
+  );
+}
+
+function CheckGithubCli(props: Props) {
+  const actions = Store.useActions();
+
+  return (
+    <Await
+      fallback={
+        <Ink.Text color={colors.yellow}>
+          <Ink.Text>
+            Checking <Command>gh</Command> install...
+          </Ink.Text>
+        </Ink.Text>
+      }
+      function={async () => {
+        if (is_command_available("gh")) {
+          return;
+        }
+
+        actions.output(
+          <Ink.Text color={colors.yellow}>
+            <Command>gh</Command> must be installed.
+          </Ink.Text>
+        );
+
+        actions.output(
+          <Ink.Text color={colors.yellow}>
+            <Ink.Text>{"Visit "}</Ink.Text>
+            <Url>https://cli.github.com</Url>
+            <Ink.Text>{" to install the github cli "}</Ink.Text>
+
+            <Parens>
+              <Command>gh</Command>
+            </Parens>
+          </Ink.Text>
+        );
+
+        actions.exit(3);
+      }}
+    >
+      {props.children}
+    </Await>
+  );
+}
+
+function CheckGithubCliAuth(props: Props) {
+  const actions = Store.useActions();
+
+  return (
+    <Await
+      fallback={
+        <Ink.Text color={colors.yellow}>
+          <Ink.Text>
+            Checking <Command>gh auth status</Command>...
+          </Ink.Text>
+        </Ink.Text>
+      }
+      function={async () => {
+        const options = { ignoreExitCode: true };
+        const auth_status = await cli(`gh auth status`, options);
+
+        if (auth_status.code === 0) {
+          const username = gh.auth_status(auth_status.stdout);
+
+          if (username) {
+            actions.set((state) => {
+              state.username = username;
+            });
+
             return;
           }
+        }
 
-          actions.output(
-            <Ink.Text color={colors.yellow}>
-              <Command>node</Command> must be installed.
-            </Ink.Text>
-          );
+        if (actions.isDebug()) {
+          actions.error("gh auth status could not find username");
+        }
 
-          actions.exit(2);
-        }}
-      >
-        <Await
-          fallback={
-            <Ink.Text color={colors.yellow}>
-              <Ink.Text>
-                Checking <Command>gh</Command> install...
-              </Ink.Text>
-            </Ink.Text>
-          }
-          function={async () => {
-            if (is_command_available("gh")) {
-              return;
-            }
+        actions.output(
+          <Ink.Text color={colors.yellow}>
+            <Command>gh</Command>
+            <Ink.Text>{" requires login, please run "}</Ink.Text>
+            <Command>gh auth login</Command>
+          </Ink.Text>
+        );
 
-            actions.output(
-              <Ink.Text color={colors.yellow}>
-                <Command>gh</Command> must be installed.
-              </Ink.Text>
-            );
-
-            actions.output(
-              <Ink.Text color={colors.yellow}>
-                <Ink.Text>{"Visit "}</Ink.Text>
-                <Url>https://cli.github.com</Url>
-                <Ink.Text>{" to install the github cli "}</Ink.Text>
-
-                <Parens>
-                  <Command>gh</Command>
-                </Parens>
-              </Ink.Text>
-            );
-
-            actions.exit(3);
-          }}
-        >
-          <Await
-            fallback={
-              <Ink.Text color={colors.yellow}>
-                <Ink.Text>
-                  Checking <Command>gh auth status</Command>...
-                </Ink.Text>
-              </Ink.Text>
-            }
-            function={async () => {
-              const options = { ignoreExitCode: true };
-              const auth_status = await cli(`gh auth status`, options);
-
-              if (auth_status.code === 0) {
-                const username = gh.auth_status(auth_status.stdout);
-
-                if (username) {
-                  actions.set((state) => {
-                    state.username = username;
-                  });
-
-                  return;
-                }
-              }
-
-              if (actions.isDebug()) {
-                actions.error("gh auth status could not find username");
-              }
-
-              actions.output(
-                <Ink.Text color={colors.yellow}>
-                  <Command>gh</Command>
-                  <Ink.Text>{" requires login, please run "}</Ink.Text>
-                  <Command>gh auth login</Command>
-                </Ink.Text>
-              );
-
-              actions.exit(4);
-            }}
-          >
-            {props.children}
-          </Await>
-        </Await>
-      </Await>
+        actions.exit(4);
+      }}
+    >
+      {props.children}
     </Await>
   );
 }
