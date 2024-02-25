@@ -175,7 +175,7 @@ function CheckGitRevise(props: Props) {
       fallback={
         <Ink.Text color={colors.yellow}>
           <Ink.Text>
-            Checking <Command>git-revise</Command> install...
+            Checking <Command>git revise</Command> install...
           </Ink.Text>
         </Ink.Text>
       }
@@ -186,7 +186,7 @@ function CheckGitRevise(props: Props) {
 
         actions.output(
           <Ink.Text color={colors.yellow}>
-            <Command>git-revise</Command> must be installed.
+            <Command>git revise</Command> must be installed.
           </Ink.Text>
         );
 
@@ -201,7 +201,7 @@ function CheckGitRevise(props: Props) {
 
               command: (
                 <Parens>
-                  <Command>git-revise</Command>
+                  <Command>git revise</Command>
                 </Parens>
               ),
             }}

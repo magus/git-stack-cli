@@ -9,6 +9,7 @@
 - 💪 **Work seamlessly with GitHub's interface**
 - 🚫 **Avoid juggling mutiple branches and complex rebasing**
 - 📚 **Preserve your detailed commit history**
+- ⚡ **Faster, in-memory rebase via [`git revise`](https://github.com/mystor/git-revise)**
 
 ## Demo
 
