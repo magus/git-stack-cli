@@ -70,6 +70,8 @@ const re_token = (name: string) => new RegExp(`{{ ${name} }}`, "g");
 
 process.chdir(HOMEBREW_DIR);
 
+// homebrew tap formula (binaries)
+
 let tap = await file.read_text(
   path.join("templates", "git-stack.tap.rb.template")
 );
@@ -82,17 +84,24 @@ tap = tap.replace(re_token("linux_sha256"), linux_asset.sha256);
 
 await file.write_text(path.join("Formula", "git-stack.rb"), tap);
 
+// homebrew/core formula (build from source)
+
+// download github asset and calculate sha256
+// prettier-ignore
+await spawn.sync(`gh release download ${version} -p "git-stack-cli-${version}.tgz"`);
+// prettier-ignore
+const tarball_asset = await create_asset(`git-stack-cli-${version}.tgz`, { version });
+
 let core = await file.read_text(
   path.join("templates", "git-stack.core.rb.template")
 );
 
 core = core.replace(re_token("version"), version);
-core = core.replace(re_token("mac_bin"), macos_asset.filepath);
-core = core.replace(re_token("mac_sha256"), macos_asset.sha256);
-core = core.replace(re_token("linux_bin"), linux_asset.filepath);
-core = core.replace(re_token("linux_sha256"), linux_asset.sha256);
+core = core.replace(re_token("tarball_sha256"), tarball_asset.sha256);
 
 await file.write_text(path.join("Formula", "git-stack.core.rb"), core);
+
+await file.rm(tarball_asset.filepath);
 
 // finally upload the assets to the github release
 process.chdir(STANDALONE_DIR);

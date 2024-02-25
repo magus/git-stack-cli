@@ -14,12 +14,11 @@ const package_json = await file.read_json(
 
 const version = package_json.version;
 
+// generates local tarball e.g. git-stack-cli-1.2.0.tgz
 await spawn("npm pack");
 
 // prettier-ignore
-const tarball_asset = (
-  await create_asset(`git-stack-cli-${version}.tgz`, { version })
-);
+const tarball_asset = await create_asset(`git-stack-cli-${version}.tgz`, { version });
 
 await spawn.sync(`gh release create ${version} -t ${version} --generate-notes`);
 
