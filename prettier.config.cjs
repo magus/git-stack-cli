@@ -1,5 +1,5 @@
 /** @type {import("prettier").Config} */
 module.exports = {
-  quoteProps: "consistent",
+  quoteProps: "preserve",
   trailingComma: "es5",
 };
