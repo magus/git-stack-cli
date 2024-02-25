@@ -98,7 +98,7 @@ npm run build:standalone
 
 > [!IMPORTANT]
 >
-> **You must update the `version` in `package.json` and commit all changes first!**
+> **You must update the `version` in `package.json` before running `npm run release`**
 
 ```bash
 npm run release
