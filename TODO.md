@@ -1,5 +1,12 @@
 # TODO
 
+- **git-revise for in-memory rebase alternative (performance)**
+
+  - write testable script to convert `commit_range` and `rebase_group_index` into `git-revise-todo`
+  - optional `--git-revise` cli argument
+  - when passed, ensure `git-revise` exists as cli
+  - check for flag in `ManualRebase` and use `git revise` to perform rebase
+
 - **multiselect with more items than terminal rows needs pagination**
 
   - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
