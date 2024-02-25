@@ -10,7 +10,6 @@ import { Url } from "~/app/Url";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { is_command_available } from "~/core/is_command_available";
-import { semver_compare } from "~/core/semver_compare";
 import * as gh from "~/github/gh";
 
 type Props = {
@@ -20,14 +19,12 @@ type Props = {
 export function DependencyCheck(props: Props) {
   return (
     <EnsureGit>
-      <EnsureNode>
-        <CheckGithubCli>
-          <CheckGithubCliAuth>
-            {/* force line break */}
-            {props.children}
-          </CheckGithubCliAuth>
-        </CheckGithubCli>
-      </EnsureNode>
+      <CheckGithubCli>
+        <CheckGithubCliAuth>
+          {/* force line break */}
+          {props.children}
+        </CheckGithubCliAuth>
+      </CheckGithubCli>
     </EnsureGit>
   );
 }
@@ -55,38 +52,6 @@ function EnsureGit(props: Props) {
         actions.output(
           <Ink.Text color={colors.yellow}>
             <Command>git</Command> must be installed.
-          </Ink.Text>
-        );
-
-        actions.exit(2);
-      }}
-    >
-      {props.children}
-    </Await>
-  );
-}
-
-function EnsureNode(props: Props) {
-  const actions = Store.useActions();
-
-  return (
-    <Await
-      fallback={
-        <Ink.Text color={colors.yellow}>
-          Checking <Command>node</Command> install...
-        </Ink.Text>
-      }
-      function={async () => {
-        const process_version = process.version.substring(1);
-        const semver_result = semver_compare(process_version, "14.0.0");
-
-        if (semver_result >= 0) {
-          return;
-        }
-
-        actions.output(
-          <Ink.Text color={colors.yellow}>
-            <Command>node</Command> must be installed.
           </Ink.Text>
         );
 

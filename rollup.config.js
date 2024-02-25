@@ -40,6 +40,7 @@ export default {
       values: {
         "process.env.NODE_ENV": JSON.stringify("production"),
         "process.env.CLI_VERSION": JSON.stringify(String(package_json.version)),
+        "process.env.GIT_STACK_STANDALONE": process.env.GIT_STACK_STANDALONE,
       },
     }),
   ],
