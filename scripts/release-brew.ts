@@ -56,6 +56,13 @@ await file.write_text(
 
 process.chdir(PROJECT_DIR);
 
+// download github asset and calculate sha256
+// prettier-ignore
+await spawn.sync(["gh", "release", "download", version, "-p", `git-stack-cli-${version}.tgz`]);
+// prettier-ignore
+const tarball_asset = await create_asset(`git-stack-cli-${version}.tgz`, { version });
+await file.rm(tarball_asset.filepath);
+
 await spawn(`npm run build:standalone`);
 
 process.chdir(STANDALONE_DIR);
@@ -86,12 +93,6 @@ await file.write_text(path.join("Formula", "git-stack.rb"), tap);
 
 // homebrew/core formula (build from source)
 
-// download github asset and calculate sha256
-// prettier-ignore
-await spawn.sync(`gh release download ${version} -p "git-stack-cli-${version}.tgz"`);
-// prettier-ignore
-const tarball_asset = await create_asset(`git-stack-cli-${version}.tgz`, { version });
-
 let core = await file.read_text(
   path.join("templates", "git-stack.core.rb.template")
 );
@@ -100,8 +101,6 @@ core = core.replace(re_token("version"), version);
 core = core.replace(re_token("tarball_sha256"), tarball_asset.sha256);
 
 await file.write_text(path.join("Formula", "git-stack.core.rb"), core);
-
-await file.rm(tarball_asset.filepath);
 
 // finally upload the assets to the github release
 process.chdir(STANDALONE_DIR);
@@ -117,13 +116,8 @@ await spawn.sync(`git push`);
 
 // commmit changes to main repo
 process.chdir(PROJECT_DIR);
-await spawn.sync([
-  "git",
-  "commit",
-  "-a",
-  "-m",
-  `homebrew-git-stack ${version}`,
-]);
+// prettier-ignore
+await spawn.sync(["git", "commit", "-a", "-m", `homebrew-git-stack ${version}`]);
 await spawn.sync(`git push`);
 
 console.debug();
