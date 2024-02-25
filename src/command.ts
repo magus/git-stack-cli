@@ -29,6 +29,12 @@ export async function command() {
         description: "Skip git hooks such as pre-commit and pre-push",
       })
 
+      .option("git-revise", {
+        type: "boolean",
+        default: false,
+        description: `Use git-revise to perform in-memory rebase, (macOS + Linux only)`,
+      })
+
       .option("verbose", {
         type: "boolean",
         alias: ["v"],

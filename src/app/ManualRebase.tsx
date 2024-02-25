@@ -1,6 +1,8 @@
 import * as React from "react";
 
 import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 import * as Ink from "ink-cjs";
 
@@ -9,6 +11,7 @@ import { Brackets } from "~/app/Brackets";
 import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
+import { GitReviseTodo } from "~/core/GitReviseTodo";
 import * as Metadata from "~/core/Metadata";
 import * as StackSummaryTable from "~/core/StackSummaryTable";
 import { cli } from "~/core/cli";
@@ -68,19 +71,148 @@ async function run(props: Props) {
     }
 
     if (i > 0) {
-      const last_group = commit_range.group_list[i - 1];
-      const last_commit = last_group.commits[last_group.commits.length - 1];
-      rebase_merge_base = last_commit.sha;
+      const prev_group = commit_range.group_list[i - 1];
+      const prev_commit = prev_group.commits[prev_group.commits.length - 1];
+      rebase_merge_base = prev_commit.sha;
       rebase_group_index = i;
     }
 
     break;
   }
 
+  actions.debug(`rebase_merge_base=${rebase_merge_base}`);
+  actions.debug(`rebase_group_index=${rebase_group_index}`);
+  actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
+
   try {
     // must perform rebase from repo root for applying git patch
     process.chdir(repo_root);
     await cli(`pwd`);
+
+    if (argv["git-revise"]) {
+      await rebase_git_revise();
+    } else {
+      await rebase_cherry_pick();
+    }
+
+    // after all commits have been cherry-picked and amended
+    // move the branch pointer to the newly created temporary branch
+    // now we are in locally in sync with github and on the original branch
+    await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
+
+    restore_git();
+
+    actions.set((state) => {
+      state.step = "post-rebase-status";
+    });
+  } catch (err) {
+    actions.error("Unable to rebase.");
+
+    if (err instanceof Error) {
+      if (actions.isDebug()) {
+        actions.error(err.message);
+      }
+    }
+
+    handle_exit();
+  }
+
+  async function rebase_git_revise() {
+    invariant(argv, "argv must exist");
+
+    actions.debug(`rebase_git_revise`);
+
+    actions.output(
+      <Ink.Text color={colors.yellow} wrap="truncate-end">
+        Rebasing…
+      </Ink.Text>
+    );
+
+    // generate temporary directory and drop sequence editor script
+    const tmp_git_sequence_editor_path = path.join(
+      os.tmpdir(),
+      "git-sequence-editor.sh"
+    );
+
+    actions.debug(
+      `tmp_git_sequence_editor_path=${tmp_git_sequence_editor_path}`
+    );
+
+    // replaced at build time with literal contents of `scripts/git-sequence-editor.sh`
+    const GIT_SEQUENCE_EDITOR_SCRIPT = `process.env.GIT_SEQUENCE_EDITOR_SCRIPT`;
+
+    // write script to temporary path
+    fs.writeFileSync(tmp_git_sequence_editor_path, GIT_SEQUENCE_EDITOR_SCRIPT);
+
+    // ensure script is executable
+    fs.chmodSync(tmp_git_sequence_editor_path, "755");
+
+    // create temporary branch
+    await cli(`git checkout -b ${temp_branch_name}`);
+
+    const git_revise_todo = GitReviseTodo({ rebase_group_index, commit_range });
+
+    // execute cli with temporary git sequence editor script
+    // revise from merge base to pick correct commits
+    await cli([
+      `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
+      `GIT_REVISE_TODO="${git_revise_todo}"`,
+      `git`,
+      `revise --edit -i ${rebase_merge_base}`,
+    ]);
+
+    // start from HEAD and work backward to rebase_group_index
+    const push_group_list = [];
+    let lookback_index = 0;
+    for (let i = 0; i < commit_range.group_list.length; i++) {
+      const index = commit_range.group_list.length - 1 - i;
+
+      // do not go past rebase_group_index
+      if (index < rebase_group_index) {
+        break;
+      }
+
+      const group = commit_range.group_list[index];
+      // console.debug({ i, index, group });
+
+      if (i > 0) {
+        const prev_group = commit_range.group_list[index + 1];
+        lookback_index += prev_group.commits.length;
+      }
+
+      // console.debug(`git show head~${lookback_index}`);
+
+      // push group and lookback_index onto front of push_group_list
+      push_group_list.unshift({ group, lookback_index });
+    }
+
+    const pr_url_list = commit_range.group_list.map(get_group_url);
+
+    // use push_group_list to sync each group HEAD to github
+    for (const push_group of push_group_list) {
+      const { group } = push_group;
+
+      // move to temporary branch for resetting to lookback_index to create PR
+      await cli(`git checkout -b ${group.id}`);
+
+      // prepare branch for sync, reset to commit at lookback index
+      await cli(`git reset --hard HEAD~${push_group.lookback_index}`);
+
+      await sync_group_github({ group, pr_url_list, skip_checkout: true });
+
+      // done, remove temp push branch and move back to temp branch
+      await cli(`git checkout ${temp_branch_name}`);
+      await cli(`git branch -D ${group.id}`);
+    }
+
+    // finally, ensure all prs have the updated stack table from updated pr_url_list
+    await update_pr_tables(pr_url_list);
+  }
+
+  async function rebase_cherry_pick() {
+    invariant(argv, "argv must exist");
+
+    actions.debug("rebase_cherry_pick");
 
     // create temporary branch based on merge base
     await cli(`git checkout -b ${temp_branch_name} ${rebase_merge_base}`);
@@ -103,8 +235,6 @@ async function run(props: Props) {
           }}
         />
       );
-
-      const selected_url = get_group_url(group);
 
       // cherry-pick and amend commits one by one
       for (const commit of group.commits) {
@@ -129,73 +259,98 @@ async function run(props: Props) {
         await cli(git_commit_comand);
       }
 
-      actions.output(
-        <FormatText
-          wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
-          message="Syncing {group}…"
-          values={{
-            group: (
-              <Brackets>{group.pr?.title || group.title || group.id}</Brackets>
-            ),
-          }}
-        />
-      );
-
-      if (!props.skipSync) {
-        // push to origin since github requires commit shas to line up perfectly
-        const git_push_command = [`git push -f origin HEAD:${group.id}`];
-
-        if (argv.verify === false) {
-          git_push_command.push("--no-verify");
-        }
-
-        await cli(git_push_command);
-
-        if (group.pr) {
-          // ensure base matches pr in github
-          await github.pr_edit({
-            branch: group.id,
-            base: group.base,
-            body: StackSummaryTable.write({
-              body: group.pr.body,
-              pr_url_list,
-              selected_url,
-            }),
-          });
-        } else {
-          // delete local group branch if leftover
-          await cli(`git branch -D ${group.id}`, { ignoreExitCode: true });
-
-          // move to temporary branch for creating pr
-          await cli(`git checkout -b ${group.id}`);
-
-          // create pr in github
-          const pr_url = await github.pr_create({
-            branch: group.id,
-            base: group.base,
-            title: group.title,
-            body: "",
-          });
-
-          if (!pr_url) {
-            throw new Error("unable to create pr");
-          }
-
-          // update pr_url_list with created pr_url
-          for (let i = 0; i < pr_url_list.length; i++) {
-            const url = pr_url_list[i];
-            if (url === selected_url) {
-              pr_url_list[i] = pr_url;
-            }
-          }
-
-          // move back to temp branch
-          await cli(`git checkout ${temp_branch_name}`);
-        }
-      }
+      await sync_group_github({ group, pr_url_list, skip_checkout: false });
     }
 
     // finally, ensure all prs have the updated stack table from updated pr_url_list
+    await update_pr_tables(pr_url_list);
+  }
+
+  async function sync_group_github(args: {
+    group: CommitMetadataGroup;
+    pr_url_list: Array<string>;
+    skip_checkout: boolean;
+  }) {
+    if (props.skipSync) {
+      return;
+    }
+
+    const { group, pr_url_list } = args;
+
+    invariant(argv, "argv must exist");
+    invariant(group.base, "group.base must exist");
+
+    actions.output(
+      <FormatText
+        wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
+        message="Syncing {group}…"
+        values={{
+          group: (
+            <Brackets>{group.pr?.title || group.title || group.id}</Brackets>
+          ),
+        }}
+      />
+    );
+
+    // push to origin since github requires commit shas to line up perfectly
+    const git_push_command = [`git push -f origin HEAD:${group.id}`];
+
+    if (argv.verify === false) {
+      git_push_command.push("--no-verify");
+    }
+
+    await cli(git_push_command);
+
+    const selected_url = get_group_url(group);
+
+    if (group.pr) {
+      // ensure base matches pr in github
+      await github.pr_edit({
+        branch: group.id,
+        base: group.base,
+        body: StackSummaryTable.write({
+          body: group.pr.body,
+          pr_url_list,
+          selected_url,
+        }),
+      });
+    } else {
+      if (!args.skip_checkout) {
+        // delete local group branch if leftover
+        await cli(`git branch -D ${group.id}`, { ignoreExitCode: true });
+
+        // move to temporary branch for creating pr
+        await cli(`git checkout -b ${group.id}`);
+      }
+
+      // create pr in github
+      const pr_url = await github.pr_create({
+        branch: group.id,
+        base: group.base,
+        title: group.title,
+        body: "",
+      });
+
+      if (!pr_url) {
+        throw new Error("unable to create pr");
+      }
+
+      // update pr_url_list with created pr_url
+      for (let i = 0; i < pr_url_list.length; i++) {
+        const url = pr_url_list[i];
+        if (url === selected_url) {
+          pr_url_list[i] = pr_url;
+        }
+      }
+
+      // move back to temp branch
+      if (!args.skip_checkout) {
+        await cli(`git checkout ${temp_branch_name}`);
+      }
+    }
+  }
+
+  async function update_pr_tables(pr_url_list: Array<string>) {
     for (let i = 0; i < commit_range.group_list.length; i++) {
       const group = commit_range.group_list[i];
 
@@ -224,27 +379,6 @@ async function run(props: Props) {
         });
       }
     }
-
-    // after all commits have been cherry-picked and amended
-    // move the branch pointer to the newly created temporary branch
-    // now we are in locally in sync with github and on the original branch
-    await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
-
-    restore_git();
-
-    actions.set((state) => {
-      state.step = "post-rebase-status";
-    });
-  } catch (err) {
-    actions.error("Unable to rebase.");
-
-    if (err instanceof Error) {
-      if (actions.isDebug()) {
-        actions.error(err.message);
-      }
-    }
-
-    handle_exit();
   }
 
   // cleanup git operations if cancelled during manual rebase
