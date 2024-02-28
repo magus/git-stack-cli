@@ -80,9 +80,11 @@ Managing even a few stacked diffs requires a relatively strong knowledge of `git
 git submodule update --init --recursive
 npm i
 npm run dev
+npm unlink git-stack-cli
 npm link
 
 # navigate to project to test within
+npm unlink git-stack-cli
 npm link git-stack-cli
 
 git stack --verbose
