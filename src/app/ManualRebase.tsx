@@ -38,14 +38,13 @@ async function run(props: Props) {
   const actions = state.actions;
   const argv = state.argv;
   const branch_name = state.branch_name;
-  const merge_base = state.merge_base;
   const commit_map = state.commit_map;
+  const master_branch = state.master_branch;
   const cwd = state.cwd;
   const repo_root = state.repo_root;
 
   invariant(argv, "argv must exist");
   invariant(branch_name, "branch_name must exist");
-  invariant(merge_base, "merge_base must exist");
   invariant(commit_map, "commit_map must exist");
   invariant(cwd, "cwd must exist");
   invariant(repo_root, "repo_root must exist");
@@ -59,6 +58,9 @@ async function run(props: Props) {
 
   // reverse commit list so that we can cherry-pick in order
   commit_range.group_list.reverse();
+
+  // get latest merge_base relative to local master
+  const merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;
 
   let rebase_merge_base = merge_base;
   let rebase_group_index = 0;
@@ -80,8 +82,8 @@ async function run(props: Props) {
     break;
   }
 
-  actions.debug(`rebase_merge_base=${rebase_merge_base}`);
-  actions.debug(`rebase_group_index=${rebase_group_index}`);
+  actions.debug(`rebase_merge_base = ${rebase_merge_base}`);
+  actions.debug(`rebase_group_index = ${rebase_group_index}`);
   actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
 
   try {

@@ -117,7 +117,6 @@ async function gather_metadata() {
       state.repo_root = repo_root;
       state.master_branch = master_branch;
       state.head = head;
-      state.merge_base = merge_base;
       state.branch_name = branch_name;
     });
   } catch (err) {

@@ -34,7 +34,6 @@ export type State = {
   repo_root: null | string;
   master_branch: string;
   head: null | string;
-  merge_base: null | string;
   branch_name: null | string;
   commit_range: null | CommitMetadata.CommitRange;
   commit_map: null | CommitMap;
@@ -95,7 +94,6 @@ const BaseStore = createStore<State>()(
     repo_root: null,
     master_branch: "master",
     head: null,
-    merge_base: null,
     branch_name: null,
     commit_range: null,
     commit_map: null,

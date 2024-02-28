@@ -47,16 +47,18 @@ async function run() {
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
   try {
+    actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
+
     // must perform rebase from repo root for applying git patch
     process.chdir(repo_root);
     await cli(`pwd`);
 
+    // update local master to match remote
     await cli(
       `git fetch --no-tags -v origin ${master_branch}:${master_branch}`
     );
 
     const master_sha = (await cli(`git rev-parse ${master_branch}`)).stdout;
-
     const rebase_merge_base = master_sha;
 
     // create temporary branch based on merge base
