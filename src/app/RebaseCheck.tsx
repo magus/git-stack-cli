@@ -10,7 +10,6 @@ import { Store } from "~/app/Store";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
-import { invariant } from "~/core/invariant";
 
 type Props = {
   children: React.ReactNode;
@@ -26,8 +25,6 @@ function reducer(state: State, patch: Partial<State>) {
 
 export function RebaseCheck(props: Props) {
   const actions = Store.useActions();
-  const argv = Store.useState((state) => state.argv);
-  invariant(argv, "argv must exist");
 
   const [state, patch] = React.useReducer(reducer, {
     status: "init",
@@ -68,9 +65,6 @@ export function RebaseCheck(props: Props) {
 
   async function rebase_check() {
     const actions = Store.getState().actions;
-    const argv = Store.getState().argv;
-
-    invariant(argv, "argv must exist");
 
     try {
       const repo_root = (await cli(`git rev-parse --absolute-git-dir`)).stdout;

@@ -8,7 +8,6 @@ import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
-import { invariant } from "~/core/invariant";
 import { match_group } from "~/core/match_group";
 
 type Props = {
@@ -16,9 +15,6 @@ type Props = {
 };
 
 export function GatherMetadata(props: Props) {
-  const argv = Store.useState((state) => state.argv);
-  invariant(argv, "argv must exist");
-
   const fallback = (
     <Ink.Text color={colors.yellow}>
       Gathering local git information...
@@ -35,8 +31,6 @@ export function GatherMetadata(props: Props) {
 async function gather_metadata() {
   const actions = Store.getState().actions;
   const argv = Store.getState().argv;
-
-  invariant(argv, "argv must exist");
 
   try {
     // default to master branch, fallback to main

@@ -8,21 +8,15 @@ import { Store } from "~/app/Store";
 import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 
-import type { Argv } from "~/command";
-
 export function Status() {
-  const argv = Store.useState((state) => state.argv);
-  invariant(argv, "argv must exist");
-
-  return <Await fallback={null} function={() => run({ argv })} />;
+  return <Await fallback={null} function={run} />;
 }
 
-type Args = {
-  argv: Argv;
-};
+async function run() {
+  const state = Store.getState();
+  const actions = state.actions;
+  const argv = state.argv;
 
-async function run(args: Args) {
-  const actions = Store.getState().actions;
   const commit_range = Store.getState().commit_range;
 
   invariant(commit_range, "commit_range must exist");
@@ -51,7 +45,7 @@ async function run(args: Args) {
     }
   }
 
-  if (args.argv.check) {
+  if (argv.check) {
     actions.exit(0);
   } else if (needs_rebase) {
     Store.setState((state) => {
@@ -61,7 +55,7 @@ async function run(args: Args) {
     Store.setState((state) => {
       state.step = "pre-select-commit-ranges";
     });
-  } else if (args.argv.force) {
+  } else if (argv.force) {
     Store.setState((state) => {
       state.step = "select-commit-ranges";
     });

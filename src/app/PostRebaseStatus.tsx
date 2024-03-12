@@ -6,12 +6,8 @@ import { Await } from "~/app/Await";
 import { StatusTable } from "~/app/StatusTable";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
-import { invariant } from "~/core/invariant";
 
 export function PostRebaseStatus() {
-  const argv = Store.useState((state) => state.argv);
-  invariant(argv, "argv must exist");
-
   return <Await fallback={null} function={run} />;
 }
 

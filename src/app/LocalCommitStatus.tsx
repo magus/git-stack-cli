@@ -6,7 +6,6 @@ import { Await } from "~/app/Await";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
 import { colors } from "~/core/colors";
-import { invariant } from "~/core/invariant";
 import * as json from "~/core/json";
 
 type Props = {
@@ -15,7 +14,6 @@ type Props = {
 
 export function LocalCommitStatus(props: Props) {
   const argv = Store.useState((state) => state.argv);
-  invariant(argv, "argv must exist");
 
   const fallback = (
     <Ink.Text color={colors.yellow}>Fetching PR status from Github...</Ink.Text>

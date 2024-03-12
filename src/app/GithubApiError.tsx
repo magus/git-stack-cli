@@ -9,12 +9,8 @@ import { Store } from "~/app/Store";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import * as date from "~/core/date";
-import { invariant } from "~/core/invariant";
 
 export function GithubApiError() {
-  const argv = Store.useState((state) => state.argv);
-  invariant(argv, "argv must exist");
-
   return <Await fallback={null} function={run} />;
 }
 

@@ -35,10 +35,8 @@ async function run() {
   const cwd = state.cwd;
   const repo_root = state.repo_root;
 
-  invariant(argv, "argv must exist");
   invariant(branch_name, "branch_name must exist");
   invariant(commit_range, "commit_range must exist");
-  invariant(cwd, "cwd must exist");
   invariant(repo_root, "repo_root must exist");
 
   // always listen for SIGINT event and restore git state
@@ -200,7 +198,6 @@ async function run() {
     }
 
     // restore back to original dir
-    invariant(cwd, "cwd must exist");
     if (fs.existsSync(cwd)) {
       process.chdir(cwd);
     }

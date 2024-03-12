@@ -7,7 +7,6 @@ import * as Ink from "ink-cjs";
 
 import { Store } from "~/app/Store";
 import { colors } from "~/core/colors";
-import { invariant } from "~/core/invariant";
 import * as json from "~/core/json";
 
 export function Debug() {
@@ -29,8 +28,6 @@ export function Debug() {
 
   React.useEffect(
     function syncStateJson() {
-      invariant(state.cwd, "state.cwd must exist");
-
       if (!argv?.["write-state-json"]) {
         return;
       }

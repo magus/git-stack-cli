@@ -25,10 +25,11 @@ type MutateOutputArgs = {
 };
 
 export type State = {
-  argv: null | Argv;
-  ink: null | InkInstance;
+  // set immediately in `index.tsx` so no `null` scenario
+  argv: Argv;
+  ink: InkInstance;
+  cwd: string;
 
-  cwd: null | string;
   username: null | string;
   repo_path: null | string;
   repo_root: null | string;
@@ -84,10 +85,11 @@ export type State = {
 
 const BaseStore = createStore<State>()(
   immer((set, get) => ({
-    argv: null,
-    ink: null,
+    // set immediately in `index.tsx` so no `null` scenario
+    argv: {} as Argv,
+    ink: {} as InkInstance,
+    cwd: "",
 
-    cwd: null,
     username: null,
     repo_path: null,
     repo_root: null,

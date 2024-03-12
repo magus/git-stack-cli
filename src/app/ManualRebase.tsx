@@ -39,10 +39,8 @@ async function run() {
   const cwd = state.cwd;
   const repo_root = state.repo_root;
 
-  invariant(argv, "argv must exist");
   invariant(branch_name, "branch_name must exist");
   invariant(commit_map, "commit_map must exist");
-  invariant(cwd, "cwd must exist");
   invariant(repo_root, "repo_root must exist");
 
   // always listen for SIGINT event and restore git state
@@ -116,8 +114,6 @@ async function run() {
   }
 
   async function rebase_git_revise() {
-    invariant(argv, "argv must exist");
-
     actions.debug(`rebase_git_revise`);
 
     actions.output(
@@ -208,8 +204,6 @@ async function run() {
   }
 
   async function rebase_cherry_pick() {
-    invariant(argv, "argv must exist");
-
     actions.debug("rebase_cherry_pick");
 
     // create temporary branch based on merge base
@@ -269,15 +263,12 @@ async function run() {
     pr_url_list: Array<string>;
     skip_checkout: boolean;
   }) {
-    invariant(argv, "argv must exist");
-
     if (!argv.sync) {
       return;
     }
 
     const { group, pr_url_list } = args;
 
-    invariant(argv, "argv must exist");
     invariant(group.base, "group.base must exist");
 
     actions.output(
@@ -410,7 +401,6 @@ async function run() {
     }
 
     // restore back to original dir
-    invariant(cwd, "cwd must exist");
     if (fs.existsSync(cwd)) {
       process.chdir(cwd);
     }
