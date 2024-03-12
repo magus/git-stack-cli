@@ -28,7 +28,8 @@ export async function command() {
       .option("verify", {
         type: "boolean",
         default: true,
-        description: "Skip git hooks such as pre-commit and pre-push",
+        description:
+          "Run git hooks such as pre-commit and pre-push, disable with --no-verify",
       })
 
       .option("rebase", {
