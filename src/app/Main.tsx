@@ -15,11 +15,11 @@ export function Main() {
   const step = Store.useState((state) => state.step);
 
   switch (step) {
-    case "github-api-error":
-      return <GithubApiError />;
-
     case "loading":
       return null;
+
+    case "github-api-error":
+      return <GithubApiError />;
 
     case "status":
       return <Status />;
