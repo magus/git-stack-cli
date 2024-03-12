@@ -346,7 +346,7 @@ function SelectCommitRangesInternal(props: Props) {
   );
 
   function submit_group_input(title: string) {
-    const id = short_id();
+    const id = `gs-${short_id()}`;
 
     actions.output(
       <FormatText
