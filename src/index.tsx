@@ -17,6 +17,8 @@ command()
       state.argv = argv;
       state.cwd = process.cwd();
     });
+
+    Store.getState().actions.debug(JSON.stringify(argv, null, 2));
   })
   // eslint-disable-next-line no-console
   .catch(console.error);
