@@ -22,7 +22,14 @@ export async function command() {
         type: "boolean",
         alias: ["c"],
         default: false,
-        description: "Print status table without syncing",
+        description: "Print status table and exit without syncing",
+      })
+
+      .option("sync", {
+        type: "boolean",
+        alias: ["s"],
+        default: true,
+        description: "Sync commit ranges to Github, disable with --no-sync",
       })
 
       .option("verify", {

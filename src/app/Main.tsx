@@ -39,9 +39,6 @@ export function Main() {
     case "manual-rebase":
       return <ManualRebase />;
 
-    case "manual-rebase-no-sync":
-      return <ManualRebase skipSync />;
-
     case "post-rebase-status":
       return <PostRebaseStatus />;
 

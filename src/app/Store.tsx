@@ -47,7 +47,6 @@ export type State = {
     | "pre-select-commit-ranges"
     | "select-commit-ranges"
     | "manual-rebase"
-    | "manual-rebase-no-sync"
     | "post-rebase-status";
 
   output: Array<React.ReactNode>;

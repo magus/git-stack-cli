@@ -20,20 +20,16 @@ import * as github from "~/core/github";
 import { invariant } from "~/core/invariant";
 import { short_id } from "~/core/short_id";
 
-type Props = {
-  skipSync?: boolean;
-};
-
-export function ManualRebase(props: Props) {
+export function ManualRebase() {
   return (
     <Await
       fallback={<Ink.Text color={colors.yellow}>Rebasing commits...</Ink.Text>}
-      function={() => run(props)}
+      function={run}
     />
   );
 }
 
-async function run(props: Props) {
+async function run() {
   const state = Store.getState();
   const actions = state.actions;
   const argv = state.argv;
@@ -273,7 +269,9 @@ async function run(props: Props) {
     pr_url_list: Array<string>;
     skip_checkout: boolean;
   }) {
-    if (props.skipSync) {
+    invariant(argv, "argv must exist");
+
+    if (!argv.sync) {
       return;
     }
 
