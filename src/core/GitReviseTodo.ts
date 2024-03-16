@@ -56,7 +56,8 @@ export function GitReviseTodo(args: Args): string {
 
     for (const commit of group.commits) {
       // update git commit message with stack id
-      const message_with_id = Metadata.write(commit.full_message, group.id);
+      const metadata = { id: group.id };
+      const message_with_id = Metadata.write(commit.full_message, metadata);
 
       // get first 12 characters of commit sha
       const sha = commit.sha.slice(0, 12);

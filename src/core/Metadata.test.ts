@@ -11,9 +11,15 @@ test("read handles bulleted lists", () => {
     "- move logic inside if branch",
     "",
     "git-stack-id: DdKIFyufW",
+    "git-stack-title: saved group title",
   ].join("\n");
 
-  expect(Metadata.read(body)).toEqual("DdKIFyufW");
+  const metadata = Metadata.read(body);
+
+  expect(metadata).toEqual({
+    id: "DdKIFyufW",
+    title: "saved group title",
+  });
 });
 
 test("write handles bulleted lists", () => {
@@ -27,7 +33,12 @@ test("write handles bulleted lists", () => {
     "git-stack-id: DdKIFyufW",
   ].join("\n");
 
-  expect(Metadata.write(body, "abcd1234")).toEqual(
+  const metadata = {
+    id: "abcd1234",
+    title: "banana",
+  };
+
+  expect(Metadata.write(body, metadata)).toEqual(
     [
       "[feat] implement various features",
       "",
@@ -36,6 +47,30 @@ test("write handles bulleted lists", () => {
       "- move logic inside if branch",
       "",
       "git-stack-id: abcd1234",
+      "git-stack-title: banana",
+    ].join("\n")
+  );
+});
+
+test("removes metadata", () => {
+  const body = [
+    "[feat] implement various features",
+    "",
+    "- keyboard modality escape key",
+    "- centralize settings",
+    "- move logic inside if branch",
+    "",
+    "git-stack-id: DdKIFyufW",
+    "git-stack-title: this is a PR title",
+  ].join("\n");
+
+  expect(Metadata.remove(body)).toEqual(
+    [
+      "[feat] implement various features",
+      "",
+      "- keyboard modality escape key",
+      "- centralize settings",
+      "- move logic inside if branch",
     ].join("\n")
   );
 });

@@ -112,7 +112,8 @@ async function run() {
 
       let new_message;
       if (commit.branch_id) {
-        new_message = Metadata.write(commit.full_message, commit.branch_id);
+        const metadata = { id: commit.branch_id };
+        new_message = Metadata.write(commit.full_message, metadata);
       } else {
         new_message = commit.full_message;
       }
