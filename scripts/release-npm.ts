@@ -52,7 +52,7 @@ for (const filepath of package_json.files) {
 process.env.GS_RELEASE_NPM = "true";
 console.info("Publishing to NPM requires a one-time password");
 const otp = await input("Enter OTP: ");
-await spawn(`npm publish --otp=${otp}`);
+await spawn(["npm", "publish", `--otp=${otp}`]);
 
 process.chdir(PROJECT_DIR);
 
