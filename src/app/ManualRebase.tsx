@@ -241,7 +241,7 @@ async function run() {
         // add all changes to stage
         await cli(`git add --all`);
 
-        const metadata = { id: group.id };
+        const metadata = { id: group.id, title: group.title };
         const new_message = Metadata.write(commit.full_message, metadata);
         const git_commit_comand = [`git commit -m "${new_message}"`];
 

@@ -16,21 +16,25 @@ test("git-revise-todo from commit range with single new commit", () => {
       "lemon color",
       "",
       "git-stack-id: E63ytp5dj",
+      "git-stack-title: lemon color",
       "",
       "++ pick d36d63499425",
       "cantaloupe color",
       "",
       "git-stack-id: E63ytp5dj",
+      "git-stack-title: lemon color",
       "",
       "++ pick 4f98dd3e67d0",
       "banana sweet",
       "",
       "git-stack-id: E63ytp5dj",
+      "git-stack-title: lemon color",
       "",
       "++ pick f143d03c723c",
       "apple sweet",
       "",
       "git-stack-id: E63ytp5dj",
+      "git-stack-title: lemon color",
     ].join("\n")
   );
 });
@@ -48,6 +52,7 @@ test("git-revise-todo from commit range with single new commit in new group", ()
       "apple sweet",
       "",
       "git-stack-id: 6Ak-qn+5Z",
+      "git-stack-title: new group",
     ].join("\n")
   );
 });
