@@ -155,6 +155,14 @@ async function run() {
       `revise --edit -i ${rebase_merge_base}`,
     ]);
 
+    // early return since we do not need to sync
+    if (!argv.sync) {
+      return;
+    }
+
+    // in order to sync we walk from rebase_group_index to HEAD
+    // checking out each group and syncing to github
+
     // start from HEAD and work backward to rebase_group_index
     const push_group_list = [];
     let lookback_index = 0;
