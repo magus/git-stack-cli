@@ -342,6 +342,10 @@ async function run() {
   }
 
   async function update_pr_tables(pr_url_list: Array<string>) {
+    if (!argv.sync) {
+      return;
+    }
+
     for (let i = 0; i < commit_range.group_list.length; i++) {
       const group = commit_range.group_list[i];
 
