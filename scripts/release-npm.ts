@@ -70,34 +70,6 @@ console.debug();
 console.debug("https://www.npmjs.com/package/git-stack-cli");
 console.debug();
 
-// // https://github.com/magus/git-stack-cli/releases/download/0.8.9/git-stack-cli-linux
-// async function create_asset(name: string) {
-//   const sha256_cmd = await spawn.sync(`shasum -a 256 ${name}`);
-//   const match = sha256_cmd.stdout.match(/(?<sha256>[^\s]+)/i);
-
-//   if (!match?.groups) {
-//     throw new Error(`unable to get sha256 for ${name}`);
-//   }
-
-//   const sha256 = match.groups.sha256;
-
-//   const url = `https://github.com/magus/git-stack-cli/releases/download/${version}/${name}`;
-
-//   return { name, sha256, url };
-// }
-
-// function reFind(list: Array<string>, re: RegExp) {
-//   for (const str of list) {
-//     const match = str.match(re);
-
-//     if (match?.groups) {
-//       return match.groups.value;
-//     }
-//   }
-
-//   return null;
-// }
-
 async function input(prompt: string) {
   process.stdout.write(prompt);
   for await (const value of console) {
