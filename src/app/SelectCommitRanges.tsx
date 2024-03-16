@@ -33,6 +33,8 @@ type SimpleGroup = { id: string; title: string };
 function SelectCommitRangesInternal(props: Props) {
   const actions = Store.useActions();
 
+  const argv = Store.useState((state) => state.argv);
+
   const [selected_group_id, set_selected_group_id] = React.useState(
     props.commit_range.UNASSIGNED
   );
@@ -259,22 +261,41 @@ function SelectCommitRangesInternal(props: Props) {
         />
       ) : (
         <React.Fragment>
-          <FormatText
-            wrapper={<Ink.Text />}
-            message="🎉 Done! Press {s} to {sync} the commits to Github"
-            values={{
-              s: (
-                <Ink.Text bold color={colors.green}>
-                  s
-                </Ink.Text>
-              ),
-              sync: (
-                <Ink.Text bold color={colors.green}>
-                  <Parens>s</Parens>ync
-                </Ink.Text>
-              ),
-            }}
-          />
+          {argv.sync ? (
+            <FormatText
+              wrapper={<Ink.Text />}
+              message="🎉 Done! Press {s} to {sync} the commits to Github"
+              values={{
+                s: (
+                  <Ink.Text bold color={colors.green}>
+                    s
+                  </Ink.Text>
+                ),
+                sync: (
+                  <Ink.Text bold color={colors.green}>
+                    <Parens>s</Parens>ync
+                  </Ink.Text>
+                ),
+              }}
+            />
+          ) : (
+            <FormatText
+              wrapper={<Ink.Text />}
+              message="🎉 Done! Press {s} to {save} the commits locally"
+              values={{
+                s: (
+                  <Ink.Text bold color={colors.green}>
+                    s
+                  </Ink.Text>
+                ),
+                save: (
+                  <Ink.Text bold color={colors.green}>
+                    <Parens>s</Parens>save
+                  </Ink.Text>
+                ),
+              }}
+            />
+          )}
         </React.Fragment>
       )}
 
