@@ -36,7 +36,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
   for (const commit of commit_list) {
     let id = commit.branch_id;
-    let title = id;
+    let title = commit.title || id;
 
     // use commit map if provided (via select commit ranges)
     if (commit_group_map) {
@@ -192,12 +192,14 @@ export async function commit(sha: string) {
   const metadata = await Metadata.read(full_message);
   const branch_id = metadata?.id;
   const subject_line = get_subject_line(full_message);
+  const title = metadata?.title;
 
   return {
     sha,
     full_message,
     subject_line,
     branch_id,
+    title,
   };
 }
 

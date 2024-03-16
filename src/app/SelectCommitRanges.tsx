@@ -101,7 +101,7 @@ function SelectCommitRangesInternal(props: Props) {
 
     group_list.push({
       id: group.id,
-      title: group.pr?.title || group.id,
+      title: group.pr?.title || group.title || group.id,
     });
   }
 
