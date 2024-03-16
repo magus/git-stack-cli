@@ -36,15 +36,6 @@ async function run() {
     }
   }
 
-  for (let i = 0; i < commit_range.commit_list.length; i++) {
-    const commit = commit_range.commit_list[i];
-    const commit_pr = commit_range.pr_lookup[commit.branch_id || ""];
-
-    if (commit.branch_id && !commit_pr) {
-      needs_rebase = true;
-    }
-  }
-
   if (argv.check) {
     actions.exit(0);
   } else if (needs_rebase) {
