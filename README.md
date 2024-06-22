@@ -101,6 +101,10 @@ npm run build:standalone
 > [!IMPORTANT]
 >
 > **You must update the `version` in `package.json` before running `npm run release`**
+>
+> ```bash
+> npm version patch
+> ```
 
 ```bash
 npm run release
