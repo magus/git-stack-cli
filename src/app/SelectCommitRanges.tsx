@@ -166,7 +166,9 @@ function SelectCommitRangesInternal(props: Props) {
 
     let disabled;
 
-    if (group.id === props.commit_range.UNASSIGNED) {
+    if (group_input) {
+      disabled = true;
+    } else if (group.id === props.commit_range.UNASSIGNED) {
       disabled = true;
     } else {
       disabled = Boolean(selected && commit_metadata_id !== group.id);
