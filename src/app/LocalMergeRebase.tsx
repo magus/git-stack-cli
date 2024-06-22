@@ -102,18 +102,13 @@ async function run() {
     }
 
     if (picked_commit_list.length > 0) {
-      const first_commit = picked_commit_list.at(0);
-      const last_commit = picked_commit_list.at(-1);
-
-      invariant(first_commit, "first_commit must exist");
-      invariant(last_commit, "last_commit must exist");
-
       // ensure clean base to avoid conflicts when applying patch
       await cli(`git clean -fd`);
 
-      await cli(
-        `git cherry-pick "${first_commit.sha}^..${last_commit.sha}" --keep-redundant-commits`
-      );
+      // create list of sha for cherry-pick
+      const sha_list = picked_commit_list.map((commit) => commit.sha).join(" ");
+
+      await cli(`git cherry-pick --keep-redundant-commits ${sha_list}`);
     }
 
     // after all commits have been cherry-picked and amended
