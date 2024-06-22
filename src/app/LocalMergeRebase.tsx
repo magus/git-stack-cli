@@ -10,7 +10,6 @@ import { FormatText } from "~/app/FormatText";
 import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
-import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
@@ -28,7 +27,6 @@ export function LocalMergeRebase() {
 async function run() {
   const state = Store.getState();
   const actions = state.actions;
-  const argv = state.argv;
   const branch_name = state.branch_name;
   const commit_range = state.commit_range;
   const master_branch = state.master_branch;
@@ -62,6 +60,8 @@ async function run() {
     // create temporary branch based on merge base
     await cli(`git checkout -b ${temp_branch_name} ${rebase_merge_base}`);
 
+    const picked_commit_list = [];
+
     for (let i = 0; i < commit_range.commit_list.length; i++) {
       const commit = commit_range.commit_list[i];
       const commit_pr = commit_range.pr_lookup[commit.branch_id || ""];
@@ -86,7 +86,6 @@ async function run() {
         continue;
       }
 
-      // cherry-pick and amend commits one by one
       if (actions.isDebug()) {
         actions.output(
           <FormatText
@@ -99,55 +98,25 @@ async function run() {
         );
       }
 
+      picked_commit_list.push(commit);
+    }
+
+    if (picked_commit_list.length > 0) {
+      const first_commit = picked_commit_list.at(0);
+      const last_commit = picked_commit_list.at(-1);
+
+      invariant(first_commit, "first_commit must exist");
+      invariant(last_commit, "last_commit must exist");
+
       // ensure clean base to avoid conflicts when applying patch
       await cli(`git clean -fd`);
 
-      // create, apply and cleanup patch
-      await cli(`git format-patch -1 ${commit.sha} --stdout > ${PATCH_FILE}`);
-      await cli(`git apply ${PATCH_FILE}`);
-      await cli(`rm ${PATCH_FILE}`);
-
-      // add all changes to stage
-      await cli(`git add --all`);
-
-      let new_message;
-      if (commit.branch_id) {
-        const metadata = { id: commit.branch_id };
-        new_message = Metadata.write(commit.full_message, metadata);
-      } else {
-        new_message = commit.full_message;
-      }
-
-      const git_commit_comand = [`git commit -m "${new_message}"`];
-
-      if (argv.verify === false) {
-        git_commit_comand.push("--no-verify");
-      }
-
-      await cli(git_commit_comand);
-
-      if (commit.branch_id && !commit_pr) {
-        if (actions.isDebug()) {
-          actions.output(
-            <FormatText
-              wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
-              message="Cleaning up unused group {group}"
-              values={{
-                group: <Brackets>{commit.branch_id}</Brackets>,
-              }}
-            />
-          );
-        }
-
-        // missing PR, clear branch id from commit
-        const new_message = await Metadata.remove(commit.full_message);
-        await cli(`git commit --amend -m "${new_message}"`);
-      }
+      await cli(`git cherry-pick "${first_commit.sha}^..${last_commit.sha}"`);
     }
 
     // after all commits have been cherry-picked and amended
     // move the branch pointer to the newly created temporary branch
-    // now we are in locally in sync with github and on the original branch
+    // now we are locally in sync with github and on the original branch
     await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
 
     restore_git();
