@@ -111,7 +111,9 @@ async function run() {
       // ensure clean base to avoid conflicts when applying patch
       await cli(`git clean -fd`);
 
-      await cli(`git cherry-pick "${first_commit.sha}^..${last_commit.sha}"`);
+      await cli(
+        `git cherry-pick "${first_commit.sha}^..${last_commit.sha}" --keep-redundant-commits`
+      );
     }
 
     // after all commits have been cherry-picked and amended
