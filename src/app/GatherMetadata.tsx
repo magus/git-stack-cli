@@ -16,9 +16,7 @@ type Props = {
 
 export function GatherMetadata(props: Props) {
   const fallback = (
-    <Ink.Text color={colors.yellow}>
-      Gathering local git information...
-    </Ink.Text>
+    <Ink.Text color={colors.yellow}>Gathering local git information…</Ink.Text>
   );
 
   return (

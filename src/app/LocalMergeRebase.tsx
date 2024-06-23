@@ -18,7 +18,7 @@ import { short_id } from "~/core/short_id";
 export function LocalMergeRebase() {
   return (
     <Await
-      fallback={<Ink.Text color={colors.yellow}>Rebasing commits...</Ink.Text>}
+      fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>}
       function={run}
     />
   );
@@ -174,7 +174,7 @@ async function run() {
   function handle_exit() {
     actions.output(
       <Ink.Text color={colors.yellow}>
-        Restoring <Brackets>{branch_name}</Brackets>...
+        Restoring <Brackets>{branch_name}</Brackets>…
       </Ink.Text>
     );
 

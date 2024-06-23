@@ -56,7 +56,7 @@ export function RebaseCheck(props: Props) {
       return (
         <Await
           fallback={
-            <Ink.Text color={colors.yellow}>Checking for rebase...</Ink.Text>
+            <Ink.Text color={colors.yellow}>Checking for rebase…</Ink.Text>
           }
           function={rebase_check}
         />

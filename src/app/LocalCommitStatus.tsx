@@ -16,7 +16,7 @@ export function LocalCommitStatus(props: Props) {
   const argv = Store.useState((state) => state.argv);
 
   const fallback = (
-    <Ink.Text color={colors.yellow}>Fetching PR status from Github...</Ink.Text>
+    <Ink.Text color={colors.yellow}>Fetching PR status from Github…</Ink.Text>
   );
 
   if (argv["mock-metadata"]) {

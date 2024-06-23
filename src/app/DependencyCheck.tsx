@@ -39,7 +39,7 @@ function CheckGit(props: Props) {
     <Await
       fallback={
         <Ink.Text color={colors.yellow}>
-          Checking <Command>git</Command> install...
+          Checking <Command>git</Command> install…
         </Ink.Text>
       }
       function={async () => {
@@ -74,7 +74,7 @@ function CheckGithubCli(props: Props) {
       fallback={
         <Ink.Text color={colors.yellow}>
           <Ink.Text>
-            Checking <Command>gh</Command> install...
+            Checking <Command>gh</Command> install…
           </Ink.Text>
         </Ink.Text>
       }
@@ -117,7 +117,7 @@ function CheckGithubCliAuth(props: Props) {
       fallback={
         <Ink.Text color={colors.yellow}>
           <Ink.Text>
-            Checking <Command>gh auth status</Command>...
+            Checking <Command>gh auth status</Command>…
           </Ink.Text>
         </Ink.Text>
       }
@@ -175,7 +175,7 @@ function CheckGitRevise(props: Props) {
       fallback={
         <Ink.Text color={colors.yellow}>
           <Ink.Text>
-            Checking <Command>git revise</Command> install...
+            Checking <Command>git revise</Command> install…
           </Ink.Text>
         </Ink.Text>
       }
