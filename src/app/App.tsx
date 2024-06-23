@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { AutoUpdate } from "~/app/AutoUpdate";
+import { CherryPickCheck } from "~/app/CherryPickCheck";
 import { Debug } from "~/app/Debug";
 import { DependencyCheck } from "~/app/DependencyCheck";
 import { GatherMetadata } from "~/app/GatherMetadata";
@@ -50,13 +51,15 @@ export function App() {
       >
         <DependencyCheck>
           <RebaseCheck>
-            {!argv.verbose ? null : <GithubApiError />}
+            <CherryPickCheck>
+              {!argv.verbose ? null : <GithubApiError />}
 
-            <GatherMetadata>
-              <LocalCommitStatus>
-                <Main />
-              </LocalCommitStatus>
-            </GatherMetadata>
+              <GatherMetadata>
+                <LocalCommitStatus>
+                  <Main />
+                </LocalCommitStatus>
+              </GatherMetadata>
+            </CherryPickCheck>
           </RebaseCheck>
         </DependencyCheck>
       </AutoUpdate>
