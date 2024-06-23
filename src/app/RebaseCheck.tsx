@@ -6,6 +6,7 @@ import path from "node:path";
 import * as Ink from "ink-cjs";
 
 import { Await } from "~/app/Await";
+import { Command } from "~/app/Command";
 import { Store } from "~/app/Store";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
 import { cli } from "~/core/cli";
@@ -39,7 +40,8 @@ export function RebaseCheck(props: Props) {
         <YesNoPrompt
           message={
             <Ink.Text color={colors.yellow}>
-              Rebase detected, would you like to abort it?
+              <Command>git rebase</Command> detected, would you like to abort
+              it?
             </Ink.Text>
           }
           onYes={async () => {
@@ -56,7 +58,9 @@ export function RebaseCheck(props: Props) {
       return (
         <Await
           fallback={
-            <Ink.Text color={colors.yellow}>Checking for rebase…</Ink.Text>
+            <Ink.Text color={colors.yellow}>
+              Checking for <Command>git rebase</Command>…
+            </Ink.Text>
           }
           function={rebase_check}
         />
@@ -67,11 +71,11 @@ export function RebaseCheck(props: Props) {
     const actions = Store.getState().actions;
 
     try {
-      const repo_root = (await cli(`git rev-parse --absolute-git-dir`)).stdout;
+      const git_dir = (await cli(`git rev-parse --absolute-git-dir`)).stdout;
 
       let is_rebase = false;
-      is_rebase ||= fs.existsSync(path.join(repo_root, "rebase-apply"));
-      is_rebase ||= fs.existsSync(path.join(repo_root, "rebase-merge"));
+      is_rebase ||= fs.existsSync(path.join(git_dir, "rebase-apply"));
+      is_rebase ||= fs.existsSync(path.join(git_dir, "rebase-merge"));
 
       const status = is_rebase ? "prompt" : "done";
       patch({ status });
