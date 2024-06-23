@@ -48,8 +48,8 @@ export function App() {
           }
         }}
       >
-        <RebaseCheck>
-          <DependencyCheck>
+        <DependencyCheck>
+          <RebaseCheck>
             {!argv.verbose ? null : <GithubApiError />}
 
             <GatherMetadata>
@@ -57,8 +57,8 @@ export function App() {
                 <Main />
               </LocalCommitStatus>
             </GatherMetadata>
-          </DependencyCheck>
-        </RebaseCheck>
+          </RebaseCheck>
+        </DependencyCheck>
       </AutoUpdate>
     </Providers>
   );
