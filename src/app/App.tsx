@@ -4,6 +4,7 @@ import { AutoUpdate } from "~/app/AutoUpdate";
 import { CherryPickCheck } from "~/app/CherryPickCheck";
 import { Debug } from "~/app/Debug";
 import { DependencyCheck } from "~/app/DependencyCheck";
+import { DirtyCheck } from "~/app/DirtyCheck";
 import { GatherMetadata } from "~/app/GatherMetadata";
 import { GithubApiError } from "~/app/GithubApiError";
 import { LocalCommitStatus } from "~/app/LocalCommitStatus";
@@ -50,17 +51,19 @@ export function App() {
         }}
       >
         <DependencyCheck>
-          <RebaseCheck>
-            <CherryPickCheck>
-              {!argv.verbose ? null : <GithubApiError />}
+          <DirtyCheck>
+            <RebaseCheck>
+              <CherryPickCheck>
+                {!argv.verbose ? null : <GithubApiError />}
 
-              <GatherMetadata>
-                <LocalCommitStatus>
-                  <Main />
-                </LocalCommitStatus>
-              </GatherMetadata>
-            </CherryPickCheck>
-          </RebaseCheck>
+                <GatherMetadata>
+                  <LocalCommitStatus>
+                    <Main />
+                  </LocalCommitStatus>
+                </GatherMetadata>
+              </CherryPickCheck>
+            </RebaseCheck>
+          </DirtyCheck>
         </DependencyCheck>
       </AutoUpdate>
     </Providers>
