@@ -32,7 +32,9 @@ export function table(args: WriteArgs) {
   }
 
   // add remaining old stack pr urls to the front of stack pr url list
-  for (const pr_url of old_stack.keys()) {
+  const old_pr_list = Array.from(old_stack.keys());
+  old_pr_list.reverse();
+  for (const pr_url of old_pr_list) {
     stack_pr_url_list.unshift(pr_url);
   }
 
@@ -61,9 +63,6 @@ export function table(args: WriteArgs) {
   if (!stack_list.length) {
     return "";
   }
-
-  // reverse order of pr list to match the order of git stack
-  stack_list.reverse();
 
   return TEMPLATE.stack_table(["", ...stack_list, "", ""].join("\n"));
 }

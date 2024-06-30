@@ -80,8 +80,8 @@ test("builds list of prs with selected emoji", () => {
     ...args.body.split("\n"),
     "",
     "#### git stack",
-    "- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/47",
     "- 👉 `1` https://github.com/magus/git-multi-diff-playground/pull/43",
+    "- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/47",
   ]);
 });
 
@@ -123,9 +123,9 @@ test("persists removed pr urls from previous stack table", () => {
       "Summary of problem",
       "",
       "#### git stack",
-      "- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47",
-      "- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/44",
       "- ⏳ `1` https://github.com/magus/git-multi-diff-playground/pull/43",
+      "- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/44",
+      "- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47",
     ].join("\n"),
 
     pr_url_list: [
@@ -143,11 +143,11 @@ test("persists removed pr urls from previous stack table", () => {
     "Summary of problem",
     "",
     "#### git stack",
-    "- ⏳ `5` https://github.com/magus/git-multi-diff-playground/pull/61",
-    "- ⏳ `4` https://github.com/magus/git-multi-diff-playground/pull/54",
-    "- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47",
-    "- ✅ `2` https://github.com/magus/git-multi-diff-playground/pull/44",
     "- ✅ `1` https://github.com/magus/git-multi-diff-playground/pull/43",
+    "- ✅ `2` https://github.com/magus/git-multi-diff-playground/pull/44",
+    "- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47",
+    "- ⏳ `4` https://github.com/magus/git-multi-diff-playground/pull/54",
+    "- ⏳ `5` https://github.com/magus/git-multi-diff-playground/pull/61",
   ]);
 
   // run again on the output to make sure it doesn't change
