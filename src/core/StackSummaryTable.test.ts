@@ -155,3 +155,41 @@ test("persists removed pr urls from previous stack table", () => {
 
   expect(rerun_output).toBe(output);
 });
+
+test("persist only valid urls, removed broken branch ids from interrupted sync", () => {
+  const args = {
+    body: [
+      "Summary of problem",
+      "",
+      "#### git stack",
+      "- ✅ `1` https://github.com/magus/git-multi-diff-playground/pull/43",
+      "- ✅ `2` gs-P4EBkJm+q",
+      "- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47",
+    ].join("\n"),
+
+    pr_url_list: [
+      "https://github.com/magus/git-multi-diff-playground/pull/47",
+      "https://github.com/magus/git-multi-diff-playground/pull/54",
+      "https://github.com/magus/git-multi-diff-playground/pull/61",
+    ],
+
+    selected_url: "https://github.com/magus/git-multi-diff-playground/pull/47",
+  };
+
+  const output = StackSummaryTable.write(args);
+
+  expect(output.split("\n")).toEqual([
+    "Summary of problem",
+    "",
+    "#### git stack",
+    "- ✅ `1` https://github.com/magus/git-multi-diff-playground/pull/43",
+    "- 👉 `2` https://github.com/magus/git-multi-diff-playground/pull/47",
+    "- ⏳ `3` https://github.com/magus/git-multi-diff-playground/pull/54",
+    "- ⏳ `4` https://github.com/magus/git-multi-diff-playground/pull/61",
+  ]);
+
+  // run again on the output to make sure it doesn't change
+  const rerun_output = StackSummaryTable.write({ ...args, body: output });
+
+  expect(rerun_output).toBe(output);
+});

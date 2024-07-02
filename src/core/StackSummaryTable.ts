@@ -88,6 +88,10 @@ export function parse(body: string): Map<string, StackTableRow> {
       continue;
     }
 
+    if (!RE.pr_url.test(parsed_row.pr_url)) {
+      continue;
+    }
+
     result.set(parsed_row.pr_url, parsed_row);
   }
 
@@ -117,6 +121,8 @@ const RE = {
       pr_url: "(?<pr_url>.+)",
     })
   ),
+
+  pr_url: /^https:\/\/.*$/,
 };
 
 type StackTableRow = {
