@@ -9,9 +9,12 @@ export function write(args: WriteArgs) {
 
   let result = args.body;
 
-  if (RE.stack_table.test(result)) {
+  if (RE.stack_table_link.test(result)) {
     // replace stack table
-    result = result.replace(RE.stack_table, stack_table);
+    result = result.replace(RE.stack_table_link, stack_table);
+  } else if (RE.stack_table_legacy.test(result)) {
+    // replace stack table
+    result = result.replace(RE.stack_table_legacy, stack_table);
   } else {
     // append stack table
     result = `${result}\n\n${stack_table}`;
@@ -64,11 +67,15 @@ export function table(args: WriteArgs) {
     return "";
   }
 
-  return TEMPLATE.stack_table(["", ...stack_list, "", ""].join("\n"));
+  return TEMPLATE.stack_table_link(["", ...stack_list, "", ""].join("\n"));
 }
 
 export function parse(body: string): Map<string, StackTableRow> {
-  const stack_table_match = body.match(RE.stack_table);
+  let stack_table_match = body.match(RE.stack_table_link);
+
+  if (!stack_table_match?.groups) {
+    stack_table_match = body.match(RE.stack_table_legacy);
+  }
 
   if (!stack_table_match?.groups) {
     return new Map();
@@ -99,8 +106,12 @@ export function parse(body: string): Map<string, StackTableRow> {
 }
 
 const TEMPLATE = {
-  stack_table(rows: string) {
+  stack_table_legacy(rows: string) {
     return `#### git stack${rows}`;
+  },
+
+  stack_table_link(rows: string) {
+    return `#### [git stack](https://github.com/magus/git-stack-cli)${rows}`;
   },
 
   row(args: StackTableRow) {
@@ -110,8 +121,17 @@ const TEMPLATE = {
 
 const RE = {
   // https://regex101.com/r/kqB9Ft/1
-  stack_table: new RegExp(
-    TEMPLATE.stack_table("\\s+(?<rows>(?:- [^\r^\n]*(?:[\r\n]+)?)+)")
+  stack_table_legacy: new RegExp(
+    TEMPLATE.stack_table_legacy("\\s+(?<rows>(?:- [^\r^\n]*(?:[\r\n]+)?)+)")
+  ),
+
+  stack_table_link: new RegExp(
+    TEMPLATE.stack_table_link("ROWS")
+      .replace("[", "\\[")
+      .replace("]", "\\]")
+      .replace("(", "\\(")
+      .replace(")", "\\)")
+      .replace("ROWS", "\\s+(?<rows>(?:- [^\r^\n]*(?:[\r\n]+)?)+)")
   ),
 
   row: new RegExp(
