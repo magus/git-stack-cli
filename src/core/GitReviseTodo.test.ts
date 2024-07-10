@@ -57,6 +57,24 @@ test("git-revise-todo from commit range with single new commit in new group", ()
   );
 });
 
+test("git-revise-todo handles double quotes in commit message", () => {
+  const rebase_group_index = 0;
+  const commit_range = COMMIT_MESSAGE_WITH_QUOTES;
+
+  const git_revise_todo = GitReviseTodo({ rebase_group_index, commit_range });
+
+  expect(git_revise_todo).toBe(
+    [
+      //force line break
+      "++ pick f143d03c723c",
+      '[new] invalid \\\\"by me\\\\" quotes',
+      "",
+      "git-stack-id: 6Ak-qn+5Z",
+      'git-stack-title: [new] invalid \\"by me\\" quotes',
+    ].join("\n")
+  );
+});
+
 const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
   "invalid": false,
   "group_list": [
@@ -593,5 +611,38 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       "url": "https://github.com/magus/git-multi-diff-playground/pull/47",
     },
   },
+  "UNASSIGNED": "unassigned",
+};
+
+const COMMIT_MESSAGE_WITH_QUOTES: CommitMetadata.CommitRange = {
+  "invalid": false,
+  "group_list": [
+    {
+      "id": "6Ak-qn+5Z",
+      "title": '[new] invalid "by me" quotes',
+      "pr": null,
+      "base": "E63ytp5dj",
+      "dirty": true,
+      "commits": [
+        {
+          "sha": "f143d03c723c9f5231a81c1e12098511611898cb",
+          "full_message": '[new] invalid "by me" quotes',
+          "subject_line": '[new] invalid "by me" quotes',
+          "branch_id": null,
+          "title": null,
+        },
+      ],
+    },
+  ],
+  "commit_list": [
+    {
+      "sha": "f143d03c723c9f5231a81c1e12098511611898cb",
+      "full_message": '[new] invalid "by me" quotes',
+      "subject_line": '[new] invalid "by me" quotes',
+      "branch_id": null,
+      "title": null,
+    },
+  ],
+  "pr_lookup": {},
   "UNASSIGNED": "unassigned",
 };
