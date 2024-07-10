@@ -20,15 +20,18 @@
 > [!TIP]
 >
 > Install via **[Homebrew](https://brew.sh/)** to ensure the **[official Github CLI](https://cli.github.com/)** and **[git revise](https://github.com/mystor/git-revise)** dependencies are installed automatically
+>
+> ```bash
+> brew install magus/git-stack/git-stack
+> ```
 
-```bash
-brew tap magus/git-stack
-brew install git-stack
-```
+<details>
 
-### `npm`
+<summary>
+npm alternative
+</summary>
 
-Installing via **[npm](https://www.npmjs.com/)** requires installing the **[official Github CLI](https://cli.github.com/)** and **[git revise](https://github.com/mystor/git-revise)** dependencies separarely
+If you prefer to use **[npm](https://www.npmjs.com/)** you will need to install the **[official Github CLI](https://cli.github.com/)** and **[git revise](https://github.com/mystor/git-revise)** dependencies separarely
 
 ```bash
 brew install gh
@@ -36,6 +39,8 @@ brew install git-revise
 
 npm i -g git-stack-cli
 ```
+
+</details>
 
 ## Usage
 
