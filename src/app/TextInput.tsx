@@ -6,6 +6,7 @@ import { colors } from "~/core/colors";
 
 type Props = {
   multiline?: boolean;
+  defaultValue?: string;
   value?: string;
   onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
@@ -84,5 +85,5 @@ export function TextInput(props: Props) {
 }
 
 function get_value(props: Props) {
-  return props.value || "";
+  return props.value || props.defaultValue || "";
 }
