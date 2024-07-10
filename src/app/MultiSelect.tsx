@@ -9,7 +9,8 @@ import { wrap_index } from "~/core/wrap_index";
 
 type Props<T> = {
   items: Array<Item<T>>;
-  onSelect(args: SelectArgs<T>): void;
+  onSelect: (args: CallbackArgs<T>) => void;
+  onFocus?: (args: CallbackArgs<T>) => void;
   disabled?: boolean;
   maxWidth?: number;
 };
@@ -21,7 +22,7 @@ type Item<T> = {
   disabled?: ItemRowProps["disabled"];
 };
 
-type SelectArgs<T> = {
+type CallbackArgs<T> = {
   item: T;
   selected: boolean;
   state: Array<T>;
@@ -55,7 +56,8 @@ export function MultiSelect<T>(props: Props<T>) {
   // clamp index to keep in item range
   const [index, set_index] = React.useReducer(
     (_: unknown, value: number) => {
-      return clamp(value, 0, props.items.length - 1);
+      const next_index = clamp(value, 0, props.items.length - 1);
+      return next_index;
     },
     0,
     function find_initial_index() {
@@ -94,9 +96,19 @@ export function MultiSelect<T>(props: Props<T>) {
     const selected = selected_set.has(index);
     const state = selected_list.map((index) => props.items[index].value);
 
-    // console.debug({ item, selected, state });
+    // console.debug("onSelect", { item, selected, state });
     props.onSelect({ item, selected, state });
   }, [selected_set]);
+
+  React.useEffect(() => {
+    const item = props.items[index].value;
+    const selected_list = Array.from(selected_set);
+    const selected = selected_set.has(index);
+    const state = selected_list.map((index) => props.items[index].value);
+
+    // console.debug("onFocus", { item, selected, state });
+    props.onFocus?.({ item, selected, state });
+  }, [index]);
 
   Ink.useInput((input, key) => {
     if (props.disabled) {
