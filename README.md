@@ -76,6 +76,8 @@ Managing even a few stacked diffs requires a relatively strong knowledge of `git
 
 ## Development
 
+Ensure `node --version` is the same across both projects you are using to test the `git-stack` cli
+
 ```bash
 git submodule update --init --recursive
 npm i
