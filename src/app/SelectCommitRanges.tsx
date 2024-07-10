@@ -199,6 +199,8 @@ function SelectCommitRangesInternal(props: Props) {
   let max_item_width = max_group_label_width;
   max_item_width -= left_arrow.length + right_arrow.length;
 
+  const [focused, set_focused] = React.useState("");
+
   return (
     <Ink.Box flexDirection="column">
       <Ink.Box height={1} />
@@ -208,6 +210,11 @@ function SelectCommitRangesInternal(props: Props) {
         items={items}
         maxWidth={max_item_width}
         disabled={group_input}
+        onFocus={(args) => {
+          // console.debug("onFocus", args);
+
+          set_focused(args.item.subject_line);
+        }}
         onSelect={(args) => {
           // console.debug("onSelect", args);
 
@@ -326,7 +333,7 @@ function SelectCommitRangesInternal(props: Props) {
             }}
           />
 
-          <TextInput onSubmit={submit_group_input} />
+          <TextInput defaultValue={focused} onSubmit={submit_group_input} />
 
           <Ink.Box height={1} />
         </React.Fragment>
