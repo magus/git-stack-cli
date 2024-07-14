@@ -35,15 +35,24 @@ function SelectCommitRangesInternal(props: Props) {
 
   const argv = Store.useState((state) => state.argv);
 
-  const [selected_group_id, set_selected_group_id] = React.useState(
-    props.commit_range.UNASSIGNED
-  );
+  const [selected_group_id, set_selected_group_id] = React.useState(() => {
+    const first_group = props.commit_range.group_list.find(
+      (g) => g.id !== props.commit_range.UNASSIGNED
+    );
+
+    if (first_group) {
+      return first_group.id;
+    }
+
+    return props.commit_range.UNASSIGNED;
+  });
 
   const [group_input, set_group_input] = React.useState(false);
 
   const [new_group_list, create_group] = React.useReducer(
     (group_list: Array<SimpleGroup>, group: SimpleGroup) => {
-      return group_list.concat(group);
+      const next_group_list = group_list.concat(group);
+      return next_group_list;
     },
     []
   );
@@ -79,12 +88,13 @@ function SelectCommitRangesInternal(props: Props) {
     }
   }
 
-  group_list.push(...new_group_list);
-
   const total_group_count =
     new_group_list.length + props.commit_range.group_list.length;
 
-  for (const group of props.commit_range.group_list) {
+  for (let i = 0; i < props.commit_range.group_list.length; i++) {
+    const index = props.commit_range.group_list.length - i - 1;
+    const group = props.commit_range.group_list[index];
+
     if (group.pr?.state === "MERGED") continue;
 
     if (group.id === props.commit_range.UNASSIGNED) {
@@ -104,6 +114,8 @@ function SelectCommitRangesInternal(props: Props) {
       title: group.pr?.title || group.title || group.id,
     });
   }
+
+  group_list.push(...new_group_list);
 
   let current_index = group_list.findIndex((g) => g.id === selected_group_id);
   if (current_index === -1) {
