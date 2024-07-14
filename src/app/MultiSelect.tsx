@@ -12,6 +12,7 @@ type Props<T> = {
   onSelect: (args: CallbackArgs<T>) => void;
   onFocus?: (args: CallbackArgs<T>) => void;
   disabled?: boolean;
+  disableSelect?: boolean;
   maxWidth?: number;
 };
 
@@ -118,11 +119,13 @@ export function MultiSelect<T>(props: Props<T>) {
 
     const space = input === " ";
 
-    if (key.return || space) {
-      selectRef.current = true;
-      const item = props.items[index];
-      if (!item.disabled) {
-        return select(index);
+    if (!props.disableSelect) {
+      if (key.return || space) {
+        selectRef.current = true;
+        const item = props.items[index];
+        if (!item.disabled) {
+          return select(index);
+        }
       }
     }
 
