@@ -171,6 +171,9 @@ function SelectCommitRangesInternal(props: Props) {
 
   const group = group_list[current_index];
 
+  const multiselect_disabled = group_input;
+  const multiselect_disableSelect = group.id === props.commit_range.UNASSIGNED;
+
   const items = props.commit_range.commit_list.map((commit) => {
     const commit_metadata_id = commit_map.get(commit.sha);
 
@@ -179,8 +182,6 @@ function SelectCommitRangesInternal(props: Props) {
     let disabled;
 
     if (group_input) {
-      disabled = true;
-    } else if (group.id === props.commit_range.UNASSIGNED) {
       disabled = true;
     } else {
       disabled = Boolean(selected && commit_metadata_id !== group.id);
@@ -218,10 +219,10 @@ function SelectCommitRangesInternal(props: Props) {
       <Ink.Box height={1} />
 
       <MultiSelect
-        key={group.id}
         items={items}
         maxWidth={max_item_width}
-        disabled={group_input}
+        disabled={multiselect_disabled}
+        disableSelect={multiselect_disableSelect}
         onFocus={(args) => {
           // console.debug("onFocus", args);
 
