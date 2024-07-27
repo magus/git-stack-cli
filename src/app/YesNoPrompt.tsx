@@ -55,7 +55,7 @@ export function YesNoPrompt(props: Props) {
 
   return (
     <Ink.Box flexDirection="column">
-      <Ink.Box>
+      <Ink.Box alignItems="flex-end">
         {typeof props.message === "object" ? (
           props.message
         ) : (
