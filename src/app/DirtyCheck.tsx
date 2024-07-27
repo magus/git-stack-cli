@@ -37,14 +37,24 @@ export function DirtyCheck(props: Props) {
       return (
         <YesNoPrompt
           message={
-            <FormatText
-              wrapper={<Ink.Text color={colors.yellow} />}
-              message="{git} repo is dirty, changed may be lost during {git_stack}, are you sure you wannt to proceed?"
-              values={{
-                git: <Command>git</Command>,
-                git_stack: <Command>git stack</Command>,
-              }}
-            />
+            <Ink.Box flexDirection="column">
+              <FormatText
+                wrapper={<Ink.Text color={colors.yellow} />}
+                message="{git} repo has uncommitted changes."
+                values={{
+                  git: <Command>git</Command>,
+                  git_stack: <Command>git stack</Command>,
+                }}
+              />
+              <FormatText
+                wrapper={<Ink.Text color={colors.yellow} />}
+                message="Changes may be lost during {git_stack}, are you sure you want to proceed?"
+                values={{
+                  git: <Command>git</Command>,
+                  git_stack: <Command>git stack</Command>,
+                }}
+              />
+            </Ink.Box>
           }
           onYes={async () => {
             patch({ status: "done" });
