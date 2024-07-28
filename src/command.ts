@@ -71,6 +71,13 @@ export async function command() {
           'Set the master branch name, defaults to "master" (or "main" if "master" is not found)',
       })
 
+      .option("draft", {
+        type: "boolean",
+        alias: ["d"],
+        default: false,
+        description: "Open all PRs as drafts",
+      })
+
       .option("write-state-json", {
         hidden: true,
         type: "boolean",
