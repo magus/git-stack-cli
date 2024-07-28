@@ -46,6 +46,11 @@ async function run() {
   // always listen for SIGINT event and restore git state
   process.once("SIGINT", handle_exit);
 
+  let DEFAULT_PR_BODY = "";
+  if (state.pr_template_body) {
+    DEFAULT_PR_BODY = state.pr_template_body;
+  }
+
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
   const commit_range = await CommitMetadata.range(commit_map);
@@ -328,7 +333,7 @@ async function run() {
         branch: group.id,
         base: group.base,
         title: group.title,
-        body: "",
+        body: DEFAULT_PR_BODY,
       });
 
       if (!pr_url) {
@@ -363,7 +368,7 @@ async function run() {
 
       invariant(group.base, "group.base must exist");
 
-      const body = group.pr?.body || "";
+      const body = group.pr?.body || DEFAULT_PR_BODY;
 
       const update_body = StackSummaryTable.write({
         body,

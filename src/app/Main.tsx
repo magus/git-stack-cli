@@ -5,6 +5,7 @@ import { LocalMergeRebase } from "~/app/LocalMergeRebase";
 import { ManualRebase } from "~/app/ManualRebase";
 import { PostRebaseStatus } from "~/app/PostRebaseStatus";
 import { PreLocalMergeRebase } from "~/app/PreLocalMergeRebase";
+import { PreManualRebase } from "~/app/PreManualRebase";
 import { PreSelectCommitRanges } from "~/app/PreSelectCommitRanges";
 import { SelectCommitRanges } from "~/app/SelectCommitRanges";
 import { Status } from "~/app/Status";
@@ -35,6 +36,9 @@ export function Main() {
 
     case "select-commit-ranges":
       return <SelectCommitRanges />;
+
+    case "pre-manual-rebase":
+      return <PreManualRebase />;
 
     case "manual-rebase":
       return <ManualRebase />;

@@ -143,7 +143,7 @@ function SelectCommitRangesInternal(props: Props) {
 
         switch (inputLower) {
           case "s":
-            state.step = "manual-rebase";
+            state.step = "pre-manual-rebase";
             break;
         }
       });
