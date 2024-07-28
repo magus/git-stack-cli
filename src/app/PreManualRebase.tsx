@@ -31,24 +31,37 @@ async function run() {
     });
   }
 
-  // ./.github/PULL_REQUEST_TEMPLATE/*.md
-  let pr_templates: Array<string> = [];
-  if (fs.existsSync(template_pr_template(repo_root))) {
-    pr_templates = fs.readdirSync(template_pr_template(repo_root));
-  }
+  let pr_template_body: null | string = null;
 
   // look for pull request template
   // https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository
   // ./.github/pull_request_template.md
   // ./pull_request_template.md
   // ./docs/pull_request_template.md
-  let pr_template_body: null | string = null;
-  if (fs.existsSync(github_pr_template(repo_root))) {
-    pr_template_body = fs.readFileSync(github_pr_template(repo_root), "utf-8");
-  } else if (fs.existsSync(root_pr_template(repo_root))) {
-    pr_template_body = fs.readFileSync(root_pr_template(repo_root), "utf-8");
-  } else if (fs.existsSync(docs_pr_template(repo_root))) {
-    pr_template_body = fs.readFileSync(docs_pr_template(repo_root), "utf-8");
+  for (const key of PR_TEMPLATE_KEY_LIST) {
+    const pr_template_fn = PR_TEMPLATE[key as keyof typeof PR_TEMPLATE];
+
+    if (fs.existsSync(pr_template_fn(repo_root))) {
+      pr_template_body = fs.readFileSync(pr_template_fn(repo_root), "utf-8");
+
+      actions.output(
+        <FormatText
+          wrapper={<Ink.Text color={colors.yellow} />}
+          message="Using PR template {pr_filepath}"
+          values={{
+            pr_filepath: <Brackets>{pr_template_fn("")}</Brackets>,
+          }}
+        />
+      );
+
+      break;
+    }
+  }
+
+  // ./.github/PULL_REQUEST_TEMPLATE/*.md
+  let pr_templates: Array<string> = [];
+  if (fs.existsSync(PR_TEMPLATE.TemplateDir(repo_root))) {
+    pr_templates = fs.readdirSync(PR_TEMPLATE.TemplateDir(repo_root));
   }
 
   // check if repo has multiple pr templates
@@ -65,7 +78,7 @@ async function run() {
             count: (
               <Ink.Text color={colors.blue}>{pr_templates.length}</Ink.Text>
             ),
-            dir: <Brackets>{template_pr_template("")}</Brackets>,
+            dir: <Brackets>{PR_TEMPLATE.TemplateDir("")}</Brackets>,
           }}
         />
       );
@@ -75,18 +88,13 @@ async function run() {
   });
 }
 
-function github_pr_template(repo_root: string) {
-  return path.join(repo_root, ".github", "pull_request_template.md");
-}
+// prettier-ignore
+const PR_TEMPLATE = Object.freeze({
+  Github: (root: string) => path.join(root, ".github", "pull_request_template.md"),
+  Root: (root: string) => path.join(root, "pull_request_template.md"),
+  Docs: (root: string) => path.join(root, "docs", "pull_request_template.md"),
+  TemplateDir: (root: string) => path.join(root, ".github", "PULL_REQUEST_TEMPLATE"),
+});
 
-function root_pr_template(repo_root: string) {
-  return path.join(repo_root, "pull_request_template.md");
-}
-
-function docs_pr_template(repo_root: string) {
-  return path.join(repo_root, "docs", "pull_request_template.md");
-}
-
-function template_pr_template(repo_root: string) {
-  return path.join(repo_root, ".github", "PULL_REQUEST_TEMPLATE");
-}
+// prettier-ignore
+const PR_TEMPLATE_KEY_LIST = Object.keys(PR_TEMPLATE) as Array<keyof typeof PR_TEMPLATE>;
