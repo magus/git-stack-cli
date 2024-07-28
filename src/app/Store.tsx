@@ -38,6 +38,8 @@ export type State = {
   branch_name: null | string;
   commit_range: null | CommitMetadata.CommitRange;
   commit_map: null | CommitMap;
+  pr_templates: Array<string>;
+  pr_template_body: null | string;
 
   step:
     | "github-api-error"
@@ -47,6 +49,7 @@ export type State = {
     | "local-merge-rebase"
     | "pre-select-commit-ranges"
     | "select-commit-ranges"
+    | "pre-manual-rebase"
     | "manual-rebase"
     | "post-rebase-status";
 
@@ -98,6 +101,8 @@ const BaseStore = createStore<State>()(
     branch_name: null,
     commit_range: null,
     commit_map: null,
+    pr_templates: [],
+    pr_template_body: null,
 
     step: "loading",
 

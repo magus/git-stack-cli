@@ -78,6 +78,13 @@ export async function command() {
         description: "Write state to local json file for debugging",
       })
 
+      .option("template", {
+        type: "boolean",
+        default: true,
+        description:
+          "Use automatic Github PR template, e.g. .github/pull_request_template.md, disable with --no-template",
+      })
+
       .option("mock-metadata", {
         hidden: true,
         type: "boolean",
