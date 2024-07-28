@@ -131,14 +131,18 @@ type CreatePullRequestArgs = {
   base: string;
   title: string;
   body: string;
+  draft: boolean;
 };
 
 export async function pr_create(args: CreatePullRequestArgs) {
   const title = safe_quote(args.title);
+  let command = `gh pr create --fill --head ${args.branch} --base ${args.base} --title="${title}" --body="${args.body}"`;
 
-  const cli_result = await cli(
-    `gh pr create --fill --head ${args.branch} --base ${args.base} --title="${title}" --body="${args.body}"`
-  );
+  if (args.draft) {
+    command += " --draft";
+  }
+
+  const cli_result = await cli(command);
 
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);

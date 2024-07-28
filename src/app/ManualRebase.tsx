@@ -334,6 +334,7 @@ async function run() {
         base: group.base,
         title: group.title,
         body: DEFAULT_PR_BODY,
+        draft: argv.draft,
       });
 
       if (!pr_url) {
