@@ -1,5 +1,19 @@
 # TODO
 
+- paint all commits before doing the longer rebase and sync?
+  ensure if we fail midway that we don't create new PRs
+  should be able to reuse existing PRs from previous failed run
+
+- run all pr edits simultaneously in Promise.all?
+
+- run push/sync simultaneously by pushing specific commits to a specific branch in origin?
+
+- add a key to create group from commit title without editing, e.g. "g"
+
+- graphite does breakpoints, consider a hotkey for inserting "breakpoint group", e.g. "b"
+
+- select all commits first, then press "c" to create the group
+
 - **multiselect with more items than terminal rows needs pagination**
 
   - maybe default to window size of about 10 and display a scrollbar to indicate more items in either direction?
