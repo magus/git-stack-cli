@@ -13,9 +13,6 @@ import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 import { safe_quote } from "~/core/safe_quote";
 
-// prettier-ignore
-const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,body,url";
-
 export async function pr_list(): Promise<Array<PullRequest>> {
   const state = Store.getState();
   const actions = state.actions;
@@ -25,18 +22,9 @@ export async function pr_list(): Promise<Array<PullRequest>> {
   invariant(username, "username must exist");
   invariant(repo_path, "repo_path must exist");
 
-  const cli_result = await cli(
-    `gh pr list --repo ${repo_path} --author ${username} --state open ${JSON_FIELDS}`,
-    {
-      ignoreExitCode: true,
-    }
+  const result_pr_list: Array<PullRequest> = await gh_json(
+    `pr list --repo ${repo_path} --author ${username} --state open ${JSON_FIELDS}`
   );
-
-  if (cli_result.code !== 0) {
-    handle_error(cli_result.output);
-  }
-
-  const result_pr_list: Array<PullRequest> = JSON.parse(cli_result.stdout);
 
   if (actions.isDebug()) {
     actions.output(
@@ -105,19 +93,9 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
     );
   }
 
-  const cli_result = await cli(
-    `gh pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`,
-    {
-      ignoreExitCode: true,
-    }
+  const pr: PullRequest = await gh_json(
+    `pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`
   );
-
-  if (cli_result.code !== 0) {
-    // handle_error(cli_result.output);
-    return null;
-  }
-
-  const pr: PullRequest = JSON.parse(cli_result.stdout);
 
   actions.set((state) => {
     state.pr[pr.headRefName] = pr;
@@ -167,6 +145,27 @@ export async function pr_edit(args: EditPullRequestArgs) {
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
   }
+}
+
+// prettier-ignore
+const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,body,url";
+
+// consistent handle gh cli commands returning json
+// redirect to tmp file to avoid scrollback overflow causing scrollback to be cleared
+async function gh_json(command: string) {
+  const tmp_pr_json = path.join(os.tmpdir(), "git-stack-gh.json");
+
+  const options = { ignoreExitCode: true };
+  const cli_result = await cli(`gh ${command} > ${tmp_pr_json}`, options);
+
+  if (cli_result.code !== 0) {
+    handle_error(cli_result.output);
+  }
+
+  // read from file
+  const json_str = fs.readFileSync(tmp_pr_json, "utf-8");
+  const json = JSON.parse(json_str);
+  return json;
 }
 
 function handle_error(output: string): never {

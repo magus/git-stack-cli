@@ -43,7 +43,7 @@ async function run() {
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
   try {
-    actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
+    // actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
 
     // must perform rebase from repo root for applying git patch
     process.chdir(repo_root);

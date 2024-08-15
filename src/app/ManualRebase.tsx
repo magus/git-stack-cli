@@ -83,7 +83,8 @@ async function run() {
 
   actions.debug(`rebase_merge_base = ${rebase_merge_base}`);
   actions.debug(`rebase_group_index = ${rebase_group_index}`);
-  actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
+
+  // actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
 
   try {
     // must perform rebase from repo root for applying git patch
