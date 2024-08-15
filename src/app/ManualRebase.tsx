@@ -154,12 +154,15 @@ async function run() {
 
     // execute cli with temporary git sequence editor script
     // revise from merge base to pick correct commits
-    await cli([
-      `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
-      `GIT_REVISE_TODO="${git_revise_todo}"`,
-      `git`,
-      `revise --edit -i ${rebase_merge_base}`,
-    ]);
+    await cli(
+      [
+        `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
+        `GIT_REVISE_TODO="${git_revise_todo}"`,
+        `git`,
+        `revise --edit -i ${rebase_merge_base}`,
+      ],
+      { stdio: ["ignore", "ignore", "ignore"] }
+    );
 
     // early return since we do not need to sync
     if (!argv.sync) {
