@@ -63,7 +63,6 @@
     "@types/yargs": "^17.0.29",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.9.0",
-    "bun": "^1.0.26",
     "bun-types": "^1.0.21",
     "eslint": "^8.52.0",
     "eslint-import-resolver-typescript": "^3.6.1",
