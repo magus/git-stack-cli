@@ -22,9 +22,13 @@ export async function pr_list(): Promise<Array<PullRequest>> {
   invariant(username, "username must exist");
   invariant(repo_path, "repo_path must exist");
 
-  const result_pr_list: Array<PullRequest> = await gh_json(
+  const result_pr_list = await gh_json<Array<PullRequest>>(
     `pr list --repo ${repo_path} --author ${username} --state open ${JSON_FIELDS}`
   );
+
+  if (result_pr_list instanceof Error) {
+    handle_error(result_pr_list.message);
+  }
 
   if (actions.isDebug()) {
     actions.output(
@@ -93,9 +97,13 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
     );
   }
 
-  const pr: PullRequest = await gh_json(
+  const pr = await gh_json<PullRequest>(
     `pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`
   );
+
+  if (pr instanceof Error) {
+    return null;
+  }
 
   actions.set((state) => {
     state.pr[pr.headRefName] = pr;
@@ -152,14 +160,14 @@ const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,b
 
 // consistent handle gh cli commands returning json
 // redirect to tmp file to avoid scrollback overflow causing scrollback to be cleared
-async function gh_json(command: string) {
+async function gh_json<T>(command: string): Promise<T | Error> {
   const tmp_pr_json = path.join(os.tmpdir(), "git-stack-gh.json");
 
   const options = { ignoreExitCode: true };
   const cli_result = await cli(`gh ${command} > ${tmp_pr_json}`, options);
 
   if (cli_result.code !== 0) {
-    handle_error(cli_result.output);
+    return new Error(cli_result.output);
   }
 
   // read from file
