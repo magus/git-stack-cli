@@ -5,7 +5,7 @@ import { FormattedMessage } from "react-intl";
 
 type Props = {
   message: string;
-  values: React.ComponentProps<typeof FormattedMessage>["values"];
+  values?: React.ComponentProps<typeof FormattedMessage>["values"];
   wrapper?: React.ReactNode;
 };
 
