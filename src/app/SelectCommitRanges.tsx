@@ -9,8 +9,8 @@ import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import { TextInput } from "~/app/TextInput";
 import { colors } from "~/core/colors";
+import { gs_short_id } from "~/core/gs_short_id";
 import { invariant } from "~/core/invariant";
-import { short_id } from "~/core/short_id";
 import { wrap_index } from "~/core/wrap_index";
 
 import type { State } from "~/app/Store";
@@ -388,7 +388,7 @@ function SelectCommitRangesInternal(props: Props) {
   );
 
   function submit_group_input(title: string) {
-    const id = `gs-${short_id()}`;
+    const id = gs_short_id();
 
     actions.output(
       <FormatText
