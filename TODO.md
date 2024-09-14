@@ -1,6 +1,5 @@
 # TODO
 
-- git stack fixup
 - git stack sync
 
 - paint all commits before doing the longer rebase and sync?
