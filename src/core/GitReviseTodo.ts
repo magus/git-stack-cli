@@ -4,6 +4,7 @@ import path from "node:path";
 
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
+import { invariant } from "~/core/invariant";
 
 import type * as CommitMetadata from "~/core/CommitMetadata";
 
@@ -52,7 +53,7 @@ import type * as CommitMetadata from "~/core/CommitMetadata";
 //   apple sweet
 //
 export function GitReviseTodo(args: Args): string {
-  const entry_list = [];
+  const commit_list = [];
 
   const group_list = args.commit_range.group_list;
 
@@ -60,33 +61,55 @@ export function GitReviseTodo(args: Args): string {
     const group = group_list[i];
 
     for (const commit of group.commits) {
-      // update git commit message with stack id
-      const metadata = { id: group.id, title: group.title };
-      const unsafe_message_with_id = Metadata.write(
-        commit.full_message,
-        metadata
-      );
-
-      let message_with_id = unsafe_message_with_id;
-
-      message_with_id = message_with_id.replace(/[^\\]"/g, '\\"');
-
-      // get first 12 characters of commit sha
-      const sha = commit.sha.slice(0, 12);
-
-      // generate git revise entry
-      const entry_lines = [`++ pick ${sha}`, message_with_id];
-      const entry = entry_lines.join("\n");
-
-      entry_list.push(entry);
+      commit_list.push(commit);
     }
+  }
+
+  const todo = GitReviseTodo.todo({ commit_list });
+  return todo;
+}
+
+type CommitListArgs = {
+  commit_list: CommitMetadata.CommitRange["commit_list"];
+};
+
+GitReviseTodo.todo = function todo(args: CommitListArgs) {
+  const entry_list = [];
+
+  for (const commit of args.commit_list) {
+    // update git commit message with stack id
+    const id = commit.branch_id;
+    const title = commit.title;
+
+    invariant(id, "commit.branch_id must exist");
+    invariant(title, "commit.title must exist");
+
+    const metadata = { id, title };
+
+    const unsafe_message_with_id = Metadata.write(
+      commit.full_message,
+      metadata
+    );
+
+    let message_with_id = unsafe_message_with_id;
+
+    message_with_id = message_with_id.replace(/[^\\]"/g, '\\"');
+
+    // get first 12 characters of commit sha
+    const sha = commit.sha.slice(0, 12);
+
+    // generate git revise entry
+    const entry_lines = [`++ pick ${sha}`, message_with_id];
+    const entry = entry_lines.join("\n");
+
+    entry_list.push(entry);
   }
 
   const todo = entry_list.join("\n\n");
   return todo;
-}
+};
 
-GitReviseTodo.execute = async function gitrevisetodo_execute(args: Args) {
+GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
   // generate temporary directory and drop sequence editor script
   const tmp_git_sequence_editor_path = path.join(
     os.tmpdir(),
@@ -100,19 +123,23 @@ GitReviseTodo.execute = async function gitrevisetodo_execute(args: Args) {
 
   // execute cli with temporary git sequence editor script
   // revise from merge base to pick correct commits
-  await cli(
-    [
-      `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
-      `GIT_REVISE_TODO="${git_revise_todo}"`,
-      `git`,
-      `revise --edit -i ${args.rebase_merge_base}`,
-    ],
-    { stdio: ["ignore", "ignore", "ignore"] }
-  );
+  const command = [
+    `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
+    `GIT_REVISE_TODO="${git_revise_todo}"`,
+    `git`,
+    `revise --edit -i ${args.rebase_merge_base}`,
+  ];
+
+  await cli(command, { stdio: ["ignore", "ignore", "ignore"] });
+};
+
+type ExecuteArgs = {
+  rebase_group_index: number;
+  rebase_merge_base: string;
+  commit_range: CommitMetadata.CommitRange;
 };
 
 type Args = {
   rebase_group_index: number;
-  rebase_merge_base: string;
   commit_range: CommitMetadata.CommitRange;
 };

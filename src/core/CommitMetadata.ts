@@ -17,7 +17,7 @@ type CommitGroup = {
   commits: Array<CommitMetadata>;
 };
 
-type SimpleGroup = { id: string; title: string };
+export type SimpleGroup = { id: string; title: string };
 type CommitGroupMap = { [sha: string]: SimpleGroup };
 
 export async function range(commit_group_map?: CommitGroupMap) {
