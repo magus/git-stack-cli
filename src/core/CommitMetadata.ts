@@ -2,7 +2,6 @@ import { Store } from "~/app/Store";
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
 import * as github from "~/core/github";
-import { invariant } from "~/core/invariant";
 
 export type CommitMetadata = Awaited<ReturnType<typeof commit>>;
 export type CommitRange = Awaited<ReturnType<typeof range>>;
@@ -167,10 +166,6 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
 async function get_commit_list() {
   const master_branch = Store.getState().master_branch;
-  const branch_name = Store.getState().branch_name;
-
-  invariant(branch_name, "branch_name must exist");
-
   const log_result = await cli(
     `git log ${master_branch}..HEAD --oneline --format=%H --color=never`
   );
@@ -183,28 +178,10 @@ async function get_commit_list() {
 
   const commit_metadata_list = [];
 
-  let has_metadata = false;
-
   for (let i = 0; i < sha_list.length; i++) {
     const sha = sha_list[i];
     const commit_metadata = await commit(sha);
-
-    if (commit_metadata.branch_id) {
-      has_metadata = true;
-    }
-
     commit_metadata_list.push(commit_metadata);
-  }
-
-  if (!has_metadata) {
-    // check for pr with matching branch name to initialize group
-    const pr_result = await github.pr_status(branch_name);
-    if (pr_result) {
-      for (const commit_metadata of commit_metadata_list) {
-        commit_metadata.branch_id = branch_name;
-        commit_metadata.title = pr_result.title;
-      }
-    }
   }
 
   return commit_metadata_list;
