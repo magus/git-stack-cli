@@ -14,9 +14,6 @@ type OutputMetadataValues = {
 export function write(message: string, values: InputMetadataValues) {
   let result = message;
 
-  // escape double-quote for cli
-  result = safe_quote(result);
-
   // remove any previous metadata lines
   result = remove(result);
 
@@ -26,7 +23,9 @@ export function write(message: string, values: InputMetadataValues) {
     line_list.push(TEMPLATE.group_title(values.title));
   }
 
-  const new_message = line_list.join("\n");
+  let new_message = line_list.join("\n");
+
+  new_message = safe_quote(new_message);
 
   return new_message;
 }

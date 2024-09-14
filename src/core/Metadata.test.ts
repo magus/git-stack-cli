@@ -98,6 +98,45 @@ test("write handles bulleted lists", () => {
   );
 });
 
+test("read handles double quotes", () => {
+  const body = [
+    'Revert "[abc / 123] subject (#1234)"',
+    "",
+    "git-stack-id: dev/noah/fix-slash-branch",
+    'git-stack-title: Revert \\"[abc / 123] subject (#1234)\\"',
+  ].join("\n");
+
+  const metadata = Metadata.read(body);
+
+  expect(metadata).toEqual({
+    id: "dev/noah/fix-slash-branch",
+    title: 'Revert \\"[abc / 123] subject (#1234)\\"',
+  });
+});
+
+test("write handles double quotes", () => {
+  const body = [
+    // force line break
+    'Revert "[abc / 123] subject (#1234)"',
+    "",
+  ].join("\n");
+
+  const metadata = {
+    id: "abc123",
+    title: 'Revert "[abc / 123] subject (#1234)"',
+  };
+
+  expect(Metadata.write(body, metadata)).toEqual(
+    [
+      // force line break
+      'Revert \\"[abc / 123] subject (#1234)\\"',
+      "",
+      "git-stack-id: abc123",
+      'git-stack-title: Revert \\"[abc / 123] subject (#1234)\\"',
+    ].join("\n")
+  );
+});
+
 test("removes metadata", () => {
   const body = [
     "[feat] implement various features",

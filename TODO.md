@@ -3,13 +3,9 @@
 - git stack fixup
 - git stack sync
 
-- rebase fails with commit subject below
-
-  - Revert "[abc / 123] subject (#1234)"
-
 - paint all commits before doing the longer rebase and sync?
   ensure if we fail midway that we don't create new PRs
-  should be able to reuse existing PRs from previous failed run
+  should be able to reuse existing groups after rebase fails (force error during manual to repro)
 
 - run all pr edits simultaneously in Promise.all?
 
