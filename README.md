@@ -24,23 +24,23 @@
 > ```bash
 > brew install magus/git-stack/git-stack
 > ```
-
-<details>
-
-<summary>
-npm alternative
-</summary>
-
-If you prefer to use **[npm](https://www.npmjs.com/)** you will need to install the **[official Github CLI](https://cli.github.com/)** and **[git revise](https://github.com/mystor/git-revise)** dependencies separarely
-
-```bash
-brew install gh
-brew install git-revise
-
-npm i -g git-stack-cli
-```
-
-</details>
+>
+> <details>
+>
+> <summary>
+> npm alternative
+> </summary>
+>
+> If you prefer to use **[npm](https://www.npmjs.com/)** you will need to install the **[official Github CLI](https://cli.github.com/)** and **[git revise](https://github.com/mystor/git-revise)** dependencies separarely
+>
+> ```bash
+> brew install gh
+> brew install git-revise
+>
+> npm i -g git-stack-cli
+> ```
+>
+> </details>
 
 ## Usage
 
