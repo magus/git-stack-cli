@@ -157,6 +157,10 @@ export function DetectInitialPR(props: Props) {
     for (const group of commit_range.group_list) {
       group.id = branch_name;
       group.title = state.pr?.title || "-";
+      for (const commit of commit_range.commit_list) {
+        commit.branch_id = group.id;
+        commit.title = group.title;
+      }
     }
 
     // get latest merge_base relative to local master
