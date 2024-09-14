@@ -2,10 +2,6 @@
 
 - git stack sync
 
-- paint all commits before doing the longer rebase and sync?
-  ensure if we fail midway that we don't create new PRs
-  should be able to reuse existing groups after rebase fails (force error during manual to repro)
-
 - run all pr edits simultaneously in Promise.all?
 
 - run push/sync simultaneously by pushing specific commits to a specific branch in origin?
