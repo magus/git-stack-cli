@@ -1,8 +1,23 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-export type Argv = Awaited<ReturnType<typeof command>> & {
-  ["rebase"]: keyof typeof Rebase;
+export type Argv = {
+  force: boolean;
+  check: boolean;
+  sync: boolean;
+  verify: boolean;
+  rebase: keyof typeof Rebase;
+  verbose: boolean;
+  update: boolean;
+  branch: string | undefined;
+  draft: boolean;
+  "write-state-json": boolean;
+  writeStateJson: boolean;
+  template: boolean;
+  "mock-metadata": boolean;
+  mockMetadata: boolean;
+  _: (string | number)[];
+  $0: string;
 };
 
 export async function command() {
