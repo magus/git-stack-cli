@@ -52,6 +52,52 @@ test("write handles bulleted lists", () => {
   );
 });
 
+test("read handles slashes in branch name", () => {
+  const body = [
+    "[fix] slash in branch name",
+    "",
+    "git-stack-id: dev/noah/fix-slash-branch",
+    "git-stack-title: fix slash branch",
+  ].join("\n");
+
+  const metadata = Metadata.read(body);
+
+  expect(metadata).toEqual({
+    id: "dev/noah/fix-slash-branch",
+    title: "fix slash branch",
+  });
+});
+
+test("write handles bulleted lists", () => {
+  const body = [
+    "[feat] implement various features",
+    "",
+    "- keyboard modality escape key",
+    "- centralize settings",
+    "- move logic inside if branch",
+    "",
+    "git-stack-id: DdKIFyufW",
+  ].join("\n");
+
+  const metadata = {
+    id: "fix-slash-branch",
+    title: "fix slash branch",
+  };
+
+  expect(Metadata.write(body, metadata)).toEqual(
+    [
+      "[feat] implement various features",
+      "",
+      "- keyboard modality escape key",
+      "- centralize settings",
+      "- move logic inside if branch",
+      "",
+      "git-stack-id: fix-slash-branch",
+      "git-stack-title: fix slash branch",
+    ].join("\n")
+  );
+});
+
 test("removes metadata", () => {
   const body = [
     "[feat] implement various features",

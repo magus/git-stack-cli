@@ -73,6 +73,7 @@ const TEMPLATE = {
 };
 
 const RE = {
-  stack_id: new RegExp(TEMPLATE.stack_id("(?<id>[a-z0-9-+=]+)"), "i"),
+  // https://regex101.com/r/wLmGVq/1
+  stack_id: new RegExp(`${TEMPLATE.stack_id("(?<id>[^\\s]+)")}`, "i"),
   group_title: new RegExp(TEMPLATE.group_title("(?<title>[^\\n^\\r]+)"), "i"),
 };
