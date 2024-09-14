@@ -13,6 +13,7 @@ import { Output } from "~/app/Output";
 import { Providers } from "~/app/Providers";
 import { RebaseCheck } from "~/app/RebaseCheck";
 import { Store } from "~/app/Store";
+import { Fixup } from "~/commands/Fixup";
 
 export function App() {
   const actions = Store.useActions();
@@ -51,21 +52,34 @@ export function App() {
         }}
       >
         <DependencyCheck>
-          <DirtyCheck>
-            <RebaseCheck>
-              <CherryPickCheck>
-                {!argv.verbose ? null : <GithubApiError />}
-
-                <GatherMetadata>
-                  <LocalCommitStatus>
-                    <Main />
-                  </LocalCommitStatus>
-                </GatherMetadata>
-              </CherryPickCheck>
-            </RebaseCheck>
-          </DirtyCheck>
+          <RebaseCheck>
+            <CherryPickCheck>
+              <MaybeMain />
+            </CherryPickCheck>
+          </RebaseCheck>
         </DependencyCheck>
       </AutoUpdate>
     </Providers>
+  );
+}
+function MaybeMain() {
+  const argv = Store.useState((state) => state.argv);
+
+  const positional_list = new Set(argv["_"]);
+
+  if (positional_list.has("fixup")) {
+    return <Fixup />;
+  }
+
+  return (
+    <DirtyCheck>
+      {!argv.verbose ? null : <GithubApiError />}
+
+      <GatherMetadata>
+        <LocalCommitStatus>
+          <Main />
+        </LocalCommitStatus>
+      </GatherMetadata>
+    </DirtyCheck>
   );
 }
