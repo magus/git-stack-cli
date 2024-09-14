@@ -14,6 +14,7 @@ import { Providers } from "~/app/Providers";
 import { RebaseCheck } from "~/app/RebaseCheck";
 import { Store } from "~/app/Store";
 import { Fixup } from "~/commands/Fixup";
+import { Log } from "~/commands/Log";
 
 export function App() {
   const actions = Store.useActions();
@@ -69,6 +70,8 @@ function MaybeMain() {
 
   if (positional_list.has("fixup")) {
     return <Fixup />;
+  } else if (positional_list.has("log")) {
+    return <Log />;
   }
 
   return (

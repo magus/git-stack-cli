@@ -21,6 +21,12 @@ export async function command() {
         (yargs) => yargs.positional("commit", FixupOptions.commit)
       )
 
+      .command(
+        "log [args...]",
+        "Print an abbreviated log with numbered commits, useful for git stack fixup",
+        (yargs) => yargs.strict(false)
+      )
+
       .option("verbose", GlobalOptions.verbose)
 
       // yargs default wraps to 80 columns

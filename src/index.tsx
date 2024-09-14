@@ -14,6 +14,7 @@ command()
 
     Store.setState((state) => {
       state.ink = ink;
+      state.process_argv = process.argv;
       state.argv = argv;
       state.cwd = process.cwd();
     });

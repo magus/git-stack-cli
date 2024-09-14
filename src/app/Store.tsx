@@ -26,6 +26,7 @@ type MutateOutputArgs = {
 
 export type State = {
   // set immediately in `index.tsx` so no `null` scenario
+  process_argv: Array<string>;
   argv: Argv;
   ink: InkInstance;
   cwd: string;
@@ -89,6 +90,7 @@ export type State = {
 const BaseStore = createStore<State>()(
   immer((set, get) => ({
     // set immediately in `index.tsx` so no `null` scenario
+    process_argv: [],
     argv: {} as Argv,
     ink: {} as InkInstance,
     cwd: "",
