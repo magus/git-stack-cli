@@ -150,19 +150,11 @@ async function run() {
     // create temporary branch
     await cli(`git checkout -b ${temp_branch_name}`);
 
-    const git_revise_todo = GitReviseTodo({ rebase_group_index, commit_range });
-
-    // execute cli with temporary git sequence editor script
-    // revise from merge base to pick correct commits
-    await cli(
-      [
-        `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
-        `GIT_REVISE_TODO="${git_revise_todo}"`,
-        `git`,
-        `revise --edit -i ${rebase_merge_base}`,
-      ],
-      { stdio: ["ignore", "ignore", "ignore"] }
-    );
+    await GitReviseTodo.execute({
+      rebase_group_index,
+      rebase_merge_base,
+      commit_range,
+    });
 
     // early return since we do not need to sync
     if (!argv.sync) {

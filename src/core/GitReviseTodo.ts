@@ -1,4 +1,9 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+
 import * as Metadata from "~/core/Metadata";
+import { cli } from "~/core/cli";
 
 import type * as CommitMetadata from "~/core/CommitMetadata";
 
@@ -81,7 +86,33 @@ export function GitReviseTodo(args: Args): string {
   return todo;
 }
 
+GitReviseTodo.execute = async function gitrevisetodo_execute(args: Args) {
+  // generate temporary directory and drop sequence editor script
+  const tmp_git_sequence_editor_path = path.join(
+    os.tmpdir(),
+    "git-sequence-editor.sh"
+  );
+
+  // ensure script is executable
+  fs.chmodSync(tmp_git_sequence_editor_path, "755");
+
+  const git_revise_todo = GitReviseTodo(args);
+
+  // execute cli with temporary git sequence editor script
+  // revise from merge base to pick correct commits
+  await cli(
+    [
+      `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
+      `GIT_REVISE_TODO="${git_revise_todo}"`,
+      `git`,
+      `revise --edit -i ${args.rebase_merge_base}`,
+    ],
+    { stdio: ["ignore", "ignore", "ignore"] }
+  );
+};
+
 type Args = {
   rebase_group_index: number;
+  rebase_merge_base: string;
   commit_range: CommitMetadata.CommitRange;
 };

@@ -1,8 +1,5 @@
 import * as React from "react";
 
-import os from "node:os";
-import path from "node:path";
-
 import * as Ink from "ink-cjs";
 import cloneDeep from "lodash/cloneDeep";
 
@@ -162,30 +159,18 @@ export function DetectInitialPR(props: Props) {
       group.title = state.pr?.title || "-";
     }
 
-    const rebase_group_index = 0;
-    const git_revise_todo = GitReviseTodo({ rebase_group_index, commit_range });
-
     // get latest merge_base relative to local master
-    const merge_base = (await cli(`git merge-base HEAD ${master_branch}`))
-      .stdout;
+    const rebase_group_index = 0;
 
-    // generate temporary directory and drop sequence editor script
-    const tmp_git_sequence_editor_path = path.join(
-      os.tmpdir(),
-      "git-sequence-editor.sh"
-    );
+    const rebase_merge_base = (
+      await cli(`git merge-base HEAD ${master_branch}`)
+    ).stdout;
 
-    // execute cli with temporary git sequence editor script
-    // revise from merge base to pick correct commits
-    await cli(
-      [
-        `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
-        `GIT_REVISE_TODO="${git_revise_todo}"`,
-        `git`,
-        `revise --edit -i ${merge_base}`,
-      ],
-      { stdio: ["ignore", "ignore", "ignore"] }
-    );
+    await GitReviseTodo.execute({
+      rebase_group_index,
+      rebase_merge_base,
+      commit_range,
+    });
 
     const new_branch_name = `${branch_name}-sync`;
     await cli(`git checkout -b ${new_branch_name}`);
