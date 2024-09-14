@@ -28,7 +28,7 @@ export function LocalCommitStatus(props: Props) {
   }
 
   return (
-    <Await fallback={fallback} function={gather_metadata}>
+    <Await fallback={fallback} function={run}>
       {props.children}
     </Await>
   );
@@ -41,12 +41,11 @@ async function mock_metadata() {
 
   Store.setState((state) => {
     Object.assign(state, deserialized);
-
     state.step = "status";
   });
 }
 
-async function gather_metadata() {
+async function run() {
   const actions = Store.getState().actions;
 
   try {

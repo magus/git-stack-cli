@@ -68,17 +68,17 @@ export function DirtyCheck(props: Props) {
     default:
       return (
         <Await
+          function={run}
           fallback={
             <Ink.Text color={colors.yellow}>
               Ensuring <Command>git status --porcelain</Command>…
             </Ink.Text>
           }
-          function={rebase_check}
         />
       );
   }
 
-  async function rebase_check() {
+  async function run() {
     const actions = Store.getState().actions;
 
     try {
@@ -95,7 +95,7 @@ export function DirtyCheck(props: Props) {
         }
       }
 
-      actions.exit(9);
+      actions.exit(12);
     }
   }
 }

@@ -20,13 +20,13 @@ export function GatherMetadata(props: Props) {
   );
 
   return (
-    <Await fallback={fallback} function={gather_metadata}>
+    <Await fallback={fallback} function={run}>
       {props.children}
     </Await>
   );
 }
 
-async function gather_metadata() {
+async function run() {
   const actions = Store.getState().actions;
   const argv = Store.getState().argv;
 

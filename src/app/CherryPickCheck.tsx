@@ -57,17 +57,17 @@ export function CherryPickCheck(props: Props) {
     default:
       return (
         <Await
+          function={run}
           fallback={
             <Ink.Text color={colors.yellow}>
               Checking for <Command>git cherry-pick</Command>…
             </Ink.Text>
           }
-          function={cherry_pick_check}
         />
       );
   }
 
-  async function cherry_pick_check() {
+  async function run() {
     const actions = Store.getState().actions;
 
     try {
@@ -88,7 +88,7 @@ export function CherryPickCheck(props: Props) {
         }
       }
 
-      actions.exit(9);
+      actions.exit(11);
     }
   }
 }

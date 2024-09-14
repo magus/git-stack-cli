@@ -57,17 +57,17 @@ export function RebaseCheck(props: Props) {
     default:
       return (
         <Await
+          function={run}
           fallback={
             <Ink.Text color={colors.yellow}>
               Checking for <Command>git rebase</Command>…
             </Ink.Text>
           }
-          function={rebase_check}
         />
       );
   }
 
-  async function rebase_check() {
+  async function run() {
     const actions = Store.getState().actions;
 
     try {
@@ -88,7 +88,7 @@ export function RebaseCheck(props: Props) {
         }
       }
 
-      actions.exit(9);
+      actions.exit(13);
     }
   }
 }
