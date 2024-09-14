@@ -16,6 +16,7 @@ import { RebaseCheck } from "~/app/RebaseCheck";
 import { Store } from "~/app/Store";
 import { Fixup } from "~/commands/Fixup";
 import { Log } from "~/commands/Log";
+import { Rebase } from "~/commands/Rebase";
 
 export function App() {
   const actions = Store.useActions();
@@ -73,6 +74,14 @@ function MaybeMain() {
     return <Fixup />;
   } else if (positional_list.has("log")) {
     return <Log />;
+  } else if (positional_list.has("rebase")) {
+    return (
+      <GatherMetadata>
+        <LocalCommitStatus>
+          <Rebase />
+        </LocalCommitStatus>
+      </GatherMetadata>
+    );
   }
 
   return (

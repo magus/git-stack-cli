@@ -27,6 +27,12 @@ export async function command() {
         (yargs) => yargs.strict(false)
       )
 
+      .command(
+        "rebase",
+        "Update local branch via rebase with latest changes from origin master branch",
+        (yargs) => yargs
+      )
+
       .option("verbose", GlobalOptions.verbose)
 
       // yargs default wraps to 80 columns

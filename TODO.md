@@ -1,7 +1,5 @@
 # TODO
 
-- git stack rebase (git-sync command)
-
 - run all pr edits simultaneously in Promise.all?
 
 - run push/sync simultaneously by pushing specific commits to a specific branch in origin?
