@@ -4,6 +4,7 @@ import { AutoUpdate } from "~/app/AutoUpdate";
 import { CherryPickCheck } from "~/app/CherryPickCheck";
 import { Debug } from "~/app/Debug";
 import { DependencyCheck } from "~/app/DependencyCheck";
+import { DetectInitialPR } from "~/app/DetectInitialPR";
 import { DirtyCheck } from "~/app/DirtyCheck";
 import { GatherMetadata } from "~/app/GatherMetadata";
 import { GithubApiError } from "~/app/GithubApiError";
@@ -80,7 +81,9 @@ function MaybeMain() {
 
       <GatherMetadata>
         <LocalCommitStatus>
-          <Main />
+          <DetectInitialPR>
+            <Main />
+          </DetectInitialPR>
         </LocalCommitStatus>
       </GatherMetadata>
     </DirtyCheck>
