@@ -23,7 +23,6 @@ async function run() {
   const argv = state.argv;
 
   invariant(repo_root, "repo_root must exist");
-  invariant(argv, "argv must exist");
 
   if (!argv.template) {
     return actions.set((state) => {
