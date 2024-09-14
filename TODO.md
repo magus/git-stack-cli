@@ -1,6 +1,6 @@
 # TODO
 
-- git stack sync
+- git stack rebase (git-sync command)
 
 - run all pr edits simultaneously in Promise.all?
 
