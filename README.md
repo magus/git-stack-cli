@@ -13,7 +13,7 @@
 
 ## Demo
 
-> <img src="https://github.com/magus/git-multi-diff-playground/assets/290084/069c304b-80cb-49a9-9dc6-4ed3b061a5bc">
+> <img alt="git stack demo" src="https://github.com/magus/git-multi-diff-playground/assets/290084/069c304b-80cb-49a9-9dc6-4ed3b061a5bc">
 
 ## Install
 
@@ -53,6 +53,25 @@ git stack --no-verify # skip git hooks such as pre-commit and pre-push
 
 git stack help        # print a table of all CLI arguments
 ```
+
+### Editing existing commits and pull requests
+
+Sometimes you want to add changes to an existing commit or pull request.
+With `git-stack` this is as simple as amending the commit.
+
+1. `git add` your changes to the stage
+2. `git stack log` to find the relative commit number you want to amend
+3. `git stack fixup <number>` to amend the specific commit with your staged changes.
+
+```bash
+git add -p
+git stack log
+git stack fixup 2
+```
+
+> <img alt="git stack fixup demo" src="https://github.com/user-attachments/assets/2cdfaa5b-00be-4ed3-8bed-4a24c412979b">
+
+Running `git stack` afterward will update any existing pull requests with your changes.
 
 ## Why?
 
