@@ -1,8 +1,6 @@
 import * as React from "react";
 
 import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
 
 import * as Ink from "ink-cjs";
 import cloneDeep from "lodash/cloneDeep";
@@ -144,25 +142,6 @@ async function run() {
         Rebasing…
       </Ink.Text>
     );
-
-    // generate temporary directory and drop sequence editor script
-    const tmp_git_sequence_editor_path = path.join(
-      os.tmpdir(),
-      "git-sequence-editor.sh"
-    );
-
-    actions.debug(
-      `tmp_git_sequence_editor_path=${tmp_git_sequence_editor_path}`
-    );
-
-    // replaced at build time with literal contents of `scripts/git-sequence-editor.sh`
-    const GIT_SEQUENCE_EDITOR_SCRIPT = `process.env.GIT_SEQUENCE_EDITOR_SCRIPT`;
-
-    // write script to temporary path
-    fs.writeFileSync(tmp_git_sequence_editor_path, GIT_SEQUENCE_EDITOR_SCRIPT);
-
-    // ensure script is executable
-    fs.chmodSync(tmp_git_sequence_editor_path, "755");
 
     // create temporary branch
     await cli(`git checkout -b ${temp_branch_name}`);
