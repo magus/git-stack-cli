@@ -141,14 +141,19 @@ export async function pr_create(args: CreatePullRequestArgs) {
 type EditPullRequestArgs = {
   branch: string;
   base: string;
-  body: string;
+  body?: string;
 };
 
 export async function pr_edit(args: EditPullRequestArgs) {
-  const cli_result = await cli(
-    // prettier-ignore
-    `gh pr edit ${args.branch} --base ${args.base} --body-file="${body_file(args.body)}"`
-  );
+  const command_parts = [`gh pr edit ${args.branch} --base ${args.base}`];
+
+  if (args.body) {
+    command_parts.push(`--body-file="${body_file(args.body)}"`);
+  }
+
+  const command = command_parts.join(" ");
+
+  const cli_result = await cli(command);
 
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
