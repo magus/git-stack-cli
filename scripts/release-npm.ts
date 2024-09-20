@@ -17,6 +17,13 @@ await fs.mkdir(DIST_DIR, { recursive: true });
 
 process.chdir(PROJECT_DIR);
 
+// require clean git status besides changes to package.json version
+const git_status = await spawn.sync("git status --porcelain");
+if (!/^M\s+package.json/.test(git_status.stdout)) {
+  console.error("please commit local changes before running release");
+  process.exit(4);
+}
+
 const package_json = await file.read_json(
   path.join(PROJECT_DIR, "package.json")
 );
