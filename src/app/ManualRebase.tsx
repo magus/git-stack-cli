@@ -289,6 +289,16 @@ async function run() {
       />
     );
 
+    // before pushing reset base to master temporarily
+    // avoid accidentally pointing to orphaned parent commit
+    // should hopefully fix issues where a PR includes a bunch of commits after pushing
+    if (group.pr) {
+      await github.pr_edit({
+        branch: group.id,
+        base: master_branch,
+      });
+    }
+
     // push to origin since github requires commit shas to line up perfectly
     const git_push_command = [`git push -f origin HEAD:${group.id}`];
 
