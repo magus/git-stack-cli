@@ -126,7 +126,8 @@ export function DetectInitialPR(props: Props) {
       if (!has_existing_metadata) {
         // check for pr with matching branch name to initialize group
         const pr = await github.pr_status(branch_name);
-        if (pr) {
+
+        if (pr && pr.state === "OPEN") {
           return patch({ status: "prompt", pr });
         }
       }
