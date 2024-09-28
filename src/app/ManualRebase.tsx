@@ -3,7 +3,6 @@ import * as React from "react";
 import fs from "node:fs";
 
 import * as Ink from "ink-cjs";
-import cloneDeep from "lodash/cloneDeep";
 
 import { Await } from "~/app/Await";
 import { Brackets } from "~/app/Brackets";
@@ -33,14 +32,12 @@ async function run() {
   const actions = state.actions;
   const argv = state.argv;
   const branch_name = state.branch_name;
-  const original_commit_range = cloneDeep(state.commit_range);
   const commit_map = state.commit_map;
   const master_branch = state.master_branch;
   const cwd = state.cwd;
   const repo_root = state.repo_root;
 
   invariant(branch_name, "branch_name must exist");
-  invariant(original_commit_range, "original_commit_range must exist");
   invariant(commit_map, "commit_map must exist");
   invariant(repo_root, "repo_root must exist");
 
@@ -51,8 +48,12 @@ async function run() {
   const merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;
 
   // immediately paint all commit to preserve selected commit ranges
-  original_commit_range.group_list.reverse();
-  for (const commit of original_commit_range.commit_list) {
+  let commit_range = await CommitMetadata.range(commit_map);
+
+  // reverse group list to ensure we create git revise in correct order
+  commit_range.group_list.reverse();
+
+  for (const commit of commit_range.commit_list) {
     const group_from_map = commit_map[commit.sha];
     commit.branch_id = group_from_map.id;
     commit.title = group_from_map.title;
@@ -61,7 +62,7 @@ async function run() {
   await GitReviseTodo.execute({
     rebase_group_index: 0,
     rebase_merge_base: merge_base,
-    commit_range: original_commit_range,
+    commit_range,
   });
 
   let DEFAULT_PR_BODY = "";
@@ -71,7 +72,7 @@ async function run() {
 
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
-  const commit_range = await CommitMetadata.range(commit_map);
+  commit_range = await CommitMetadata.range(commit_map);
 
   // reverse commit list so that we can cherry-pick in order
   commit_range.group_list.reverse();
