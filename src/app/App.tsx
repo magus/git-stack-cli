@@ -14,6 +14,7 @@ import { Output } from "~/app/Output";
 import { Providers } from "~/app/Providers";
 import { RebaseCheck } from "~/app/RebaseCheck";
 import { Store } from "~/app/Store";
+import { VerboseDebugInfo } from "~/app/VerboseDebugInfo";
 import { Fixup } from "~/commands/Fixup";
 import { Log } from "~/commands/Log";
 import { Rebase } from "~/commands/Rebase";
@@ -54,13 +55,15 @@ export function App() {
           }
         }}
       >
-        <DependencyCheck>
-          <RebaseCheck>
-            <CherryPickCheck>
-              <MaybeMain />
-            </CherryPickCheck>
-          </RebaseCheck>
-        </DependencyCheck>
+        <VerboseDebugInfo>
+          <DependencyCheck>
+            <RebaseCheck>
+              <CherryPickCheck>
+                <MaybeMain />
+              </CherryPickCheck>
+            </RebaseCheck>
+          </DependencyCheck>
+        </VerboseDebugInfo>
       </AutoUpdate>
     </Providers>
   );
