@@ -29,7 +29,11 @@ async function run() {
   const actions = Store.getState().actions;
 
   try {
-    await cli(`git config --list --show-origin `);
+    await cli(`git config --list --show-origin`);
+    await cli(`echo HOME=$HOME`);
+    await cli(`echo USER=$USER`);
+    await cli(`echo GIT_AUTHOR_NAME=$GIT_AUTHOR_NAME`);
+    await cli(`echo GIT_AUTHOR_EMAIL=$GIT_AUTHOR_EMAIL`);
   } catch (err) {
     actions.error("Unable to log verbose debug information.");
 
