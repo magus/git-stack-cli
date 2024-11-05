@@ -74,6 +74,17 @@ async function run() {
   const commit_sha = (await cli(`git rev-parse HEAD~${adjusted_number}`))
     .stdout;
 
+  actions.output(
+    <FormatText
+      wrapper={<Ink.Text color={colors.yellow} />}
+      message="🛠️ fixup {relative_number} {commit_sha}"
+      values={{
+        commit_sha: <Parens>{commit_sha}</Parens>,
+        relative_number: relative_number,
+      }}
+    />
+  );
+
   await cli(`git commit --fixup ${commit_sha}`);
 
   // check if stash required
@@ -91,31 +102,27 @@ async function run() {
     actions.output(<Ink.Text>📦 Changes saved to stash</Ink.Text>);
   }
 
-  // rebase target needs to account for new commit created above
-  const rebase_target = Number(relative_number) + 1;
-  await cli(`git rebase -i --autosquash HEAD~${rebase_target}`, {
-    env: {
-      PATH: process.env.PATH,
-      GIT_EDITOR: "true",
-    },
-  });
+  try {
+    // rebase target needs to account for new commit created above
+    const rebase_target = Number(relative_number) + 1;
 
-  actions.output(
-    <FormatText
-      wrapper={<Ink.Text color={colors.yellow} />}
-      message="🛠️ fixup {relative_number} {commit_sha}"
-      values={{
-        commit_sha: <Parens>{commit_sha}</Parens>,
-        relative_number: relative_number,
-      }}
-    />
-  );
+    await cli(`git rebase -i --autosquash HEAD~${rebase_target}`, {
+      env: {
+        ...process.env,
+        GIT_EDITOR: "true",
+      },
+    });
+  } catch (error) {
+    actions.error("🚨 Fixup failed");
+    await cli("git rebase --abort");
+    await cli("git reset --soft HEAD~1");
+  } finally {
+    if (save_stash) {
+      await cli("git stash pop -q");
 
-  if (save_stash) {
-    await cli("git stash pop -q");
-
-    actions.output(
-      <Ink.Text color={colors.green}>✅ Changes restored from stash</Ink.Text>
-    );
+      actions.output(
+        <Ink.Text color={colors.green}>✅ Changes restored from stash</Ink.Text>
+      );
+    }
   }
 }
