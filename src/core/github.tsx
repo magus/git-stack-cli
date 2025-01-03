@@ -161,7 +161,7 @@ export async function pr_edit(args: EditPullRequestArgs) {
 }
 
 // prettier-ignore
-const JSON_FIELDS = "--json number,state,baseRefName,headRefName,commits,title,body,url";
+const JSON_FIELDS = "--json id,number,state,baseRefName,headRefName,commits,title,body,url,isDraft";
 
 // consistent handle gh cli commands returning json
 // redirect to tmp file to avoid scrollback overflow causing scrollback to be cleared
@@ -220,6 +220,7 @@ type Commit = {
 };
 
 export type PullRequest = {
+  id: string;
   number: number;
   state: "OPEN" | "MERGED" | "CLOSED";
   baseRefName: string;
@@ -228,4 +229,5 @@ export type PullRequest = {
   title: string;
   body: string;
   url: string;
+  isDraft: boolean;
 };

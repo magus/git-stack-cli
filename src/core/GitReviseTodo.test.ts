@@ -82,6 +82,8 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
       id: "AAWsYx1UU",
       title: "banana",
       pr: {
+        id: "PR_kwDOKjvFM85ghvAH",
+        isDraft: false,
         baseRefName: "master",
         body: "adsf\r\n\r\n#### git stack\n- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/47\n- 👉 `1` https://github.com/magus/git-multi-diff-playground/pull/43",
         commits: [
@@ -123,6 +125,8 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
       id: "E63ytp5dj",
       title: "lemon color",
       pr: {
+        id: "PR_kwDOKjvFM85gwTkx",
+        isDraft: false,
         baseRefName: "AAWsYx1UU",
         body: "\r\n\r\n#### git stack\n- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47\n- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/43\n- ✅ `1`\n  https://github.com/magus/git-multi-diff-playground/pull/42",
         commits: [
@@ -251,6 +255,8 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
   ],
   pr_lookup: {
     AAWsYx1UU: {
+      id: "PR_kwDOKjvFM85ghvAH",
+      isDraft: false,
       baseRefName: "master",
       body: "adsf\r\n\r\n#### git stack\n- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/47\n- 👉 `1` https://github.com/magus/git-multi-diff-playground/pull/43",
       commits: [
@@ -277,6 +283,8 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
       url: "https://github.com/magus/git-multi-diff-playground/pull/43",
     },
     E63ytp5dj: {
+      id: "PR_kwDOKjvFM85gwTkx",
+      isDraft: false,
       baseRefName: "AAWsYx1UU",
       body: "\r\n\r\n#### git stack\n- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47\n- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/43\n- ✅ `1`\n  https://github.com/magus/git-multi-diff-playground/pull/42",
       commits: [
@@ -343,6 +351,8 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       id: "AAWsYx1UU",
       title: "banana",
       pr: {
+        id: "PR_kwDOKjvFM85ghvAH",
+        isDraft: false,
         baseRefName: "master",
         body: "adsf\r\n\r\n#### git stack\n- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/47\n- 👉 `1` https://github.com/magus/git-multi-diff-playground/pull/43",
         commits: [
@@ -384,6 +394,8 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       id: "E63ytp5dj",
       title: "lemon color",
       pr: {
+        id: "PR_kwDOKjvFM85gwTkx",
+        isDraft: false,
         baseRefName: "AAWsYx1UU",
         body: "\r\n\r\n#### git stack\n- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47\n- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/43\n- ✅ `1`\n  https://github.com/magus/git-multi-diff-playground/pull/42",
         commits: [
@@ -521,6 +533,8 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
   ],
   pr_lookup: {
     AAWsYx1UU: {
+      id: "PR_kwDOKjvFM85ghvAH",
+      isDraft: false,
       baseRefName: "master",
       body: "adsf\r\n\r\n#### git stack\n- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/47\n- 👉 `1` https://github.com/magus/git-multi-diff-playground/pull/43",
       commits: [
@@ -547,6 +561,8 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       url: "https://github.com/magus/git-multi-diff-playground/pull/43",
     },
     E63ytp5dj: {
+      id: "PR_kwDOKjvFM85gwTkx",
+      isDraft: false,
       baseRefName: "AAWsYx1UU",
       body: "\r\n\r\n#### git stack\n- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47\n- ⏳ `2` https://github.com/magus/git-multi-diff-playground/pull/43\n- ✅ `1`\n  https://github.com/magus/git-multi-diff-playground/pull/42",
       commits: [
