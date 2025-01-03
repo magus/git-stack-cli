@@ -290,10 +290,25 @@ async function run() {
       />
     );
 
+    // we may temporarily mark PR as a draft before editing it
+    // if it is not already a draft PR, to avoid notification spam
+    let is_temp_draft = false;
+
     // before pushing reset base to master temporarily
     // avoid accidentally pointing to orphaned parent commit
     // should hopefully fix issues where a PR includes a bunch of commits after pushing
     if (group.pr) {
+      if (!group.pr.isDraft) {
+        is_temp_draft = true;
+      }
+
+      if (is_temp_draft) {
+        await github.pr_draft({
+          branch: group.id,
+          draft: true,
+        });
+      }
+
       await github.pr_edit({
         branch: group.id,
         base: master_branch,
@@ -322,6 +337,14 @@ async function run() {
           selected_url,
         }),
       });
+
+      if (is_temp_draft) {
+        // mark pr as ready for review again
+        await github.pr_draft({
+          branch: group.id,
+          draft: false,
+        });
+      }
     } else {
       if (!args.skip_checkout) {
         // delete local group branch if leftover
