@@ -160,6 +160,50 @@ export async function pr_edit(args: EditPullRequestArgs) {
   }
 }
 
+type DraftPullRequestArgs = {
+  branch: string;
+  draft: boolean;
+};
+
+export async function pr_draft(args: DraftPullRequestArgs) {
+  const mutation_name = args.draft
+    ? "convertPullRequestToDraft"
+    : "markPullRequestReadyForReview";
+
+  let query = `
+    mutation($id: ID!) {
+      ${mutation_name}(input: { pullRequestId: $id }) {
+        pullRequest {
+          id
+          number
+          isDraft
+        }
+      }
+    }
+  `;
+
+  query = query.replace(/\n/g, " ");
+  query = query.replace(/\s+/g, " ");
+  query = query.trim();
+
+  // lookup id from pr cache using args.branch
+  const state = Store.getState();
+  const cache_pr = state.pr[args.branch];
+  invariant(cache_pr, "cache_pr must exist");
+
+  const command_parts = [
+    `gh api graphql -F id="${cache_pr.id}" -f query='${query}'`,
+  ];
+
+  const command = command_parts.join(" ");
+
+  const cli_result = await cli(command);
+
+  if (cli_result.code !== 0) {
+    handle_error(cli_result.output);
+  }
+}
+
 // prettier-ignore
 const JSON_FIELDS = "--json id,number,state,baseRefName,headRefName,commits,title,body,url,isDraft";
 
