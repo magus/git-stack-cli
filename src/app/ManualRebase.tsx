@@ -106,16 +106,28 @@ async function run() {
     process.chdir(repo_root);
     await cli(`pwd`);
 
-    await rebase_git_revise();
+    actions.output(
+      <Ink.Text color={colors.yellow} wrap="truncate-end">
+        Rebasing…
+      </Ink.Text>
+    );
+
+    // create temporary branch
+    await cli(`git checkout -b ${temp_branch_name}`);
+
+    await GitReviseTodo.execute({
+      rebase_group_index,
+      rebase_merge_base,
+      commit_range,
+    });
+
+    // after all commits have been modified move the pointer
+    // of original branch to the newly created temporary branch
+    await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
 
     if (argv.sync) {
       await sync_github();
     }
-
-    // after all commits have been cherry-picked and amended
-    // move the branch pointer to the newly created temporary branch
-    // now we are in locally in sync with github and on the original branch
-    await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
 
     restore_git();
 
@@ -133,128 +145,6 @@ async function run() {
     }
 
     handle_exit();
-  }
-
-  async function rebase_git_revise() {
-    actions.debug(`rebase_git_revise`);
-
-    actions.output(
-      <Ink.Text color={colors.yellow} wrap="truncate-end">
-        Rebasing…
-      </Ink.Text>
-    );
-
-    // create temporary branch
-    await cli(`git checkout -b ${temp_branch_name}`);
-
-    await GitReviseTodo.execute({
-      rebase_group_index,
-      rebase_merge_base,
-      commit_range,
-    });
-  }
-
-  async function sync_group_github(args: {
-    group: CommitMetadataGroup;
-    pr_url_list: Array<string>;
-  }) {
-    if (!argv.sync) {
-      return;
-    }
-
-    const { group, pr_url_list } = args;
-
-    invariant(group.base, "group.base must exist");
-
-    actions.output(
-      <FormatText
-        wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
-        message="Syncing {group}…"
-        values={{
-          group: (
-            <Brackets>{group.pr?.title || group.title || group.id}</Brackets>
-          ),
-        }}
-      />
-    );
-
-    // we may temporarily mark PR as a draft before editing it
-    // if it is not already a draft PR, to avoid notification spam
-    let is_temp_draft = false;
-
-    // before pushing reset base to master temporarily
-    // avoid accidentally pointing to orphaned parent commit
-    // should hopefully fix issues where a PR includes a bunch of commits after pushing
-    if (group.pr) {
-      if (!group.pr.isDraft) {
-        is_temp_draft = true;
-      }
-
-      if (is_temp_draft) {
-        await github.pr_draft({
-          branch: group.id,
-          draft: true,
-        });
-      }
-
-      await github.pr_edit({
-        branch: group.id,
-        base: master_branch,
-      });
-    }
-
-    // push to origin since github requires commit shas to line up perfectly
-    const git_push_command = [`git push -f origin HEAD:${group.id}`];
-
-    if (argv.verify === false) {
-      git_push_command.push("--no-verify");
-    }
-
-    await cli(git_push_command);
-
-    const selected_url = get_group_url(group);
-
-    if (group.pr) {
-      // ensure base matches pr in github
-      await github.pr_edit({
-        branch: group.id,
-        base: group.base,
-        body: StackSummaryTable.write({
-          body: group.pr.body,
-          pr_url_list,
-          selected_url,
-        }),
-      });
-
-      if (is_temp_draft) {
-        // mark pr as ready for review again
-        await github.pr_draft({
-          branch: group.id,
-          draft: false,
-        });
-      }
-    } else {
-      // create pr in github
-      const pr_url = await github.pr_create({
-        branch: group.id,
-        base: group.base,
-        title: group.title,
-        body: DEFAULT_PR_BODY,
-        draft: argv.draft,
-      });
-
-      if (!pr_url) {
-        throw new Error("unable to create pr");
-      }
-
-      // update pr_url_list with created pr_url
-      for (let i = 0; i < pr_url_list.length; i++) {
-        const url = pr_url_list[i];
-        if (url === selected_url) {
-          pr_url_list[i] = pr_url;
-        }
-      }
-    }
   }
 
   async function sync_github() {
@@ -286,24 +176,70 @@ async function run() {
       push_group_list.unshift({ group, lookback_index });
     }
 
+    actions.output(
+      <FormatText
+        wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
+        message="Syncing {group_list}…"
+        values={{
+          group_list: (
+            <React.Fragment>
+              {push_group_list.map((push_group) => {
+                const group = push_group.group;
+
+                return (
+                  <Brackets key={group.id}>
+                    {group.pr?.title || group.title || group.id}
+                  </Brackets>
+                );
+              })}
+            </React.Fragment>
+          ),
+        }}
+      />
+    );
+
+    // for all push targets in push_group_list
+    // things that can be done in parallel are grouped by numbers
+    //
+    // -----------------------------------
+    // 1 (before_push) temp mark draft
+    // --------------------------------------
+    // 2 push simultaneously to github
+    // --------------------------------------
+    // 2 create PR / edit PR
+    // 2 (after_push) undo temp mark draft
+    // --------------------------------------
+
+    const before_push_tasks = [];
+    for (const push_group of push_group_list) {
+      before_push_tasks.push(before_push(push_group));
+    }
+
+    await Promise.all(before_push_tasks);
+
+    const push_target_list = push_group_list.map((push_group) => {
+      return `HEAD~${push_group.lookback_index}:${push_group.group.id}`;
+    });
+
+    const push_target_args = push_target_list.join(" ");
+
+    const git_push_command = [`git push -f origin ${push_target_args}`];
+
+    if (argv.verify === false) {
+      git_push_command.push("--no-verify");
+    }
+
+    await cli(git_push_command);
+
     const pr_url_list = commit_range.group_list.map(get_group_url);
 
-    // use push_group_list to sync each group HEAD to github
+    const after_push_tasks = [];
     for (const push_group of push_group_list) {
-      const { group } = push_group;
-
-      // move to temporary branch for resetting to lookback_index to create PR
-      await cli(`git checkout -b ${group.id}`);
-
-      // prepare branch for sync, reset to commit at lookback index
-      await cli(`git reset --hard HEAD~${push_group.lookback_index}`);
-
-      await sync_group_github({ group, pr_url_list });
-
-      // done, remove temp push branch and move back to temp branch
-      await cli(`git checkout ${temp_branch_name}`);
-      await cli(`git branch -D ${group.id}`);
+      const group = push_group.group;
+      after_push_tasks.push(after_push({ group, pr_url_list }));
     }
+
+    await Promise.all(after_push_tasks);
 
     // finally, ensure all prs have the updated stack table from updated pr_url_list
     for (let i = 0; i < commit_range.group_list.length; i++) {
@@ -336,6 +272,94 @@ async function run() {
     }
   }
 
+  async function before_push(args: { group: CommitMetadataGroup }) {
+    const { group } = args;
+
+    invariant(group.base, "group.base must exist");
+
+    // we may temporarily mark PR as a draft before editing it
+    // if it is not already a draft PR, to avoid notification spam
+    let is_temp_draft = !group.pr?.isDraft;
+
+    // before pushing reset base to master temporarily
+    // avoid accidentally pointing to orphaned parent commit
+    // should hopefully fix issues where a PR includes a bunch of commits after pushing
+    if (group.pr) {
+      if (!group.pr.isDraft) {
+        is_temp_draft = true;
+      }
+
+      if (is_temp_draft) {
+        await github.pr_draft({
+          branch: group.id,
+          draft: true,
+        });
+      }
+
+      await github.pr_edit({
+        branch: group.id,
+        base: master_branch,
+      });
+    }
+  }
+
+  async function after_push(args: {
+    group: CommitMetadataGroup;
+    pr_url_list: Array<string>;
+  }) {
+    const { group, pr_url_list } = args;
+
+    invariant(group.base, "group.base must exist");
+
+    const selected_url = get_group_url(group);
+
+    if (group.pr) {
+      // ensure base matches pr in github
+      await github.pr_edit({
+        branch: group.id,
+        base: group.base,
+        body: StackSummaryTable.write({
+          body: group.pr.body,
+          pr_url_list,
+          selected_url,
+        }),
+      });
+
+      // we may temporarily mark PR as a draft before editing it
+      // if it is not already a draft PR, to avoid notification spam
+      let is_temp_draft = !group.pr?.isDraft;
+
+      if (is_temp_draft) {
+        // mark pr as ready for review again
+        await github.pr_draft({
+          branch: group.id,
+          draft: false,
+        });
+      }
+    } else {
+      // create pr in github
+      const pr_url = await github.pr_create({
+        branch: group.id,
+        base: group.base,
+        title: group.title,
+        body: DEFAULT_PR_BODY,
+        draft: argv.draft,
+      });
+
+      if (!pr_url) {
+        throw new Error("unable to create pr");
+      }
+
+      // update pr_url_list with created pr_url
+      for (let i = 0; i < pr_url_list.length; i++) {
+        const url = pr_url_list[i];
+        if (url === selected_url) {
+          pr_url_list[i] = pr_url;
+        }
+      }
+    }
+  }
+
   // cleanup git operations if cancelled during manual rebase
   function restore_git() {
     // signint handler MUST run synchronously
@@ -356,13 +380,6 @@ async function run() {
 
     // ...and cleanup temporary branch
     cli.sync(`git branch -D ${temp_branch_name}`, spawn_options);
-
-    if (commit_range) {
-      // ...and cleanup pr group branches
-      for (const group of commit_range.group_list) {
-        cli.sync(`git branch -D ${group.id}`, spawn_options);
-      }
-    }
 
     // restore back to original dir
     if (fs.existsSync(cwd)) {
