@@ -166,6 +166,10 @@ type DraftPullRequestArgs = {
 };
 
 export async function pr_draft(args: DraftPullRequestArgs) {
+  // https://cli.github.com/manual/gh_api
+  // https://docs.github.com/en/graphql/reference/mutations#convertpullrequesttodraft
+  // https://docs.github.com/en/graphql/reference/mutations#markpullrequestreadyforreview
+
   const mutation_name = args.draft
     ? "convertPullRequestToDraft"
     : "markPullRequestReadyForReview";
