@@ -153,9 +153,6 @@ Rebase.run = async function run() {
     // all children processes receive the SIGINT signal
     const spawn_options = { ignoreExitCode: true };
 
-    // always clean up any patch files
-    cli.sync(`rm ${PATCH_FILE}`, spawn_options);
-
     // always hard reset and clean to allow subsequent checkout
     // if there are files checkout will fail and cascade fail subsequent commands
     cli.sync(`git reset --hard`, spawn_options);
@@ -192,5 +189,3 @@ Rebase.run = async function run() {
     actions.exit(6);
   }
 };
-
-const PATCH_FILE = "git-stack-cli-patch.patch";

@@ -367,9 +367,6 @@ async function run() {
     // all children processes receive the SIGINT signal
     const spawn_options = { ignoreExitCode: true };
 
-    // always clean up any patch files
-    cli.sync(`rm ${PATCH_FILE}`, spawn_options);
-
     // always hard reset and clean to allow subsequent checkout
     // if there are files checkout will fail and cascade fail subsequent commands
     cli.sync(`git reset --hard`, spawn_options);
@@ -409,5 +406,3 @@ async function run() {
 
 type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
 const get_group_url = (group: CommitMetadataGroup) => group.pr?.url || group.id;
-
-const PATCH_FILE = "git-stack-cli-patch.patch";
