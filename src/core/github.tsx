@@ -149,7 +149,7 @@ export async function pr_edit(args: EditPullRequestArgs) {
   const command_parts = [`gh pr edit ${args.branch} --base ${args.base}`];
 
   if (args.body) {
-    const body_file = await write_body_file(args.body);
+    const body_file = await write_body_file(args);
     command_parts.push(`--body-file="${body_file}"`);
   }
 
@@ -243,13 +243,15 @@ function handle_error(output: string): never {
 }
 
 // convert a string to a file for use via github cli `--body-file`
-async function write_body_file(body: string) {
+async function write_body_file(args: EditPullRequestArgs) {
+  invariant(args.body, "args.body must exist");
+
   const temp_dir = os.tmpdir();
-  const temp_path = path.join(temp_dir, "git-stack-body");
+  const temp_path = path.join(temp_dir, `git-stack-body-${args.base}`);
 
   await safe_rm(temp_path);
 
-  await fs.writeFile(temp_path, body);
+  await fs.writeFile(temp_path, args.body);
 
   return temp_path;
 }
