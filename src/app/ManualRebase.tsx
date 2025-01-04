@@ -123,12 +123,13 @@ async function run() {
       state.step = "post-rebase-status";
     });
   } catch (err) {
-    actions.error("Unable to rebase.");
-
     if (err instanceof Error) {
-      if (actions.isDebug()) {
-        actions.error(err.message);
-      }
+      actions.error(err.message);
+    }
+
+    actions.error("Unable to rebase.");
+    if (!argv.verbose) {
+      actions.error("Try again with `--verbose` to see more information.");
     }
 
     handle_exit();
