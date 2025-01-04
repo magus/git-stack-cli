@@ -59,7 +59,7 @@ git stack help        # print a table of all CLI arguments
 Sometimes you want to add changes to an existing commit or pull request.
 With `git-stack` this is as simple as amending the commit.
 
-1. `git add` your changes to the stage
+1. `git add -p` your changes to the stage
 2. `git stack log` to find the relative commit number you want to amend
 3. `git stack fixup <number>` to amend the specific commit with your staged changes.
 
@@ -72,6 +72,16 @@ git stack fixup 2
 > <img alt="git stack fixup demo" src="https://github.com/user-attachments/assets/2cdfaa5b-00be-4ed3-8bed-4a24c412979b">
 
 Running `git stack` afterward will update any existing pull requests with your changes.
+
+### Syncing with remote
+
+To update your local branch with the latest changes in the remote branch (e.g. `master`, `main`)
+
+> <img alt="git stack rebase demo" src="https://github.com/user-attachments/assets/44a39be7-cd6b-4c5a-ac85-be010b7665aa" />
+
+```bash
+git stack rebase
+```
 
 ## Why?
 
