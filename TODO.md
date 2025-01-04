@@ -1,11 +1,5 @@
 # TODO
 
-- run all pr edits simultaneously in Promise.all?
-
-- run push/sync simultaneously by pushing specific commits to a specific branch in origin?
-
-- add a key to create group from commit title without editing, e.g. "g"
-
 - graphite does breakpoints, consider a hotkey for inserting "breakpoint group", e.g. "b"
 
 - select all commits first, then press "c" to create the group
