@@ -10,7 +10,6 @@ import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
 import { GitReviseTodo } from "~/core/GitReviseTodo";
-import * as Metadata from "~/core/Metadata";
 import * as StackSummaryTable from "~/core/StackSummaryTable";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
@@ -107,11 +106,7 @@ async function run() {
     process.chdir(repo_root);
     await cli(`pwd`);
 
-    if (argv["rebase"] === "git-revise") {
-      await rebase_git_revise();
-    } else {
-      await rebase_cherry_pick();
-    }
+    await rebase_git_revise();
 
     // after all commits have been cherry-picked and amended
     // move the branch pointer to the newly created temporary branch
@@ -203,62 +198,6 @@ async function run() {
       // done, remove temp push branch and move back to temp branch
       await cli(`git checkout ${temp_branch_name}`);
       await cli(`git branch -D ${group.id}`);
-    }
-
-    // finally, ensure all prs have the updated stack table from updated pr_url_list
-    await update_pr_tables(pr_url_list);
-  }
-
-  async function rebase_cherry_pick() {
-    actions.debug("rebase_cherry_pick");
-
-    // create temporary branch based on merge base
-    await cli(`git checkout -b ${temp_branch_name} ${rebase_merge_base}`);
-
-    const pr_url_list = commit_range.group_list.map(get_group_url);
-
-    for (let i = rebase_group_index; i < commit_range.group_list.length; i++) {
-      const group = commit_range.group_list[i];
-
-      invariant(group.base, "group.base must exist");
-
-      actions.output(
-        <FormatText
-          wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
-          message="Rebasing {group}…"
-          values={{
-            group: (
-              <Brackets>{group.pr?.title || group.title || group.id}</Brackets>
-            ),
-          }}
-        />
-      );
-
-      // cherry-pick and amend commits one by one
-      for (const commit of group.commits) {
-        // ensure clean base to avoid conflicts when applying patch
-        await cli(`git clean -fd`);
-
-        // create, apply and cleanup patch
-        await cli(`git format-patch -1 ${commit.sha} --stdout > ${PATCH_FILE}`);
-        await cli(`git apply ${PATCH_FILE}`);
-        await cli(`rm ${PATCH_FILE}`);
-
-        // add all changes to stage
-        await cli(`git add --all`);
-
-        const metadata = { id: group.id, title: group.title };
-        const new_message = Metadata.write(commit.full_message, metadata);
-        const git_commit_comand = [`git commit -m "${new_message}"`];
-
-        if (argv.verify === false) {
-          git_commit_comand.push("--no-verify");
-        }
-
-        await cli(git_commit_comand);
-      }
-
-      await sync_group_github({ group, pr_url_list, skip_checkout: false });
     }
 
     // finally, ensure all prs have the updated stack table from updated pr_url_list

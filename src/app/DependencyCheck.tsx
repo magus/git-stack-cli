@@ -163,12 +163,6 @@ function CheckGithubCliAuth(props: Props) {
 
 function CheckGitRevise(props: Props) {
   const actions = Store.useActions();
-  const argv = Store.useState((state) => state.argv);
-
-  // skip git revise check when `rebase` is not git-revise
-  if (argv?.["rebase"] !== "git-revise") {
-    return props.children;
-  }
 
   return (
     <Await

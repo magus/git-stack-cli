@@ -52,11 +52,6 @@ export async function command() {
   );
 }
 
-const Rebase = Object.freeze({
-  "git-revise": "git-revise",
-  "cherry-pick": "cherry-pick",
-});
-
 const GlobalOptions = {
   verbose: {
     type: "boolean",
@@ -93,17 +88,6 @@ const DefaultOptions = {
     default: true,
     description:
       "Run git hooks such as pre-commit and pre-push, disable with --no-verify",
-  },
-
-  "rebase": {
-    type: "string",
-    choices: [Rebase["git-revise"], Rebase["cherry-pick"]],
-    default: Rebase["git-revise"],
-    description: [
-      "Strategy used for syncing branches",
-      `${Rebase["git-revise"]}: perform faster in-memory rebase`,
-      `${Rebase["cherry-pick"]}: use disk and incrementally rebase each commit`,
-    ].join(" | "),
   },
 
   "update": {
