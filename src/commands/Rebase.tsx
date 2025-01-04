@@ -111,9 +111,8 @@ Rebase.run = async function run() {
       await cli(`git cherry-pick --keep-redundant-commits ${sha_list}`);
     }
 
-    // after all commits have been cherry-picked and amended
-    // move the branch pointer to the newly created temporary branch
-    // now we are locally in sync with github and on the original branch
+    // after all commits have been cherry-picked move the pointer
+    // of original branch to the newly created temporary branch
     await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
 
     restore_git();
@@ -167,13 +166,6 @@ Rebase.run = async function run() {
 
     // ...and cleanup temporary branch
     cli.sync(`git branch -D ${temp_branch_name}`, spawn_options);
-
-    if (commit_range) {
-      // ...and cleanup pr group branches
-      for (const group of commit_range.group_list) {
-        cli.sync(`git branch -D ${group.id}`, spawn_options);
-      }
-    }
 
     // restore back to original dir
     if (fs.existsSync(cwd)) {
