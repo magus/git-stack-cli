@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 
 import * as Ink from "ink-cjs";
@@ -11,6 +11,7 @@ import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
+import { safe_exists } from "~/core/safe_exists";
 
 export function PreManualRebase() {
   return <Await fallback={null} function={run} />;
@@ -40,8 +41,8 @@ async function run() {
   for (const key of PR_TEMPLATE_KEY_LIST) {
     const pr_template_fn = PR_TEMPLATE[key as keyof typeof PR_TEMPLATE];
 
-    if (fs.existsSync(pr_template_fn(repo_root))) {
-      pr_template_body = fs.readFileSync(pr_template_fn(repo_root), "utf-8");
+    if (await safe_exists(pr_template_fn(repo_root))) {
+      pr_template_body = await fs.readFile(pr_template_fn(repo_root), "utf-8");
 
       actions.output(
         <FormatText
@@ -59,8 +60,8 @@ async function run() {
 
   // ./.github/PULL_REQUEST_TEMPLATE/*.md
   let pr_templates: Array<string> = [];
-  if (fs.existsSync(PR_TEMPLATE.TemplateDir(repo_root))) {
-    pr_templates = fs.readdirSync(PR_TEMPLATE.TemplateDir(repo_root));
+  if (await safe_exists(PR_TEMPLATE.TemplateDir(repo_root))) {
+    pr_templates = await fs.readdir(PR_TEMPLATE.TemplateDir(repo_root));
   }
 
   // check if repo has multiple pr templates

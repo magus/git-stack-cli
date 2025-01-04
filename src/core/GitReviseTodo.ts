@@ -1,4 +1,4 @@
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -120,10 +120,10 @@ GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
   const GIT_SEQUENCE_EDITOR_SCRIPT = `process.env.GIT_SEQUENCE_EDITOR_SCRIPT`;
 
   // write script to temporary path
-  fs.writeFileSync(tmp_git_sequence_editor_path, GIT_SEQUENCE_EDITOR_SCRIPT);
+  await fs.writeFile(tmp_git_sequence_editor_path, GIT_SEQUENCE_EDITOR_SCRIPT);
 
   // ensure script is executable
-  fs.chmodSync(tmp_git_sequence_editor_path, "755");
+  await fs.chmod(tmp_git_sequence_editor_path, "755");
 
   const git_revise_todo = GitReviseTodo(args);
 

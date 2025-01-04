@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import fs from "node:fs";
 import path from "node:path";
 
 import * as Ink from "ink-cjs";
@@ -11,6 +10,7 @@ import { Store } from "~/app/Store";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
+import { safe_exists } from "~/core/safe_exists";
 
 type Props = {
   children: React.ReactNode;
@@ -74,8 +74,8 @@ export function RebaseCheck(props: Props) {
       const git_dir = (await cli(`git rev-parse --absolute-git-dir`)).stdout;
 
       let is_rebase = false;
-      is_rebase ||= fs.existsSync(path.join(git_dir, "rebase-apply"));
-      is_rebase ||= fs.existsSync(path.join(git_dir, "rebase-merge"));
+      is_rebase ||= await safe_exists(path.join(git_dir, "rebase-apply"));
+      is_rebase ||= await safe_exists(path.join(git_dir, "rebase-merge"));
 
       const status = is_rebase ? "prompt" : "done";
       patch({ status });

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 
 import * as Ink from "ink-cjs";
@@ -90,7 +90,8 @@ export function AutoUpdate(props: Props) {
         throw new Error("Unable to retrieve latest version from npm");
       }
 
-      const script_dir = path.dirname(fs.realpathSync(process.argv[1]));
+      const script_path = await fs.realpath(process.argv[1]);
+      const script_dir = path.dirname(script_path);
 
       // dist/ts/index.js
       const package_json_path = path.join(
@@ -100,7 +101,8 @@ export function AutoUpdate(props: Props) {
         "package.json"
       );
 
-      const package_json = read_json<{ version: string }>(package_json_path);
+      type PackageJson = { version: string };
+      const package_json = await read_json<PackageJson>(package_json_path);
 
       if (!package_json) {
         // unable to find read package.json, skip auto update

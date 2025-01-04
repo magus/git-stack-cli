@@ -1,8 +1,8 @@
-import fs from "node:fs";
+import fs from "node:fs/promises";
 
-export function read_json<T = unknown>(path: string): null | T {
+export async function read_json<T = unknown>(path: string): Promise<null | T> {
   try {
-    const file_buffer = fs.readFileSync(path);
+    const file_buffer = await fs.readFile(path);
     const json_str = String(file_buffer);
     const json = JSON.parse(json_str);
     return json;

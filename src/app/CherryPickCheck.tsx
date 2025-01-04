@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import fs from "node:fs";
 import path from "node:path";
 
 import * as Ink from "ink-cjs";
@@ -11,6 +10,7 @@ import { Store } from "~/app/Store";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
+import { safe_exists } from "~/core/safe_exists";
 
 type Props = {
   children: React.ReactNode;
@@ -73,11 +73,11 @@ export function CherryPickCheck(props: Props) {
     try {
       const git_dir = (await cli(`git rev-parse --absolute-git-dir`)).stdout;
 
-      const is_cherry_pick = fs.existsSync(
-        path.join(git_dir, "CHERRY_PICK_HEAD")
-      );
+      const cherry_pick_file = path.join(git_dir, "CHERRY_PICK_HEAD");
+      const is_cherry_pick = await safe_exists(cherry_pick_file);
 
       const status = is_cherry_pick ? "prompt" : "done";
+
       patch({ status });
     } catch (err) {
       actions.error("Must be run from within a git repository.");

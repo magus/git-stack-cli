@@ -12,6 +12,7 @@ import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 import { safe_quote } from "~/core/safe_quote";
+import { safe_rm } from "~/core/safe_rm";
 
 export async function pr_list(): Promise<Array<PullRequest>> {
   const state = Store.getState();
@@ -246,12 +247,7 @@ async function write_body_file(body: string) {
   const temp_dir = os.tmpdir();
   const temp_path = path.join(temp_dir, "git-stack-body");
 
-  try {
-    await fs.access(temp_path);
-    await fs.rm(temp_path);
-  } catch {
-    // if access fails there is no file to remove this is safe
-  }
+  await safe_rm(temp_path);
 
   await fs.writeFile(temp_path, body);
 
