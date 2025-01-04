@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import fs from "node:fs";
+import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -148,7 +148,8 @@ export async function pr_edit(args: EditPullRequestArgs) {
   const command_parts = [`gh pr edit ${args.branch} --base ${args.base}`];
 
   if (args.body) {
-    command_parts.push(`--body-file="${body_file(args.body)}"`);
+    const body_file = await write_body_file(args.body);
+    command_parts.push(`--body-file="${body_file}"`);
   }
 
   const command = command_parts.join(" ");
@@ -224,7 +225,7 @@ async function gh_json<T>(command: string): Promise<T | Error> {
   }
 
   // read from file
-  const json_str = fs.readFileSync(tmp_pr_json, "utf-8");
+  const json_str = await fs.readFile(tmp_pr_json, "utf-8");
   const json = JSON.parse(json_str);
   return json;
 }
@@ -241,13 +242,19 @@ function handle_error(output: string): never {
 }
 
 // convert a string to a file for use via github cli `--body-file`
-function body_file(body: string) {
+async function write_body_file(body: string) {
   const temp_dir = os.tmpdir();
   const temp_path = path.join(temp_dir, "git-stack-body");
-  if (fs.existsSync(temp_path)) {
-    fs.rmSync(temp_path);
+
+  try {
+    await fs.access(temp_path);
+    await fs.rm(temp_path);
+  } catch {
+    // if access fails there is no file to remove this is safe
   }
-  fs.writeFileSync(temp_path, body);
+
+  await fs.writeFile(temp_path, body);
+
   return temp_path;
 }
 
