@@ -108,6 +108,10 @@ async function run() {
 
     await rebase_git_revise();
 
+    if (argv.sync) {
+      await sync_github();
+    }
+
     // after all commits have been cherry-picked and amended
     // move the branch pointer to the newly created temporary branch
     // now we are in locally in sync with github and on the original branch
@@ -147,67 +151,11 @@ async function run() {
       rebase_merge_base,
       commit_range,
     });
-
-    // early return since we do not need to sync
-    if (!argv.sync) {
-      return;
-    }
-
-    // in order to sync we walk from rebase_group_index to HEAD
-    // checking out each group and syncing to github
-
-    // start from HEAD and work backward to rebase_group_index
-    const push_group_list = [];
-    let lookback_index = 0;
-    for (let i = 0; i < commit_range.group_list.length; i++) {
-      const index = commit_range.group_list.length - 1 - i;
-
-      // do not go past rebase_group_index
-      if (index < rebase_group_index) {
-        break;
-      }
-
-      const group = commit_range.group_list[index];
-      // console.debug({ i, index, group });
-
-      if (i > 0) {
-        const prev_group = commit_range.group_list[index + 1];
-        lookback_index += prev_group.commits.length;
-      }
-
-      // console.debug(`git show head~${lookback_index}`);
-
-      // push group and lookback_index onto front of push_group_list
-      push_group_list.unshift({ group, lookback_index });
-    }
-
-    const pr_url_list = commit_range.group_list.map(get_group_url);
-
-    // use push_group_list to sync each group HEAD to github
-    for (const push_group of push_group_list) {
-      const { group } = push_group;
-
-      // move to temporary branch for resetting to lookback_index to create PR
-      await cli(`git checkout -b ${group.id}`);
-
-      // prepare branch for sync, reset to commit at lookback index
-      await cli(`git reset --hard HEAD~${push_group.lookback_index}`);
-
-      await sync_group_github({ group, pr_url_list, skip_checkout: true });
-
-      // done, remove temp push branch and move back to temp branch
-      await cli(`git checkout ${temp_branch_name}`);
-      await cli(`git branch -D ${group.id}`);
-    }
-
-    // finally, ensure all prs have the updated stack table from updated pr_url_list
-    await update_pr_tables(pr_url_list);
   }
 
   async function sync_group_github(args: {
     group: CommitMetadataGroup;
     pr_url_list: Array<string>;
-    skip_checkout: boolean;
   }) {
     if (!argv.sync) {
       return;
@@ -285,14 +233,6 @@ async function run() {
         });
       }
     } else {
-      if (!args.skip_checkout) {
-        // delete local group branch if leftover
-        await cli(`git branch -D ${group.id}`, { ignoreExitCode: true });
-
-        // move to temporary branch for creating pr
-        await cli(`git checkout -b ${group.id}`);
-      }
-
       // create pr in github
       const pr_url = await github.pr_create({
         branch: group.id,
@@ -313,19 +253,58 @@ async function run() {
           pr_url_list[i] = pr_url;
         }
       }
-
-      // move back to temp branch
-      if (!args.skip_checkout) {
-        await cli(`git checkout ${temp_branch_name}`);
-      }
     }
   }
 
-  async function update_pr_tables(pr_url_list: Array<string>) {
-    if (!argv.sync) {
-      return;
+  async function sync_github() {
+    // in order to sync we walk from rebase_group_index to HEAD
+    // checking out each group and syncing to github
+
+    // start from HEAD and work backward to rebase_group_index
+    const push_group_list = [];
+    let lookback_index = 0;
+    for (let i = 0; i < commit_range.group_list.length; i++) {
+      const index = commit_range.group_list.length - 1 - i;
+
+      // do not go past rebase_group_index
+      if (index < rebase_group_index) {
+        break;
+      }
+
+      const group = commit_range.group_list[index];
+      // console.debug({ i, index, group });
+
+      if (i > 0) {
+        const prev_group = commit_range.group_list[index + 1];
+        lookback_index += prev_group.commits.length;
+      }
+
+      // console.debug(`git show head~${lookback_index}`);
+
+      // push group and lookback_index onto front of push_group_list
+      push_group_list.unshift({ group, lookback_index });
     }
 
+    const pr_url_list = commit_range.group_list.map(get_group_url);
+
+    // use push_group_list to sync each group HEAD to github
+    for (const push_group of push_group_list) {
+      const { group } = push_group;
+
+      // move to temporary branch for resetting to lookback_index to create PR
+      await cli(`git checkout -b ${group.id}`);
+
+      // prepare branch for sync, reset to commit at lookback index
+      await cli(`git reset --hard HEAD~${push_group.lookback_index}`);
+
+      await sync_group_github({ group, pr_url_list });
+
+      // done, remove temp push branch and move back to temp branch
+      await cli(`git checkout ${temp_branch_name}`);
+      await cli(`git branch -D ${group.id}`);
+    }
+
+    // finally, ensure all prs have the updated stack table from updated pr_url_list
     for (let i = 0; i < commit_range.group_list.length; i++) {
       const group = commit_range.group_list[i];
 
