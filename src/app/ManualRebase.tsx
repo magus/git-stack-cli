@@ -6,27 +6,44 @@ import * as Ink from "ink-cjs";
 
 import { Await } from "~/app/Await";
 import { Brackets } from "~/app/Brackets";
-import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
 import { GitReviseTodo } from "~/core/GitReviseTodo";
-import * as StackSummaryTable from "~/core/StackSummaryTable";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
-import * as github from "~/core/github";
 import { invariant } from "~/core/invariant";
 import { short_id } from "~/core/short_id";
 
 export function ManualRebase() {
+  const abort_handler = React.useRef(() => {});
+
+  React.useEffect(function listen_sigint() {
+    process.once("SIGINT", sigint_handler);
+
+    return function cleanup() {
+      process.removeListener("SIGINT", sigint_handler);
+    };
+
+    async function sigint_handler() {
+      abort_handler.current();
+    }
+  }, []);
+
   return (
     <Await
       fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>}
-      function={run}
+      function={async function () {
+        await run({ abort_handler });
+      }}
     />
   );
 }
 
-async function run() {
+type Args = {
+  abort_handler: React.MutableRefObject<() => void>;
+};
+
+async function run(args: Args) {
   const state = Store.getState();
   const actions = state.actions;
   const argv = state.argv;
@@ -41,76 +58,69 @@ async function run() {
   invariant(repo_root, "repo_root must exist");
 
   // always listen for SIGINT event and restore git state
-  process.once("SIGINT", handle_exit);
-
-  // get latest merge_base relative to local master
-  const merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;
-
-  // immediately paint all commit to preserve selected commit ranges
-  let commit_range = await CommitMetadata.range(commit_map);
-
-  // reverse group list to ensure we create git revise in correct order
-  commit_range.group_list.reverse();
-
-  for (const commit of commit_range.commit_list) {
-    const group_from_map = commit_map[commit.sha];
-    commit.branch_id = group_from_map.id;
-    commit.title = group_from_map.title;
-  }
-
-  await GitReviseTodo.execute({
-    rebase_group_index: 0,
-    rebase_merge_base: merge_base,
-    commit_range,
-  });
-
-  let DEFAULT_PR_BODY = "";
-  if (state.pr_template_body) {
-    DEFAULT_PR_BODY = state.pr_template_body;
-  }
+  args.abort_handler.current = function sigint_handler() {
+    actions.output(<Ink.Text color={colors.red}>🚨 Abort</Ink.Text>);
+    handle_exit(15);
+  };
 
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
-  commit_range = await CommitMetadata.range(commit_map);
-
-  // reverse commit list so that we can cherry-pick in order
-  commit_range.group_list.reverse();
-
-  let rebase_merge_base = merge_base;
-  let rebase_group_index = 0;
-
-  for (let i = 0; i < commit_range.group_list.length; i++) {
-    const group = commit_range.group_list[i];
-
-    if (!group.dirty) {
-      continue;
-    }
-
-    if (i > 0) {
-      const prev_group = commit_range.group_list[i - 1];
-      const prev_commit = prev_group.commits[prev_group.commits.length - 1];
-      rebase_merge_base = prev_commit.sha;
-      rebase_group_index = i;
-    }
-
-    break;
-  }
-
-  actions.debug(`rebase_merge_base = ${rebase_merge_base}`);
-  actions.debug(`rebase_group_index = ${rebase_group_index}`);
-
-  // actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
-
   try {
+    // get latest merge_base relative to local master
+    const merge_base = (await cli(`git merge-base HEAD ${master_branch}`))
+      .stdout;
+
+    // immediately paint all commit to preserve selected commit ranges
+    let commit_range = await CommitMetadata.range(commit_map);
+
+    // reverse group list to ensure we create git revise in correct order
+    commit_range.group_list.reverse();
+
+    for (const commit of commit_range.commit_list) {
+      const group_from_map = commit_map[commit.sha];
+      commit.branch_id = group_from_map.id;
+      commit.title = group_from_map.title;
+    }
+
+    await GitReviseTodo.execute({
+      rebase_group_index: 0,
+      rebase_merge_base: merge_base,
+      commit_range,
+    });
+
+    commit_range = await CommitMetadata.range(commit_map);
+
+    // reverse commit list so that we can cherry-pick in order
+    commit_range.group_list.reverse();
+
+    let rebase_merge_base = merge_base;
+    let rebase_group_index = 0;
+
+    for (let i = 0; i < commit_range.group_list.length; i++) {
+      const group = commit_range.group_list[i];
+
+      if (!group.dirty) {
+        continue;
+      }
+
+      if (i > 0) {
+        const prev_group = commit_range.group_list[i - 1];
+        const prev_commit = prev_group.commits[prev_group.commits.length - 1];
+        rebase_merge_base = prev_commit.sha;
+        rebase_group_index = i;
+      }
+
+      break;
+    }
+
+    actions.debug(`rebase_merge_base = ${rebase_merge_base}`);
+    actions.debug(`rebase_group_index = ${rebase_group_index}`);
+
+    // actions.debug(`commit_range=${JSON.stringify(commit_range, null, 2)}`);
+
     // must perform rebase from repo root for applying git patch
     process.chdir(repo_root);
     await cli(`pwd`);
-
-    actions.output(
-      <Ink.Text color={colors.yellow} wrap="truncate-end">
-        Rebasing…
-      </Ink.Text>
-    );
 
     // create temporary branch
     await cli(`git checkout -b ${temp_branch_name}`);
@@ -125,15 +135,18 @@ async function run() {
     // of original branch to the newly created temporary branch
     await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
 
-    if (argv.sync) {
-      await sync_github();
-    }
-
     restore_git();
 
-    actions.set((state) => {
-      state.step = "post-rebase-status";
-    });
+    if (argv.sync) {
+      actions.set((state) => {
+        state.step = "sync-github";
+        state.sync_github = { commit_range, rebase_group_index };
+      });
+    } else {
+      actions.set((state) => {
+        state.step = "post-rebase-status";
+      });
+    }
   } catch (err) {
     if (err instanceof Error) {
       actions.error(err.message);
@@ -144,220 +157,7 @@ async function run() {
       actions.error("Try again with `--verbose` to see more information.");
     }
 
-    handle_exit();
-  }
-
-  async function sync_github() {
-    // in order to sync we walk from rebase_group_index to HEAD
-    // checking out each group and syncing to github
-
-    // start from HEAD and work backward to rebase_group_index
-    const push_group_list = [];
-    let lookback_index = 0;
-    for (let i = 0; i < commit_range.group_list.length; i++) {
-      const index = commit_range.group_list.length - 1 - i;
-
-      // do not go past rebase_group_index
-      if (index < rebase_group_index) {
-        break;
-      }
-
-      const group = commit_range.group_list[index];
-      // console.debug({ i, index, group });
-
-      if (i > 0) {
-        const prev_group = commit_range.group_list[index + 1];
-        lookback_index += prev_group.commits.length;
-      }
-
-      // console.debug(`git show head~${lookback_index}`);
-
-      // push group and lookback_index onto front of push_group_list
-      push_group_list.unshift({ group, lookback_index });
-    }
-
-    actions.output(
-      <FormatText
-        wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
-        message="Syncing {group_list}…"
-        values={{
-          group_list: (
-            <React.Fragment>
-              {push_group_list.map((push_group) => {
-                const group = push_group.group;
-
-                return (
-                  <Brackets key={group.id}>
-                    {group.pr?.title || group.title || group.id}
-                  </Brackets>
-                );
-              })}
-            </React.Fragment>
-          ),
-        }}
-      />
-    );
-
-    // for all push targets in push_group_list
-    // things that can be done in parallel are grouped by numbers
-    //
-    // -----------------------------------
-    // 1 (before_push) temp mark draft
-    // --------------------------------------
-    // 2 push simultaneously to github
-    // --------------------------------------
-    // 2 create PR / edit PR
-    // 2 (after_push) undo temp mark draft
-    // --------------------------------------
-
-    const before_push_tasks = [];
-    for (const push_group of push_group_list) {
-      before_push_tasks.push(before_push(push_group));
-    }
-
-    await Promise.all(before_push_tasks);
-
-    const push_target_list = push_group_list.map((push_group) => {
-      return `HEAD~${push_group.lookback_index}:${push_group.group.id}`;
-    });
-
-    const push_target_args = push_target_list.join(" ");
-
-    const git_push_command = [`git push -f origin ${push_target_args}`];
-
-    if (argv.verify === false) {
-      git_push_command.push("--no-verify");
-    }
-
-    await cli(git_push_command);
-
-    const pr_url_list = commit_range.group_list.map(get_group_url);
-
-    const after_push_tasks = [];
-    for (const push_group of push_group_list) {
-      const group = push_group.group;
-      after_push_tasks.push(after_push({ group, pr_url_list }));
-    }
-
-    await Promise.all(after_push_tasks);
-
-    // finally, ensure all prs have the updated stack table from updated pr_url_list
-    for (let i = 0; i < commit_range.group_list.length; i++) {
-      const group = commit_range.group_list[i];
-
-      // use the updated pr_url_list to get the actual selected_url
-      const selected_url = pr_url_list[i];
-
-      invariant(group.base, "group.base must exist");
-
-      const body = group.pr?.body || DEFAULT_PR_BODY;
-
-      const update_body = StackSummaryTable.write({
-        body,
-        pr_url_list,
-        selected_url,
-      });
-
-      if (update_body === body) {
-        actions.debug(`Skipping body update for ${selected_url}`);
-      } else {
-        actions.debug(`Update body for ${selected_url}`);
-
-        await github.pr_edit({
-          branch: group.id,
-          base: group.base,
-          body: update_body,
-        });
-      }
-    }
-  }
-
-  async function before_push(args: { group: CommitMetadataGroup }) {
-    const { group } = args;
-
-    invariant(group.base, "group.base must exist");
-
-    // we may temporarily mark PR as a draft before editing it
-    // if it is not already a draft PR, to avoid notification spam
-    let is_temp_draft = !group.pr?.isDraft;
-
-    // before pushing reset base to master temporarily
-    // avoid accidentally pointing to orphaned parent commit
-    // should hopefully fix issues where a PR includes a bunch of commits after pushing
-    if (group.pr) {
-      if (!group.pr.isDraft) {
-        is_temp_draft = true;
-      }
-
-      if (is_temp_draft) {
-        await github.pr_draft({
-          branch: group.id,
-          draft: true,
-        });
-      }
-
-      await github.pr_edit({
-        branch: group.id,
-        base: master_branch,
-      });
-    }
-  }
-
-  async function after_push(args: {
-    group: CommitMetadataGroup;
-    pr_url_list: Array<string>;
-  }) {
-    const { group, pr_url_list } = args;
-
-    invariant(group.base, "group.base must exist");
-
-    const selected_url = get_group_url(group);
-
-    if (group.pr) {
-      // ensure base matches pr in github
-      await github.pr_edit({
-        branch: group.id,
-        base: group.base,
-        body: StackSummaryTable.write({
-          body: group.pr.body,
-          pr_url_list,
-          selected_url,
-        }),
-      });
-
-      // we may temporarily mark PR as a draft before editing it
-      // if it is not already a draft PR, to avoid notification spam
-      let is_temp_draft = !group.pr?.isDraft;
-
-      if (is_temp_draft) {
-        // mark pr as ready for review again
-        await github.pr_draft({
-          branch: group.id,
-          draft: false,
-        });
-      }
-    } else {
-      // create pr in github
-      const pr_url = await github.pr_create({
-        branch: group.id,
-        base: group.base,
-        title: group.title,
-        body: DEFAULT_PR_BODY,
-        draft: argv.draft,
-      });
-
-      if (!pr_url) {
-        throw new Error("unable to create pr");
-      }
-
-      // update pr_url_list with created pr_url
-      for (let i = 0; i < pr_url_list.length; i++) {
-        const url = pr_url_list[i];
-        if (url === selected_url) {
-          pr_url_list[i] = pr_url;
-        }
-      }
-    }
+    handle_exit(16);
   }
 
   // cleanup git operations if cancelled during manual rebase
@@ -385,7 +185,7 @@ async function run() {
     cli.sync(`pwd`, spawn_options);
   }
 
-  function handle_exit() {
+  function handle_exit(code: number) {
     actions.output(
       <Ink.Text color={colors.yellow}>
         Restoring <Brackets>{branch_name}</Brackets>…
@@ -400,9 +200,6 @@ async function run() {
       </Ink.Text>
     );
 
-    actions.exit(5);
+    actions.exit(code);
   }
 }
-
-type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
-const get_group_url = (group: CommitMetadataGroup) => group.pr?.url || group.id;

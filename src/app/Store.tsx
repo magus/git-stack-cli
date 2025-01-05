@@ -24,6 +24,11 @@ type MutateOutputArgs = {
   withoutTimestamp?: boolean;
 };
 
+type SyncGithubState = {
+  commit_range: CommitMetadata.CommitRange;
+  rebase_group_index: number;
+};
+
 export type State = {
   // set immediately in `index.tsx` so no `null` scenario
   process_argv: Array<string>;
@@ -41,6 +46,7 @@ export type State = {
   commit_map: null | CommitMap;
   pr_templates: Array<string>;
   pr_template_body: null | string;
+  sync_github: null | SyncGithubState;
 
   step:
     | "github-api-error"
@@ -52,6 +58,7 @@ export type State = {
     | "select-commit-ranges"
     | "pre-manual-rebase"
     | "manual-rebase"
+    | "sync-github"
     | "post-rebase-status";
 
   output: Array<React.ReactNode>;
@@ -105,6 +112,7 @@ const BaseStore = createStore<State>()(
     commit_map: null,
     pr_templates: [],
     pr_template_body: null,
+    sync_github: null,
 
     step: "loading",
 

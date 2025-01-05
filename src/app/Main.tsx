@@ -10,6 +10,7 @@ import { PreSelectCommitRanges } from "~/app/PreSelectCommitRanges";
 import { SelectCommitRanges } from "~/app/SelectCommitRanges";
 import { Status } from "~/app/Status";
 import { Store } from "~/app/Store";
+import { SyncGithub } from "~/app/SyncGithub";
 import { assertNever } from "~/core/assertNever";
 
 export function Main() {
@@ -42,6 +43,9 @@ export function Main() {
 
     case "manual-rebase":
       return <ManualRebase />;
+
+    case "sync-github":
+      return <SyncGithub />;
 
     case "post-rebase-status":
       return <PostRebaseStatus />;
