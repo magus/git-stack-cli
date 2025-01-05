@@ -10,7 +10,10 @@ import { command } from "~/command";
 
 command()
   .then((argv) => {
-    const ink = Ink.render(<App />);
+    const ink = Ink.render(<App />, {
+      // If true, each update will be rendered as a separate output, without replacing the previous one.
+      // debug: true,
+    });
 
     Store.setState((state) => {
       state.ink = ink;
