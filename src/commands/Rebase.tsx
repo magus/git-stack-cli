@@ -16,15 +16,35 @@ import { invariant } from "~/core/invariant";
 import { short_id } from "~/core/short_id";
 
 export function Rebase() {
+  const abort_handler = React.useRef(() => {});
+
+  React.useEffect(function listen_sigint() {
+    process.once("SIGINT", sigint_handler);
+
+    return function cleanup() {
+      process.removeListener("SIGINT", sigint_handler);
+    };
+
+    function sigint_handler() {
+      abort_handler.current();
+    }
+  }, []);
+
   return (
     <Await
-      function={Rebase.run}
       fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>}
+      function={async function () {
+        await Rebase.run({ abort_handler });
+      }}
     />
   );
 }
 
-Rebase.run = async function run() {
+type Args = {
+  abort_handler: React.MutableRefObject<() => void>;
+};
+
+Rebase.run = async function run(args: Args) {
   const state = Store.getState();
   const actions = state.actions;
   const branch_name = state.branch_name;
@@ -38,7 +58,10 @@ Rebase.run = async function run() {
   invariant(repo_root, "repo_root must exist");
 
   // always listen for SIGINT event and restore git state
-  process.once("SIGINT", handle_exit);
+  args.abort_handler.current = async function sigint_handler() {
+    actions.output(<Ink.Text color={colors.red}>🚨 Abort</Ink.Text>);
+    handle_exit(19);
+  };
 
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
@@ -143,7 +166,7 @@ Rebase.run = async function run() {
       }
     }
 
-    handle_exit();
+    handle_exit(20);
   }
 
   // cleanup git operations if cancelled during manual rebase
@@ -171,7 +194,7 @@ Rebase.run = async function run() {
     cli.sync(`pwd`, spawn_options);
   }
 
-  function handle_exit() {
+  function handle_exit(code: number) {
     actions.output(
       <Ink.Text color={colors.yellow}>
         Restoring <Brackets>{branch_name}</Brackets>…
@@ -186,6 +209,6 @@ Rebase.run = async function run() {
       </Ink.Text>
     );
 
-    actions.exit(6);
+    actions.exit(code);
   }
 };
