@@ -93,8 +93,6 @@ async function run(args: Args) {
 
     await Promise.all(before_push_tasks);
 
-    // git push -f origin HEAD~6:OtVX7Qvrw HEAD~3:E63ytp5dj HEAD~2:gs-NBabNSjXA HEAD~1:gs-UGVJdKNoD HEAD~0:gs-6LAx-On4
-
     const git_push_command = [`git push -f origin`];
 
     if (argv.verify === false) {
@@ -104,7 +102,25 @@ async function run(args: Args) {
     for (const group of push_group_list) {
       const last_commit = last(group.commits);
       invariant(last_commit, "last_commit must exist");
-      const target = `${last_commit.sha}:${group.id}`;
+
+      // explicit refs/heads head branch to avoid push failing
+      //
+      //   ❯ git push -f origin --no-verify f6e249051b4820a03deb957ddebc19acfd7dfd7c:gs-ED2etrzv2
+      //   error: The destination you provided is not a full refname (i.e.,
+      //   starting with "refs/"). We tried to guess what you meant by:
+      //
+      //   - Looking for a ref that matches 'gs-ED2etrzv2' on the remote side.
+      //   - Checking if the <src> being pushed ('f6e249051b4820a03deb957ddebc19acfd7dfd7c')
+      //     is a ref in "refs/{heads,tags}/". If so we add a corresponding
+      //     refs/{heads,tags}/ prefix on the remote side.
+      //
+      //   Neither worked, so we gave up. You must fully qualify the ref.
+      //   hint: The <src> part of the refspec is a commit object.
+      //   hint: Did you mean to create a new branch by pushing to
+      //   hint: 'f6e249051b4820a03deb957ddebc19acfd7dfd7c:refs/heads/gs-ED2etrzv2'?
+      //   error: failed to push some refs to 'github.com:magus/git-multi-diff-playground.git'
+      //
+      const target = `${last_commit.sha}:refs/heads/${group.id}`;
       git_push_command.push(target);
     }
 

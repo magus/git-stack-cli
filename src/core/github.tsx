@@ -123,7 +123,14 @@ type CreatePullRequestArgs = {
 
 export async function pr_create(args: CreatePullRequestArgs) {
   const title = safe_quote(args.title);
-  let command = `gh pr create --fill --head ${args.branch} --base ${args.base} --title="${title}" --body="${args.body}"`;
+
+  // explicit refs/heads head branch to avoid creation failing
+  //
+  //   ❯ gh pr create --head origin/gs-ED2etrzv2 --base gs-6LAx-On45 --title="2024-01-05 test" --body=""
+  //   pull request create failed: GraphQL: Head sha can't be blank, Base sha can't be blank, No commits between gs-6LAx-On45 and origin/gs-ED2etrzv2, Head ref must be a branch (createPullRequest)
+  //
+  // https://github.com/cli/cli/issues/5465
+  let command = `gh pr create --head refs/heads/${args.branch} --base ${args.base} --title="${title}" --body="${args.body}"`;
 
   if (args.draft) {
     command += " --draft";
