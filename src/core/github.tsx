@@ -130,13 +130,19 @@ export async function pr_create(args: CreatePullRequestArgs) {
   //   pull request create failed: GraphQL: Head sha can't be blank, Base sha can't be blank, No commits between gs-6LAx-On45 and origin/gs-ED2etrzv2, Head ref must be a branch (createPullRequest)
   //
   // https://github.com/cli/cli/issues/5465
-  let command = `gh pr create --head refs/heads/${args.branch} --base ${args.base} --title="${title}" --body="${args.body}"`;
+  let command_parts = [
+    "gh pr create",
+    `--head refs/heads/${args.branch}`,
+    `--base ${args.base}`,
+    `--title="${title}"`,
+    `--body="${args.body}"`,
+  ];
 
   if (args.draft) {
-    command += " --draft";
+    command_parts.push("--draft");
   }
 
-  const cli_result = await cli(command);
+  const cli_result = await cli(command_parts);
 
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
@@ -160,9 +166,7 @@ export async function pr_edit(args: EditPullRequestArgs) {
     command_parts.push(`--body-file="${body_file}"`);
   }
 
-  const command = command_parts.join(" ");
-
-  const cli_result = await cli(command);
+  const cli_result = await cli(command_parts);
 
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
