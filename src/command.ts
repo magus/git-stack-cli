@@ -111,18 +111,18 @@ const DefaultOptions = {
     description: "Open all PRs as drafts",
   },
 
-  "write-state-json": {
-    hidden: true,
-    type: "boolean",
-    default: false,
-    description: "Write state to local json file for debugging",
-  },
-
   "template": {
     type: "boolean",
     default: true,
     description:
       "Use automatic Github PR template, e.g. .github/pull_request_template.md, disable with --no-template",
+  },
+
+  "write-state-json": {
+    hidden: true,
+    type: "boolean",
+    default: false,
+    description: "Write state to local json file for debugging",
   },
 
   "mock-metadata": {
