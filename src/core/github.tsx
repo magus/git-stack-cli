@@ -258,7 +258,14 @@ async function write_body_file(args: EditPullRequestArgs) {
   invariant(args.body, "args.body must exist");
 
   const temp_dir = os.tmpdir();
-  const temp_path = path.join(temp_dir, `git-stack-body-${args.base}`);
+
+  // ensure unique filename is safe for filesystem
+  // base (group id) might contain slashes, e.g. dev/magus/gs-3cmrMBSUj
+  // the flashes would mess up the filesystem path to this file
+  let temp_filename = `git-stack-body-${args.base}`;
+  temp_filename = temp_filename.replace(RE.non_alphanumeric_dash, "-");
+
+  const temp_path = path.join(temp_dir, temp_filename);
 
   await safe_rm(temp_path);
 
@@ -294,4 +301,8 @@ export type PullRequest = {
   body: string;
   url: string;
   isDraft: boolean;
+};
+
+const RE = {
+  non_alphanumeric_dash: /[^a-zA-Z0-9_-]+/g,
 };
