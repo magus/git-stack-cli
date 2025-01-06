@@ -5,5 +5,6 @@ declare namespace NodeJS {
     CLI_VERSION?: string;
     GIT_STACK_STANDALONE?: "true" | "false";
     GIT_SEQUENCE_EDITOR_SCRIPT?: string;
+    GIT_STACK_BRANCH_PREFIX?: string;
   }
 }

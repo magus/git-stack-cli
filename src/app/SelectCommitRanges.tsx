@@ -387,8 +387,21 @@ function SelectCommitRangesInternal(props: Props) {
     </Ink.Box>
   );
 
+  function get_group_id() {
+    let branch_prefix = "";
+
+    // branch prefix via cli flag or env var
+    // cli flag takes precedence since it is more explicit
+    if (argv["branch-prefix"]) {
+      branch_prefix = argv["branch-prefix"];
+    } else if (process.env.GIT_STACK_BRANCH_PREFIX) {
+      branch_prefix = process.env.GIT_STACK_BRANCH_PREFIX;
+    }
+
+    return `${branch_prefix}${gs_short_id()}`;
+  }
   function submit_group_input(title: string) {
-    const id = gs_short_id();
+    const id = get_group_id();
 
     actions.output(
       <FormatText

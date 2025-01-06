@@ -83,6 +83,19 @@ To update your local branch with the latest changes in the remote branch (e.g. `
 git stack rebase
 ```
 
+### Customizing branch name
+
+By default `git stack` generates a unique branch name such as `gs-3cmrMBSUj`.
+
+You can specify a prefix for the generated branch name by using either the environment variable or the command line option.
+In the example below branches would be generated such as `dev/magus/gs-3cmrMBSUj`.
+
+```bash
+GIT_STACK_BRANCH_PREFIX="dev/magus/" git stack
+
+git stack --branch-prefix="dev/magus/"
+```
+
 ## Why?
 
 The goal of `git stack` is to combine the **simplicity of developing in a single branch** in order to **preserve your commit history** while also **grouping commits into pull requests for code review**.

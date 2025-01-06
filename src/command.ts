@@ -111,6 +111,12 @@ const DefaultOptions = {
     description: "Open all PRs as drafts",
   },
 
+  "branch-prefix": {
+    type: "string",
+    default: "",
+    description: "Prefix for generated branch names, e.g. dev/magus/",
+  },
+
   "template": {
     type: "boolean",
     default: true,
