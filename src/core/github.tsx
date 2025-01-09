@@ -161,8 +161,10 @@ type EditPullRequestArgs = {
 export async function pr_edit(args: EditPullRequestArgs) {
   const command_parts = [`gh pr edit ${args.branch} --base ${args.base}`];
 
+  let body_file: string | undefined;
+
   if (args.body) {
-    const body_file = await write_body_file(args);
+    body_file = await write_body_file(args);
     command_parts.push(`--body-file="${body_file}"`);
   }
 
@@ -170,6 +172,11 @@ export async function pr_edit(args: EditPullRequestArgs) {
 
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
+  }
+
+  // cleanup body_file
+  if (body_file) {
+    await safe_rm(body_file);
   }
 }
 
