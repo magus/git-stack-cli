@@ -5,6 +5,7 @@ import path from "node:path";
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
 import { invariant } from "~/core/invariant";
+import { safe_rm } from "~/core/safe_rm";
 
 import type * as CommitMetadata from "~/core/CommitMetadata";
 
@@ -140,6 +141,9 @@ GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
   // change to pipe to see output temporarily
   // https://github.com/magus/git-stack-cli/commit/f9f10e3ac3cd9a35ee75d3e0851a48391967a23f
   await cli(command, { stdio: ["ignore", "ignore", "ignore"] });
+
+  // cleanup tmp_git_sequence_editor_path
+  await safe_rm(tmp_git_sequence_editor_path);
 };
 
 type ExecuteArgs = {
