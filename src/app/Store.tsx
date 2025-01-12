@@ -30,6 +30,9 @@ type SyncGithubState = {
   rebase_group_index: number;
 };
 
+// async function that returns exit code
+type AbortHandler = () => Promise<number>;
+
 export type State = {
   // set immediately in `index.tsx` so no `null` scenario
   process_argv: Array<string>;
@@ -49,6 +52,7 @@ export type State = {
   pr_template_body: null | string;
   sync_github: null | SyncGithubState;
   is_dirty_check_stash: boolean;
+  abort_handler: null | AbortHandler;
 
   step:
     | "github-api-error"
@@ -81,6 +85,8 @@ export type State = {
     isDebug(): boolean;
 
     reset_pr(): void;
+    register_abort_handler(abort_handler: AbortHandler): void;
+    unregister_abort_handler(): void;
 
     set(setter: Setter): void;
   };
@@ -116,6 +122,7 @@ const BaseStore = createStore<State>()(
     pr_template_body: null,
     sync_github: null,
     is_dirty_check_stash: false,
+    abort_handler: null,
 
     step: "loading",
 
@@ -189,6 +196,18 @@ const BaseStore = createStore<State>()(
       reset_pr() {
         set((state) => {
           state.pr = {};
+        });
+      },
+
+      register_abort_handler(abort_handler) {
+        set((state) => {
+          state.abort_handler = abort_handler;
+        });
+      },
+
+      unregister_abort_handler() {
+        set((state) => {
+          state.abort_handler = null;
         });
       },
 

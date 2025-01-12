@@ -26,6 +26,13 @@ export function Exit(props: Props) {
 
       actions.debug(`[Exit] handle_exit ${JSON.stringify(props)}`);
 
+      let exit_code = props.code;
+
+      // run abort_handler if it exists
+      if (state.abort_handler) {
+        exit_code = await state.abort_handler();
+      }
+
       // restore git stash if necessary
       if (state.is_dirty_check_stash) {
         await cli("git stash pop");
@@ -46,7 +53,7 @@ export function Exit(props: Props) {
 
       actions.unmount();
 
-      process.exitCode = props.code;
+      process.exitCode = exit_code;
       process.exit();
     }
   }, [props.clear, props.code]);
