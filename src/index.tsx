@@ -16,6 +16,10 @@ import { pretty_json } from "~/core/pretty_json";
     const ink = Ink.render(<App />, {
       // If true, each update will be rendered as a separate output, without replacing the previous one.
       // debug: true,
+      //
+      // Configure whether Ink should listen to Ctrl+C keyboard input and exit the app.
+      // We intentionally handle this ourselves in `<Exit />`
+      exitOnCtrlC: false,
     });
 
     Store.setState((state) => {

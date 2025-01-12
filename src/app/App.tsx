@@ -8,6 +8,7 @@ import { DetectInitialPR } from "~/app/DetectInitialPR";
 import { DirtyCheck } from "~/app/DirtyCheck";
 import { GatherMetadata } from "~/app/GatherMetadata";
 import { GithubApiError } from "~/app/GithubApiError";
+import { HandleCtrlCSigint } from "~/app/HandleCtrlCSigint";
 import { LocalCommitStatus } from "~/app/LocalCommitStatus";
 import { Main } from "~/app/Main";
 import { Output } from "~/app/Output";
@@ -65,6 +66,8 @@ export function App() {
           </DependencyCheck>
         </VerboseDebugInfo>
       </AutoUpdate>
+
+      <HandleCtrlCSigint />
     </Providers>
   );
 }
