@@ -9,8 +9,10 @@ import { Store } from "~/app/Store";
 import { command } from "~/command";
 import { pretty_json } from "~/core/pretty_json";
 
-command()
-  .then((argv) => {
+(async function main() {
+  try {
+    const argv = await command();
+
     const ink = Ink.render(<App />, {
       // If true, each update will be rendered as a separate output, without replacing the previous one.
       // debug: true,
@@ -24,6 +26,14 @@ command()
     });
 
     Store.getState().actions.debug(pretty_json(argv as any));
-  })
+
+    await ink.waitUntilExit();
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(err);
+    process.exit(235);
+  }
+})().catch((err) => {
   // eslint-disable-next-line no-console
-  .catch(console.error);
+  console.error(err);
+});
