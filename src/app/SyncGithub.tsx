@@ -14,35 +14,15 @@ import { invariant } from "~/core/invariant";
 import type * as CommitMetadata from "~/core/CommitMetadata";
 
 export function SyncGithub() {
-  const abort_handler = React.useRef(() => {});
-
-  React.useEffect(function listen_sigint() {
-    process.once("SIGINT", sigint_handler);
-
-    return function cleanup() {
-      process.removeListener("SIGINT", sigint_handler);
-    };
-
-    function sigint_handler() {
-      abort_handler.current();
-    }
-  }, []);
-
   return (
     <Await
       fallback={<Ink.Text color={colors.yellow}>Syncing…</Ink.Text>}
-      function={async function () {
-        await run({ abort_handler });
-      }}
+      function={run}
     />
   );
 }
 
-type Args = {
-  abort_handler: React.MutableRefObject<() => void>;
-};
-
-async function run(args: Args) {
+async function run() {
   const state = Store.getState();
   const actions = state.actions;
   const argv = state.argv;
@@ -60,11 +40,12 @@ async function run(args: Args) {
   const commit_range = sync_github.commit_range;
   const rebase_group_index = sync_github.rebase_group_index;
 
-  // always listen for SIGINT event and restore pr state
-  args.abort_handler.current = function sigint_handler() {
+  // immediately register abort_handler in case of ctrl+c exit
+  actions.register_abort_handler(async function abort_sync_github() {
     actions.output(<Ink.Text color={colors.red}>🚨 Abort</Ink.Text>);
-    handle_exit(17);
-  };
+    handle_exit();
+    return 17;
+  });
 
   let DEFAULT_PR_BODY = "";
   if (state.pr_template_body) {
@@ -151,6 +132,8 @@ async function run(args: Args) {
 
     await Promise.all(update_pr_body_tasks);
 
+    actions.unregister_abort_handler();
+
     actions.set((state) => {
       state.step = "post-rebase-status";
     });
@@ -164,7 +147,8 @@ async function run(args: Args) {
       actions.error("Try again with `--verbose` to see more information.");
     }
 
-    await handle_exit(18);
+    handle_exit();
+    actions.exit(18);
   }
 
   function get_push_group_list() {
@@ -305,7 +289,7 @@ async function run(args: Args) {
     }
   }
 
-  function handle_exit(code: number) {
+  function handle_exit() {
     actions.output(
       <Ink.Text color={colors.yellow}>Restoring PR state…</Ink.Text>
     );
@@ -329,8 +313,6 @@ async function run(args: Args) {
     actions.output(
       <Ink.Text color={colors.yellow}>Restored PR state.</Ink.Text>
     );
-
-    actions.exit(code);
   }
 }
 

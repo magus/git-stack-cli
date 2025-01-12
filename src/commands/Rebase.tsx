@@ -16,35 +16,15 @@ import { invariant } from "~/core/invariant";
 import { short_id } from "~/core/short_id";
 
 export function Rebase() {
-  const abort_handler = React.useRef(() => {});
-
-  React.useEffect(function listen_sigint() {
-    process.once("SIGINT", sigint_handler);
-
-    return function cleanup() {
-      process.removeListener("SIGINT", sigint_handler);
-    };
-
-    function sigint_handler() {
-      abort_handler.current();
-    }
-  }, []);
-
   return (
     <Await
       fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>}
-      function={async function () {
-        await Rebase.run({ abort_handler });
-      }}
+      function={Rebase.run}
     />
   );
 }
 
-type Args = {
-  abort_handler: React.MutableRefObject<() => void>;
-};
-
-Rebase.run = async function run(args: Args) {
+Rebase.run = async function run() {
   const state = Store.getState();
   const actions = state.actions;
   const branch_name = state.branch_name;
@@ -57,11 +37,12 @@ Rebase.run = async function run(args: Args) {
   invariant(commit_range, "commit_range must exist");
   invariant(repo_root, "repo_root must exist");
 
-  // always listen for SIGINT event and restore git state
-  args.abort_handler.current = async function sigint_handler() {
+  // immediately register abort_handler in case of ctrl+c exit
+  actions.register_abort_handler(async function abort_rebase() {
     actions.output(<Ink.Text color={colors.red}>🚨 Abort</Ink.Text>);
-    handle_exit(19);
-  };
+    handle_exit();
+    return 19;
+  });
 
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
@@ -153,6 +134,8 @@ Rebase.run = async function run(args: Args) {
       />
     );
 
+    actions.unregister_abort_handler();
+
     actions.set((state) => {
       state.commit_range = next_commit_range;
       state.step = "status";
@@ -166,7 +149,8 @@ Rebase.run = async function run(args: Args) {
       }
     }
 
-    handle_exit(20);
+    handle_exit();
+    actions.exit(20);
   }
 
   // cleanup git operations if cancelled during manual rebase
@@ -194,7 +178,7 @@ Rebase.run = async function run(args: Args) {
     cli.sync(`pwd`, spawn_options);
   }
 
-  function handle_exit(code: number) {
+  function handle_exit() {
     actions.output(
       <Ink.Text color={colors.yellow}>
         Restoring <Brackets>{branch_name}</Brackets>…
@@ -208,7 +192,5 @@ Rebase.run = async function run(args: Args) {
         Restored <Brackets>{branch_name}</Brackets>.
       </Ink.Text>
     );
-
-    actions.exit(code);
   }
 };

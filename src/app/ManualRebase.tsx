@@ -15,35 +15,15 @@ import { invariant } from "~/core/invariant";
 import { short_id } from "~/core/short_id";
 
 export function ManualRebase() {
-  const abort_handler = React.useRef(() => {});
-
-  React.useEffect(function listen_sigint() {
-    process.once("SIGINT", sigint_handler);
-
-    return function cleanup() {
-      process.removeListener("SIGINT", sigint_handler);
-    };
-
-    async function sigint_handler() {
-      abort_handler.current();
-    }
-  }, []);
-
   return (
     <Await
       fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>}
-      function={async function () {
-        await run({ abort_handler });
-      }}
+      function={run}
     />
   );
 }
 
-type Args = {
-  abort_handler: React.MutableRefObject<() => void>;
-};
-
-async function run(args: Args) {
+async function run() {
   const state = Store.getState();
   const actions = state.actions;
   const argv = state.argv;
@@ -57,11 +37,12 @@ async function run(args: Args) {
   invariant(commit_map, "commit_map must exist");
   invariant(repo_root, "repo_root must exist");
 
-  // always listen for SIGINT event and restore git state
-  args.abort_handler.current = function sigint_handler() {
+  // immediately register abort_handler in case of ctrl+c exit
+  actions.register_abort_handler(async function abort_manual_rebase() {
     actions.output(<Ink.Text color={colors.red}>🚨 Abort</Ink.Text>);
-    handle_exit(15);
-  };
+    handle_exit();
+    return 15;
+  });
 
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
@@ -137,6 +118,8 @@ async function run(args: Args) {
 
     restore_git();
 
+    actions.unregister_abort_handler();
+
     if (argv.sync) {
       actions.set((state) => {
         state.step = "sync-github";
@@ -157,7 +140,8 @@ async function run(args: Args) {
       actions.error("Try again with `--verbose` to see more information.");
     }
 
-    handle_exit(16);
+    handle_exit();
+    actions.exit(16);
   }
 
   // cleanup git operations if cancelled during manual rebase
@@ -185,7 +169,7 @@ async function run(args: Args) {
     cli.sync(`pwd`, spawn_options);
   }
 
-  function handle_exit(code: number) {
+  function handle_exit() {
     actions.output(
       <Ink.Text color={colors.yellow}>
         Restoring <Brackets>{branch_name}</Brackets>…
@@ -199,7 +183,5 @@ async function run(args: Args) {
         Restored <Brackets>{branch_name}</Brackets>.
       </Ink.Text>
     );
-
-    actions.exit(code);
   }
 }
