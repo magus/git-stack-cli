@@ -97,7 +97,7 @@ async function run() {
   if (diff_cmd.code) {
     save_stash = true;
 
-    await cli("git stash -q");
+    await cli("git stash --include-untracked");
 
     actions.output(<Ink.Text>📦 Changes saved to stash</Ink.Text>);
   }
@@ -118,7 +118,7 @@ async function run() {
     await cli("git reset --soft HEAD~1");
   } finally {
     if (save_stash) {
-      await cli("git stash pop -q");
+      await cli("git stash pop");
 
       actions.output(
         <Ink.Text color={colors.green}>✅ Changes restored from stash</Ink.Text>
