@@ -15,7 +15,7 @@ type Props = {
 };
 
 type State = {
-  status: "init" | "prompt" | "done";
+  status: "init" | "prompt" | "stash" | "done";
 };
 
 function reducer(state: State, patch: Partial<State>) {
@@ -35,34 +35,42 @@ export function DirtyCheck(props: Props) {
 
     case "prompt":
       return (
-        <YesNoPrompt
-          message={
-            <Ink.Box flexDirection="column">
+        <Ink.Box flexDirection="column">
+          <FormatText
+            wrapper={<Ink.Text color={colors.yellow} />}
+            message="⚠️ Uncommitted changes detected. {git_stack} needs a clean working tree."
+            values={{
+              git: <Command>git</Command>,
+              git_stack: <Command>git stack</Command>,
+            }}
+          />
+
+          <YesNoPrompt
+            message={
               <FormatText
                 wrapper={<Ink.Text color={colors.yellow} />}
-                message="{git} repo has uncommitted changes."
+                message="{git_stash} changes to proceed?"
                 values={{
-                  git: <Command>git</Command>,
-                  git_stack: <Command>git stack</Command>,
+                  git_stash: <Command>git stash</Command>,
                 }}
               />
-              <FormatText
-                wrapper={<Ink.Text color={colors.yellow} />}
-                message="Changes may be lost during {git_stack}, are you sure you want to proceed?"
-                values={{
-                  git: <Command>git</Command>,
-                  git_stack: <Command>git stack</Command>,
-                }}
-              />
-            </Ink.Box>
-          }
-          onYes={async () => {
-            patch({ status: "done" });
-          }}
-          onNo={async () => {
-            actions.exit(0);
-          }}
-        />
+            }
+            onYes={async () => {
+              await cli("git stash --include-untracked");
+
+              actions.output(<Ink.Text>📦 Changes saved to stash</Ink.Text>);
+
+              actions.set((state) => {
+                state.is_dirty_check_stash = true;
+              });
+
+              patch({ status: "done" });
+            }}
+            onNo={async () => {
+              actions.exit(0);
+            }}
+          />
+        </Ink.Box>
       );
 
     default:
@@ -84,8 +92,11 @@ export function DirtyCheck(props: Props) {
     try {
       const git_dirty = (await cli(`git status --porcelain`)).stdout;
 
-      const status = git_dirty ? "prompt" : "done";
-      patch({ status });
+      if (!git_dirty) {
+        patch({ status: "done" });
+      } else {
+        patch({ status: "prompt" });
+      }
     } catch (err) {
       actions.error("Must be run from within a git repository.");
 

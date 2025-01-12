@@ -48,6 +48,7 @@ export type State = {
   pr_templates: Array<string>;
   pr_template_body: null | string;
   sync_github: null | SyncGithubState;
+  is_dirty_check_stash: boolean;
 
   step:
     | "github-api-error"
@@ -114,6 +115,7 @@ const BaseStore = createStore<State>()(
     pr_templates: [],
     pr_template_body: null,
     sync_github: null,
+    is_dirty_check_stash: false,
 
     step: "loading",
 
