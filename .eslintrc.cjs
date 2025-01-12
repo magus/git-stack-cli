@@ -84,6 +84,7 @@ module.exports = {
         ],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-floating-promises": ["error"],
+        "@typescript-eslint/no-namespace": "off",
 
         ...import_eslint.rules,
       },

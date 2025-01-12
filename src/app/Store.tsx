@@ -7,6 +7,7 @@ import { immer } from "zustand/middleware/immer";
 import { Exit } from "~/app/Exit";
 import { LogTimestamp } from "~/app/LogTimestamp";
 import { colors } from "~/core/colors";
+import { pretty_json } from "~/core/pretty_json";
 
 import type { Instance as InkInstance } from "ink-cjs";
 import type { Argv } from "~/command";
@@ -71,7 +72,7 @@ export type State = {
     clear(): void;
     unmount(): void;
     newline(): void;
-    json(value: object): void;
+    json(value: pretty_json.JSONValue): void;
     error(message: string): void;
     output(node: React.ReactNode): void;
     debug(node: React.ReactNode, id?: string): void;
@@ -146,7 +147,7 @@ const BaseStore = createStore<State>()(
 
       json(value) {
         set((state) => {
-          const node = JSON.stringify(value, null, 2);
+          const node = pretty_json(value);
           state.mutate.output(state, { node });
         });
       },

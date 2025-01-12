@@ -8,6 +8,7 @@ import * as Ink from "ink-cjs";
 import { Store } from "~/app/Store";
 import { colors } from "~/core/colors";
 import * as json from "~/core/json";
+import { pretty_json } from "~/core/pretty_json";
 import { safe_rm } from "~/core/safe_rm";
 
 export function Debug() {
@@ -41,7 +42,7 @@ export function Debug() {
         await safe_rm(output_file);
 
         const serialized = json.serialize(state);
-        const content = JSON.stringify(serialized, null, 2);
+        const content = pretty_json(serialized);
         await fs.writeFile(output_file, content);
       }
     },

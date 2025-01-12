@@ -7,6 +7,7 @@ import * as Ink from "ink-cjs";
 import { App } from "~/app/App";
 import { Store } from "~/app/Store";
 import { command } from "~/command";
+import { pretty_json } from "~/core/pretty_json";
 
 command()
   .then((argv) => {
@@ -22,7 +23,7 @@ command()
       state.cwd = process.cwd();
     });
 
-    Store.getState().actions.debug(JSON.stringify(argv, null, 2));
+    Store.getState().actions.debug(pretty_json(argv as any));
   })
   // eslint-disable-next-line no-console
   .catch(console.error);
