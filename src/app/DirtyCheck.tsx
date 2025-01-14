@@ -33,6 +33,14 @@ export function DirtyCheck(props: Props) {
     case "done":
       return props.children;
 
+    case "stash":
+      return (
+        <FormatText
+          wrapper={<Ink.Text color={colors.yellow} />}
+          message="📦 Stashing uncommitted changes…"
+        />
+      );
+
     case "prompt":
       return (
         <Ink.Box flexDirection="column">
@@ -56,9 +64,15 @@ export function DirtyCheck(props: Props) {
               />
             }
             onYes={async () => {
+              patch({ status: "stash" });
+
               await cli("git stash --include-untracked");
 
-              actions.output(<Ink.Text>📦 Changes saved to stash</Ink.Text>);
+              actions.output(
+                <Ink.Text color={colors.yellow}>
+                  <FormatText message="📦 Changes saved to stash" />
+                </Ink.Text>
+              );
 
               actions.set((state) => {
                 state.is_dirty_check_stash = true;

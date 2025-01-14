@@ -99,7 +99,11 @@ async function run() {
 
     await cli("git stash --include-untracked");
 
-    actions.output(<Ink.Text>📦 Changes saved to stash</Ink.Text>);
+    actions.output(
+      <Ink.Text color={colors.yellow}>
+        <FormatText message="📦 Changes saved to stash" />
+      </Ink.Text>
+    );
   }
 
   try {
