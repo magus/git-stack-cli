@@ -2,56 +2,67 @@ import * as React from "react";
 
 import * as Ink from "ink-cjs";
 
+import { FormatText } from "~/app/FormatText";
 import { Parens } from "~/app/Parens";
 import { colors } from "~/core/colors";
 
+type Handler = () => void;
+
 type Props = {
   message: React.ReactNode;
-  onYes(): void;
-  onNo(): void;
+  onYes: Handler;
+  onNo: Handler;
 };
 
 export function YesNoPrompt(props: Props) {
   const [answer, set_answer] = React.useState("");
 
+  const answered_ref = React.useRef(false);
+
   Ink.useInput((input) => {
-    const inputLower = input.toLowerCase();
+    // prevent answering multiple times
+    if (answered_ref.current) {
+      return;
+    }
 
-    set_answer(inputLower);
+    const input_lower = input.toLowerCase();
 
-    switch (inputLower) {
+    let handler: undefined | Handler;
+
+    switch (input_lower) {
       case "n":
-        return props.onNo();
+        handler = props.onNo;
+        break;
 
       case "y":
-        return props.onYes();
+        handler = props.onYes;
+        break;
+    }
+
+    // handler if valid answer (y or n)
+    if (handler) {
+      answered_ref.current = true;
+      set_answer(input_lower);
+      handler();
     }
   });
 
-  // prettier-ignore
-  const y = <Ink.Text bold color={colors.green}>Y</Ink.Text>;
-  const n = <Ink.Text color={colors.red}>n</Ink.Text>;
+  const choices = (function get_choices() {
+    // prettier-ignore
+    const y = <Ink.Text bold color={colors.green}>Y</Ink.Text>;
+    const n = <Ink.Text color={colors.red}>n</Ink.Text>;
 
-  let choices;
+    switch (answer) {
+      case "y":
+        return y;
 
-  switch (answer) {
-    case "y":
-      choices = y;
-      break;
+      case "n":
+        return n;
 
-    case "n":
-      choices = n;
-      break;
-
-    default:
-      choices = (
-        <React.Fragment>
-          {y}
-          <Ink.Text>/</Ink.Text>
-          {n}
-        </React.Fragment>
-      );
-  }
+      default:
+        return <FormatText message="{y}/{n}" values={{ y, n }} />;
+    }
+  })();
 
   return (
     <Ink.Box flexDirection="column">
