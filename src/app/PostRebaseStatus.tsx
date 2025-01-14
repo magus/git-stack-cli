@@ -26,4 +26,6 @@ async function run() {
   actions.output(<StatusTable />);
 
   actions.output(<Ink.Text>✅ Everything up to date.</Ink.Text>);
+
+  actions.exit(0);
 }
