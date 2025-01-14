@@ -16,10 +16,7 @@ import { short_id } from "~/core/short_id";
 
 export function ManualRebase() {
   return (
-    <Await
-      fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>}
-      function={run}
-    />
+    <Await fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>} function={run} />
   );
 }
 
@@ -48,8 +45,7 @@ async function run() {
 
   try {
     // get latest merge_base relative to local master
-    const merge_base = (await cli(`git merge-base HEAD ${master_branch}`))
-      .stdout;
+    const merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;
 
     // immediately paint all commit to preserve selected commit ranges
     let commit_range = await CommitMetadata.range(commit_map);

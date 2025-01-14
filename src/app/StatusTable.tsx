@@ -84,10 +84,7 @@ function StatusColumn(props: TableColumnProps<Row>) {
   const value = props.row[props.column];
 
   return (
-    <Ink.Text
-      color={get_status_color(props.row)}
-      bold={get_status_bold(props.row)}
-    >
+    <Ink.Text color={get_status_color(props.row)} bold={get_status_bold(props.row)}>
       {get_status_icon(props.row)} {value}
     </Ink.Text>
   );

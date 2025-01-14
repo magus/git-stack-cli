@@ -58,10 +58,7 @@ function SelectCommitRangesInternal(props: Props) {
   );
 
   const [commit_map, update_commit_map] = React.useReducer(
-    (
-      map: Map<string, null | string>,
-      args: { key: string; value: null | string }
-    ) => {
+    (map: Map<string, null | string>, args: { key: string; value: null | string }) => {
       map.set(args.key, args.value);
 
       // console.debug("update_commit_map", map, args);
@@ -88,8 +85,7 @@ function SelectCommitRangesInternal(props: Props) {
     }
   }
 
-  const total_group_count =
-    new_group_list.length + props.commit_range.group_list.length;
+  const total_group_count = new_group_list.length + props.commit_range.group_list.length;
 
   for (let i = 0; i < props.commit_range.group_list.length; i++) {
     const index = props.commit_range.group_list.length - i - 1;

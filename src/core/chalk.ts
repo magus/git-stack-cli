@@ -19,11 +19,7 @@ function create_color_proxy(base: typeof chalk): ColorProxy {
 
         case "bracket":
           return (str: string) =>
-            [
-              target.bold.whiteBright("["),
-              str,
-              target.bold.whiteBright("]"),
-            ].join("");
+            [target.bold.whiteBright("["), str, target.bold.whiteBright("]")].join("");
 
         case "url":
           return target.bold.underline.blueBright;

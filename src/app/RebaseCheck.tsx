@@ -40,8 +40,7 @@ export function RebaseCheck(props: Props) {
         <YesNoPrompt
           message={
             <Ink.Text color={colors.yellow}>
-              <Command>git rebase</Command> detected, would you like to abort
-              it?
+              <Command>git rebase</Command> detected, would you like to abort it?
             </Ink.Text>
           }
           onYes={async () => {

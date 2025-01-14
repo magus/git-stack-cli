@@ -50,13 +50,9 @@ async function run(args: Args) {
   const subject_format = `%<(60,trunc)%s`;
 
   // combine all the above formats into one
-  const format = [
-    sha_format,
-    date_format,
-    author_format,
-    decoration_format,
-    subject_format,
-  ].join(" ");
+  const format = [sha_format, date_format, author_format, decoration_format, subject_format].join(
+    " "
+  );
 
   // view the SHA, description and history graph of last 20 commits
   const rest_args = process_argv.slice(3).join(" ");

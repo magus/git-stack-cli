@@ -36,11 +36,7 @@ export function Exit(props: Props) {
       // restore git stash if necessary
       if (state.is_dirty_check_stash) {
         await cli("git stash pop");
-        actions.output(
-          <Ink.Text color={colors.green}>
-            ✅ Changes restored from stash
-          </Ink.Text>
-        );
+        actions.output(<Ink.Text color={colors.green}>✅ Changes restored from stash</Ink.Text>);
       }
 
       // ensure output has a chance to render

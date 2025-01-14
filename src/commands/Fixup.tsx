@@ -22,20 +22,14 @@ async function run() {
 
   if (!relative_number) {
     actions.output(
-      <Ink.Text color={colors.red}>
-        ❗️ Usage: git fixup {"<relative-commit-number>"}
-      </Ink.Text>
+      <Ink.Text color={colors.red}>❗️ Usage: git fixup {"<relative-commit-number>"}</Ink.Text>
     );
     actions.output("");
-    actions.output(
-      "This script automates the process of adding staged changes as a fixup commit"
-    );
+    actions.output("This script automates the process of adding staged changes as a fixup commit");
     actions.output(
       "and the subsequent git rebase to flatten the commits based on relative commit number"
     );
-    actions.output(
-      "You can use a `git log` like below to get the relative commit number"
-    );
+    actions.output("You can use a `git log` like below to get the relative commit number");
     actions.output("");
     actions.output("    ❯ git stack log");
     actions.output(
@@ -44,9 +38,7 @@ async function run() {
     actions.output(
       "    2\t57f43b596e5c6b97bc47e2a591f82ccc81651156 test drop_error_subtask baseline"
     );
-    actions.output(
-      "    3\t838e878d483c6a2d5393063fc59baf2407225c6d ErrorSubtask test baseline"
-    );
+    actions.output("    3\t838e878d483c6a2d5393063fc59baf2407225c6d ErrorSubtask test baseline");
     actions.output("");
     actions.output("To target `838e87` above, you would call `fixup 3`");
 
@@ -71,8 +63,7 @@ async function run() {
   const adjusted_number = Number(relative_number) - 1;
 
   // get the commit SHA of the target commit
-  const commit_sha = (await cli(`git rev-parse HEAD~${adjusted_number}`))
-    .stdout;
+  const commit_sha = (await cli(`git rev-parse HEAD~${adjusted_number}`)).stdout;
 
   actions.output(
     <FormatText
@@ -124,9 +115,7 @@ async function run() {
     if (save_stash) {
       await cli("git stash pop");
 
-      actions.output(
-        <Ink.Text color={colors.green}>✅ Changes restored from stash</Ink.Text>
-      );
+      actions.output(<Ink.Text color={colors.green}>✅ Changes restored from stash</Ink.Text>);
     }
   }
 }

@@ -12,11 +12,7 @@ type Props = {
 };
 
 export function VerboseDebugInfo(props: Props) {
-  const fallback = (
-    <Ink.Text color={colors.yellow}>
-      Logging verbose debug information…
-    </Ink.Text>
-  );
+  const fallback = <Ink.Text color={colors.yellow}>Logging verbose debug information…</Ink.Text>;
 
   return (
     <Await fallback={fallback} function={run}>

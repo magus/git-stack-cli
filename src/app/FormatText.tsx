@@ -13,11 +13,7 @@ export function FormatText(props: Props) {
   const wrapper = (props.wrapper as React.ReactElement) || <Ink.Text />;
 
   return (
-    <FormattedMessage
-      id="FormatText"
-      defaultMessage={props.message}
-      values={props.values}
-    >
+    <FormattedMessage id="FormatText" defaultMessage={props.message} values={props.values}>
       {(chunks) => {
         return React.cloneElement(wrapper, {}, chunks);
       }}

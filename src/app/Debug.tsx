@@ -20,9 +20,7 @@ export function Debug() {
   React.useEffect(
     function debugMessageOnce() {
       if (debug) {
-        actions.output(
-          <Ink.Text color={colors.yellow}>Debug mode enabled</Ink.Text>
-        );
+        actions.output(<Ink.Text color={colors.yellow}>Debug mode enabled</Ink.Text>);
       }
     },
     [argv]

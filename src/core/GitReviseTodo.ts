@@ -87,10 +87,7 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
 
     const metadata = { id, title };
 
-    const unsafe_message_with_id = Metadata.write(
-      commit.full_message,
-      metadata
-    );
+    const unsafe_message_with_id = Metadata.write(commit.full_message, metadata);
 
     let message_with_id = unsafe_message_with_id;
 
@@ -112,10 +109,7 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
 
 GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
   // generate temporary directory and drop sequence editor script
-  const tmp_git_sequence_editor_path = path.join(
-    os.tmpdir(),
-    "git-sequence-editor.sh"
-  );
+  const tmp_git_sequence_editor_path = path.join(os.tmpdir(), "git-sequence-editor.sh");
 
   // replaced at build time with literal contents of `scripts/git-sequence-editor.sh`
   const GIT_SEQUENCE_EDITOR_SCRIPT = `process.env.GIT_SEQUENCE_EDITOR_SCRIPT`;

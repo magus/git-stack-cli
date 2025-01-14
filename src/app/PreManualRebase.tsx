@@ -75,9 +75,7 @@ async function run() {
           wrapper={<Ink.Text color={colors.yellow} />}
           message="{count} queryable templates found under {dir}, but not supported."
           values={{
-            count: (
-              <Ink.Text color={colors.blue}>{pr_templates.length}</Ink.Text>
-            ),
+            count: <Ink.Text color={colors.blue}>{pr_templates.length}</Ink.Text>,
             dir: <Brackets>{PR_TEMPLATE.TemplateDir("")}</Brackets>,
           }}
         />

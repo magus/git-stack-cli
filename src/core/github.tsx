@@ -98,9 +98,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
     );
   }
 
-  const pr = await gh_json<PullRequest>(
-    `pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`
-  );
+  const pr = await gh_json<PullRequest>(`pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`);
 
   if (pr instanceof Error) {
     return null;
@@ -190,9 +188,7 @@ export async function pr_draft(args: DraftPullRequestArgs) {
   // https://docs.github.com/en/graphql/reference/mutations#convertpullrequesttodraft
   // https://docs.github.com/en/graphql/reference/mutations#markpullrequestreadyforreview
 
-  const mutation_name = args.draft
-    ? "convertPullRequestToDraft"
-    : "markPullRequestReadyForReview";
+  const mutation_name = args.draft ? "convertPullRequestToDraft" : "markPullRequestReadyForReview";
 
   let query = `
     mutation($id: ID!) {
@@ -215,9 +211,7 @@ export async function pr_draft(args: DraftPullRequestArgs) {
   const cache_pr = state.pr[args.branch];
   invariant(cache_pr, "cache_pr must exist");
 
-  const command_parts = [
-    `gh api graphql -F id="${cache_pr.id}" -f query='${query}'`,
-  ];
+  const command_parts = [`gh api graphql -F id="${cache_pr.id}" -f query='${query}'`];
 
   const command = command_parts.join(" ");
 

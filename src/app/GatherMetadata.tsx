@@ -15,9 +15,7 @@ type Props = {
 };
 
 export function GatherMetadata(props: Props) {
-  const fallback = (
-    <Ink.Text color={colors.yellow}>Gathering local git information…</Ink.Text>
-  );
+  const fallback = <Ink.Text color={colors.yellow}>Gathering local git information…</Ink.Text>;
 
   return (
     <Await fallback={fallback} function={run}>
@@ -46,9 +44,7 @@ async function run() {
 
       master_branch = argv.branch;
     } else {
-      const detect_master = await cli(
-        `git branch --list "${BRANCH.master}" --color=never`
-      );
+      const detect_master = await cli(`git branch --list "${BRANCH.master}" --color=never`);
 
       if (detect_master.stdout !== "") {
         master_branch = BRANCH.master;
@@ -84,15 +80,12 @@ async function run() {
     }
 
     const head = (await cli("git rev-parse HEAD")).stdout;
-    const merge_base = (await cli(`git merge-base HEAD ${master_branch}`))
-      .stdout;
+    const merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;
 
     // handle when there are no detected changes
     if (head === merge_base) {
       actions.newline();
-      actions.output(
-        <Ink.Text color={colors.gray}>No changes detected.</Ink.Text>
-      );
+      actions.output(<Ink.Text color={colors.gray}>No changes detected.</Ink.Text>);
       actions.exit(0);
       return;
     }

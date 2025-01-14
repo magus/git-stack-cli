@@ -14,12 +14,7 @@ import { invariant } from "~/core/invariant";
 import type * as CommitMetadata from "~/core/CommitMetadata";
 
 export function SyncGithub() {
-  return (
-    <Await
-      fallback={<Ink.Text color={colors.yellow}>Syncing…</Ink.Text>}
-      function={run}
-    />
-  );
+  return <Await fallback={<Ink.Text color={colors.yellow}>Syncing…</Ink.Text>} function={run} />;
 }
 
 async function run() {
@@ -202,10 +197,7 @@ async function run() {
     }
   }
 
-  async function after_push(args: {
-    group: CommitMetadataGroup;
-    pr_url_list: Array<string>;
-  }) {
+  async function after_push(args: { group: CommitMetadataGroup; pr_url_list: Array<string> }) {
     const { group, pr_url_list } = args;
 
     invariant(group.base, "group.base must exist");
@@ -290,9 +282,7 @@ async function run() {
   }
 
   function handle_exit() {
-    actions.output(
-      <Ink.Text color={colors.yellow}>Restoring PR state…</Ink.Text>
-    );
+    actions.output(<Ink.Text color={colors.yellow}>Restoring PR state…</Ink.Text>);
 
     for (const group of push_group_list) {
       // we may temporarily mark PR as a draft before editing it
@@ -310,9 +300,7 @@ async function run() {
       }
     }
 
-    actions.output(
-      <Ink.Text color={colors.yellow}>Restored PR state.</Ink.Text>
-    );
+    actions.output(<Ink.Text color={colors.yellow}>Restored PR state.</Ink.Text>);
   }
 }
 

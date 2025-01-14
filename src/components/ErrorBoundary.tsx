@@ -67,9 +67,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     const store_state = Store.getState();
 
     if (store_state.argv.verbose) {
-      return (
-        <Ink.Text color={colors.gray}>{this.state.component_stack}</Ink.Text>
-      );
+      return <Ink.Text color={colors.gray}>{this.state.component_stack}</Ink.Text>;
     }
 
     return (

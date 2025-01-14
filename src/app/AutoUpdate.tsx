@@ -67,14 +67,10 @@ export function AutoUpdate(props: Props) {
 
     async function auto_update() {
       if (props_ref.current.verbose) {
-        handle_output(
-          <Ink.Text key="init">Checking for latest version...</Ink.Text>
-        );
+        handle_output(<Ink.Text key="init">Checking for latest version...</Ink.Text>);
       }
 
-      const timeout_ms = is_finite_value(props.timeoutMs)
-        ? props.timeoutMs
-        : 2 * 1000;
+      const timeout_ms = is_finite_value(props.timeoutMs) ? props.timeoutMs : 2 * 1000;
 
       const npm_json = await Promise.race([
         fetch_json(`https://registry.npmjs.org/${props.name}`),
@@ -94,12 +90,7 @@ export function AutoUpdate(props: Props) {
       const script_dir = path.dirname(script_path);
 
       // dist/ts/index.js
-      const package_json_path = path.join(
-        script_dir,
-        "..",
-        "..",
-        "package.json"
-      );
+      const package_json_path = path.join(script_dir, "..", "..", "package.json");
 
       type PackageJson = { version: string };
       const package_json = await read_json<PackageJson>(package_json_path);
@@ -185,14 +176,8 @@ export function AutoUpdate(props: Props) {
                   wrapper={<Ink.Text />}
                   message="Installing {name}@{version}..."
                   values={{
-                    name: (
-                      <Ink.Text color={colors.yellow}>{props.name}</Ink.Text>
-                    ),
-                    version: (
-                      <Ink.Text color={colors.blue}>
-                        {state.latest_version}
-                      </Ink.Text>
-                    ),
+                    name: <Ink.Text color={colors.yellow}>{props.name}</Ink.Text>,
+                    version: <Ink.Text color={colors.blue}>{state.latest_version}</Ink.Text>,
                   }}
                 />
               );

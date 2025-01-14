@@ -97,11 +97,7 @@ export function DetectInitialPR(props: Props) {
       return (
         <Await
           function={run}
-          fallback={
-            <Ink.Text color={colors.yellow}>
-              Checking for existing PR on Github…
-            </Ink.Text>
-          }
+          fallback={<Ink.Text color={colors.yellow}>Checking for existing PR on Github…</Ink.Text>}
         />
       );
   }
@@ -167,9 +163,7 @@ export function DetectInitialPR(props: Props) {
     // get latest merge_base relative to local master
     const rebase_group_index = 0;
 
-    const rebase_merge_base = (
-      await cli(`git merge-base HEAD ${master_branch}`)
-    ).stdout;
+    const rebase_merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;
 
     await GitReviseTodo.execute({
       rebase_group_index,

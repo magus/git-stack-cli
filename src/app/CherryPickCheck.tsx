@@ -40,8 +40,7 @@ export function CherryPickCheck(props: Props) {
         <YesNoPrompt
           message={
             <Ink.Text color={colors.yellow}>
-              <Command>git cherry-pick</Command> detected, would you like to
-              abort it?
+              <Command>git cherry-pick</Command> detected, would you like to abort it?
             </Ink.Text>
           }
           onYes={async () => {

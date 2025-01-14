@@ -11,14 +11,10 @@ export async function command() {
     yargs(hideBin(process.argv))
       .usage("Usage: git stack [command] [options]")
 
-      .command("$0", "Sync commit ranges to Github", (yargs) =>
-        yargs.options(DefaultOptions)
-      )
+      .command("$0", "Sync commit ranges to Github", (yargs) => yargs.options(DefaultOptions))
 
-      .command(
-        "fixup [commit]",
-        "Amend staged changes to a specific commit in history",
-        (yargs) => yargs.positional("commit", FixupOptions.commit)
+      .command("fixup [commit]", "Amend staged changes to a specific commit in history", (yargs) =>
+        yargs.positional("commit", FixupOptions.commit)
       )
 
       .command(
@@ -43,12 +39,8 @@ export async function command() {
       // disallow unknown options
       .strict()
       .version(process.env.CLI_VERSION || "unknown")
-      .showHidden(
-        "show-hidden",
-        "Show hidden options via `git stack help --show-hidden`"
-      )
-      .help("help", "Show usage via `git stack help`")
-      .argv as unknown as Promise<Argv>
+      .showHidden("show-hidden", "Show hidden options via `git stack help --show-hidden`")
+      .help("help", "Show usage via `git stack help`").argv as unknown as Promise<Argv>
   );
 }
 
@@ -86,8 +78,7 @@ const DefaultOptions = {
   "verify": {
     type: "boolean",
     default: true,
-    description:
-      "Run git hooks such as pre-commit and pre-push, disable with --no-verify",
+    description: "Run git hooks such as pre-commit and pre-push, disable with --no-verify",
   },
 
   "update": {

@@ -70,10 +70,7 @@ export function Table<T extends BaseRow>(props: Props<T>) {
     remaining_space -= breathing_room;
 
     if (props.fillColumn) {
-      max_col_width[props.fillColumn] = Math.min(
-        max_col_width[props.fillColumn],
-        remaining_space
-      );
+      max_col_width[props.fillColumn] = Math.min(max_col_width[props.fillColumn], remaining_space);
     }
   }
 
@@ -91,9 +88,7 @@ export function Table<T extends BaseRow>(props: Props<T>) {
             width={available_width}
           >
             {RowColumnList.map((column) => {
-              const ColumnComponent = props.columns[
-                column
-              ] as ColumnComponent<T>;
+              const ColumnComponent = props.columns[column] as ColumnComponent<T>;
 
               return (
                 <Ink.Box key={String(column)} width={max_col_width[column]}>
@@ -122,14 +117,9 @@ type BaseRow = Record<string, string | number>;
 
 type Column<T extends BaseRow> = keyof T;
 
-type ColumnComponent<T extends BaseRow> = (
-  props: TableColumnProps<T>
-) => React.ReactNode;
+type ColumnComponent<T extends BaseRow> = (props: TableColumnProps<T>) => React.ReactNode;
 
-type ColumnComponentMap<T extends BaseRow> = Record<
-  Column<T>,
-  ColumnComponent<T>
->;
+type ColumnComponentMap<T extends BaseRow> = Record<Column<T>, ColumnComponent<T>>;
 
 export type TableColumnProps<T extends BaseRow> = {
   row: T;

@@ -69,12 +69,7 @@ export function TextInput(props: Props) {
   // console.debug("[TextInput]", { value });
 
   return (
-    <Ink.Box
-      borderStyle="single"
-      minHeight={1}
-      borderColor={colors.yellow}
-      borderDimColor
-    >
+    <Ink.Box borderStyle="single" minHeight={1} borderColor={colors.yellow} borderDimColor>
       <Ink.Text>{value || ""}</Ink.Text>
 
       <Ink.Text color={colors.yellow} dimColor inverse={caret_visible}>
