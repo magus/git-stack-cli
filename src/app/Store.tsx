@@ -53,6 +53,7 @@ export type State = {
   sync_github: null | SyncGithubState;
   is_dirty_check_stash: boolean;
   abort_handler: null | AbortHandler;
+  is_exiting: boolean;
 
   step:
     | "github-api-error"
@@ -123,6 +124,7 @@ const BaseStore = createStore<State>()(
     sync_github: null,
     is_dirty_check_stash: false,
     abort_handler: null,
+    is_exiting: false,
 
     step: "loading",
 
@@ -134,6 +136,8 @@ const BaseStore = createStore<State>()(
     actions: {
       exit(code, clear = true) {
         set((state) => {
+          state.is_exiting = true;
+
           const node = <Exit clear={clear} code={code} />;
           state.mutate.output(state, { node });
         });

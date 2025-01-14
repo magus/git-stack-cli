@@ -20,6 +20,7 @@ import { Fixup } from "~/commands/Fixup";
 import { Log } from "~/commands/Log";
 import { Rebase } from "~/commands/Rebase";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
+import { ExitingGate } from "~/components/ExitingGate";
 
 export function App() {
   const actions = Store.useActions();
@@ -47,29 +48,31 @@ export function App() {
         <Debug />
         <Output />
 
-        <AutoUpdate
-          name="git-stack-cli"
-          verbose={argv.verbose || argv.update}
-          timeoutMs={argv.update ? 30 * 1000 : 2 * 1000}
-          onOutput={actions.output}
-          onDone={() => {
-            if (argv.update) {
-              actions.exit(0);
-            }
-          }}
-        >
-          <VerboseDebugInfo>
-            <DependencyCheck>
-              <RebaseCheck>
-                <CherryPickCheck>
-                  <MaybeMain />
-                </CherryPickCheck>
-              </RebaseCheck>
-            </DependencyCheck>
-          </VerboseDebugInfo>
-        </AutoUpdate>
+        <ExitingGate>
+          <AutoUpdate
+            name="git-stack-cli"
+            verbose={argv.verbose || argv.update}
+            timeoutMs={argv.update ? 30 * 1000 : 2 * 1000}
+            onOutput={actions.output}
+            onDone={() => {
+              if (argv.update) {
+                actions.exit(0);
+              }
+            }}
+          >
+            <VerboseDebugInfo>
+              <DependencyCheck>
+                <RebaseCheck>
+                  <CherryPickCheck>
+                    <MaybeMain />
+                  </CherryPickCheck>
+                </RebaseCheck>
+              </DependencyCheck>
+            </VerboseDebugInfo>
+          </AutoUpdate>
 
-        <HandleCtrlCSigint />
+          <HandleCtrlCSigint />
+        </ExitingGate>
       </ErrorBoundary>
     </Providers>
   );
@@ -94,16 +97,18 @@ function MaybeMain() {
   }
 
   return (
-    <DirtyCheck>
+    <React.Fragment>
       {!argv.verbose ? null : <GithubApiError />}
 
       <GatherMetadata>
-        <LocalCommitStatus>
-          <DetectInitialPR>
-            <Main />
-          </DetectInitialPR>
-        </LocalCommitStatus>
+        <DirtyCheck>
+          <LocalCommitStatus>
+            <DetectInitialPR>
+              <Main />
+            </DetectInitialPR>
+          </LocalCommitStatus>
+        </DirtyCheck>
       </GatherMetadata>
-    </DirtyCheck>
+    </React.Fragment>
   );
 }
