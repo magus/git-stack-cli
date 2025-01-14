@@ -19,6 +19,7 @@ import { VerboseDebugInfo } from "~/app/VerboseDebugInfo";
 import { Fixup } from "~/commands/Fixup";
 import { Log } from "~/commands/Log";
 import { Rebase } from "~/commands/Rebase";
+import { ErrorBoundary } from "~/components/ErrorBoundary";
 
 export function App() {
   const actions = Store.useActions();
@@ -42,32 +43,34 @@ export function App() {
 
   return (
     <Providers>
-      <Debug />
-      <Output />
+      <ErrorBoundary>
+        <Debug />
+        <Output />
 
-      <AutoUpdate
-        name="git-stack-cli"
-        verbose={argv.verbose || argv.update}
-        timeoutMs={argv.update ? 30 * 1000 : 2 * 1000}
-        onOutput={actions.output}
-        onDone={() => {
-          if (argv.update) {
-            actions.exit(0);
-          }
-        }}
-      >
-        <VerboseDebugInfo>
-          <DependencyCheck>
-            <RebaseCheck>
-              <CherryPickCheck>
-                <MaybeMain />
-              </CherryPickCheck>
-            </RebaseCheck>
-          </DependencyCheck>
-        </VerboseDebugInfo>
-      </AutoUpdate>
+        <AutoUpdate
+          name="git-stack-cli"
+          verbose={argv.verbose || argv.update}
+          timeoutMs={argv.update ? 30 * 1000 : 2 * 1000}
+          onOutput={actions.output}
+          onDone={() => {
+            if (argv.update) {
+              actions.exit(0);
+            }
+          }}
+        >
+          <VerboseDebugInfo>
+            <DependencyCheck>
+              <RebaseCheck>
+                <CherryPickCheck>
+                  <MaybeMain />
+                </CherryPickCheck>
+              </RebaseCheck>
+            </DependencyCheck>
+          </VerboseDebugInfo>
+        </AutoUpdate>
 
-      <HandleCtrlCSigint />
+        <HandleCtrlCSigint />
+      </ErrorBoundary>
     </Providers>
   );
 }
