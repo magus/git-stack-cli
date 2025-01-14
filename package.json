@@ -24,6 +24,7 @@
     "dev": "npm run build -- --watch",
     "build": "rollup -c rollup.config.js",
     "build:standalone": "GIT_STACK_STANDALONE=true bun run scripts/build-standalone.ts",
+    "link": "bun run scripts/link.ts",
     "release:npm": "bun run scripts/release-npm.ts",
     "release:github": "bun run scripts/release-github.ts",
     "release:brew": "bun run scripts/release-brew.ts",

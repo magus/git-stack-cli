@@ -129,12 +129,10 @@ Ensure `node --version` is the same across both projects you are using to test t
 git submodule update --init --recursive
 npm i
 npm run dev
-npm unlink git-stack-cli
-npm link
+npm run link
 
 # navigate to project to test within
-npm unlink git-stack-cli
-npm link git-stack-cli
+npm unlink git-stack-cli && npm link git-stack-cli
 
 git stack --verbose
 ```
