@@ -35,7 +35,7 @@ test("git-revise-todo from commit range with single new commit", () => {
       "",
       "git-stack-id: E63ytp5dj",
       "git-stack-title: lemon color",
-    ].join("\n")
+    ].join("\n"),
   );
 });
 
@@ -53,7 +53,7 @@ test("git-revise-todo from commit range with single new commit in new group", ()
       "",
       "git-stack-id: 6Ak-qn+5Z",
       "git-stack-title: new group",
-    ].join("\n")
+    ].join("\n"),
   );
 });
 
@@ -71,7 +71,7 @@ test("git-revise-todo handles double quotes in commit message", () => {
       "",
       "git-stack-id: 6Ak-qn+5Z",
       'git-stack-title: [new] invalid \\"by me\\" quotes',
-    ].join("\n")
+    ].join("\n"),
   );
 });
 

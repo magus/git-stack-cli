@@ -69,6 +69,6 @@ async function run() {
           {time_until}
         </Ink.Text>
       </Parens>
-    </Ink.Text>
+    </Ink.Text>,
   );
 }

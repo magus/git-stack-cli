@@ -23,7 +23,7 @@ export function Debug() {
         actions.output(<Ink.Text color={colors.yellow}>Debug mode enabled</Ink.Text>);
       }
     },
-    [argv]
+    [argv],
   );
 
   React.useEffect(
@@ -44,7 +44,7 @@ export function Debug() {
         await fs.writeFile(output_file, content);
       }
     },
-    [argv, state]
+    [argv, state],
   );
 
   return null;

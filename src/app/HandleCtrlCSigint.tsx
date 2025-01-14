@@ -23,7 +23,7 @@ export function HandleCtrlCSigint() {
         actions.output(
           <Ink.Text color={colors.red}>
             <FormatText message="🚨 Ctrl+C detected" />
-          </Ink.Text>
+          </Ink.Text>,
         );
 
         await sleep(1);

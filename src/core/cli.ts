@@ -22,7 +22,7 @@ let i = 0;
 
 export async function cli(
   unsafe_command: string | Array<string | number>,
-  unsafe_options?: Options
+  unsafe_options?: Options,
 ): Promise<Return> {
   const options = Object.assign({}, unsafe_options);
 
@@ -97,7 +97,7 @@ export async function cli(
 
 cli.sync = function cli_sync(
   unsafe_command: string | Array<string | number>,
-  unsafe_options?: Options
+  unsafe_options?: Options,
 ): Return {
   const options = Object.assign({}, unsafe_options);
 

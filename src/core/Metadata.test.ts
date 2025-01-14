@@ -48,7 +48,7 @@ test("write handles bulleted lists", () => {
       "",
       "git-stack-id: abcd1234",
       "git-stack-title: banana",
-    ].join("\n")
+    ].join("\n"),
   );
 });
 
@@ -94,7 +94,7 @@ test("write handles bulleted lists", () => {
       "",
       "git-stack-id: fix-slash-branch",
       "git-stack-title: fix slash branch",
-    ].join("\n")
+    ].join("\n"),
   );
 });
 
@@ -133,7 +133,7 @@ test("write handles double quotes", () => {
       "",
       "git-stack-id: abc123",
       'git-stack-title: Revert \\"[abc / 123] subject (#1234)\\"',
-    ].join("\n")
+    ].join("\n"),
   );
 });
 
@@ -156,6 +156,6 @@ test("removes metadata", () => {
       "- keyboard modality escape key",
       "- centralize settings",
       "- move logic inside if branch",
-    ].join("\n")
+    ].join("\n"),
   );
 });

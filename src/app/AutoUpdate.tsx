@@ -112,7 +112,7 @@ export function AutoUpdate(props: Props) {
               latest_version: <Brackets>{latest_version}</Brackets>,
               local_version: <Brackets>{local_version}</Brackets>,
             }}
-          />
+          />,
         );
       }
 
@@ -125,7 +125,7 @@ export function AutoUpdate(props: Props) {
       if (semver_result === -1) {
         // latest version is less than or equal to local version, skip auto update
         throw new Error(
-          `latest version < local_version, skipping auto update [${latest_version} < ${local_version}]`
+          `latest version < local_version, skipping auto update [${latest_version} < ${local_version}]`,
         );
       }
 
@@ -147,7 +147,7 @@ export function AutoUpdate(props: Props) {
           handle_output(
             <Ink.Text key="error" color={colors.red}>
               {error?.message}
-            </Ink.Text>
+            </Ink.Text>,
           );
         }
       })
@@ -179,7 +179,7 @@ export function AutoUpdate(props: Props) {
                     name: <Ink.Text color={colors.yellow}>{props.name}</Ink.Text>,
                     version: <Ink.Text color={colors.blue}>{state.latest_version}</Ink.Text>,
                   }}
-                />
+                />,
               );
 
               patch({ status: "install" });

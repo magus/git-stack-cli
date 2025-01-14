@@ -22,21 +22,21 @@ async function run() {
 
   if (!relative_number) {
     actions.output(
-      <Ink.Text color={colors.red}>❗️ Usage: git fixup {"<relative-commit-number>"}</Ink.Text>
+      <Ink.Text color={colors.red}>❗️ Usage: git fixup {"<relative-commit-number>"}</Ink.Text>,
     );
     actions.output("");
     actions.output("This script automates the process of adding staged changes as a fixup commit");
     actions.output(
-      "and the subsequent git rebase to flatten the commits based on relative commit number"
+      "and the subsequent git rebase to flatten the commits based on relative commit number",
     );
     actions.output("You can use a `git log` like below to get the relative commit number");
     actions.output("");
     actions.output("    ❯ git stack log");
     actions.output(
-      "    1\te329794d5f881cbf0fc3f26d2108cf6f3fdebabe enable drop_error_subtask test param"
+      "    1\te329794d5f881cbf0fc3f26d2108cf6f3fdebabe enable drop_error_subtask test param",
     );
     actions.output(
-      "    2\t57f43b596e5c6b97bc47e2a591f82ccc81651156 test drop_error_subtask baseline"
+      "    2\t57f43b596e5c6b97bc47e2a591f82ccc81651156 test drop_error_subtask baseline",
     );
     actions.output("    3\t838e878d483c6a2d5393063fc59baf2407225c6d ErrorSubtask test baseline");
     actions.output("");
@@ -73,7 +73,7 @@ async function run() {
         commit_sha: <Parens>{commit_sha}</Parens>,
         relative_number: relative_number,
       }}
-    />
+    />,
   );
 
   await cli(`git commit --fixup ${commit_sha}`);
@@ -93,7 +93,7 @@ async function run() {
     actions.output(
       <Ink.Text color={colors.yellow}>
         <FormatText message="📦 Changes saved to stash" />
-      </Ink.Text>
+      </Ink.Text>,
     );
   }
 

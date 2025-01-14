@@ -59,7 +59,7 @@ async function run() {
           {` --force `}
         </Ink.Text>
         <Ink.Text>to force update all pull requests.</Ink.Text>
-      </Ink.Text>
+      </Ink.Text>,
     );
 
     actions.exit(0);

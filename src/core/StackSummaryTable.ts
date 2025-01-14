@@ -122,7 +122,7 @@ const TEMPLATE = {
 const RE = {
   // https://regex101.com/r/kqB9Ft/1
   stack_table_legacy: new RegExp(
-    TEMPLATE.stack_table_legacy("\\s+(?<rows>(?:- [^\r^\n]*(?:[\r\n]+)?)+)")
+    TEMPLATE.stack_table_legacy("\\s+(?<rows>(?:- [^\r^\n]*(?:[\r\n]+)?)+)"),
   ),
 
   stack_table_link: new RegExp(
@@ -131,7 +131,7 @@ const RE = {
       .replace("]", "\\]")
       .replace("(", "\\(")
       .replace(")", "\\)")
-      .replace("ROWS", "\\s+(?<rows>(?:- [^\r^\n]*(?:[\r\n]+)?)+)")
+      .replace("ROWS", "\\s+(?<rows>(?:- [^\r^\n]*(?:[\r\n]+)?)+)"),
   ),
 
   row: new RegExp(
@@ -139,7 +139,7 @@ const RE = {
       icon: "(?<icon>.+)",
       num: "(?<num>\\d+)",
       pr_url: "(?<pr_url>.+)",
-    })
+    }),
   ),
 
   pr_url: /^https:\/\/.*$/,

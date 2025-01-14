@@ -81,7 +81,7 @@ Rebase.run = async function run() {
                 commit_message: <Brackets>{commit.subject_line}</Brackets>,
                 pr_status: <Parens>MERGED</Parens>,
               }}
-            />
+            />,
           );
         }
 
@@ -96,7 +96,7 @@ Rebase.run = async function run() {
             values={{
               commit_message: <Brackets>{commit.subject_line}</Brackets>,
             }}
-          />
+          />,
         );
       }
 
@@ -129,7 +129,7 @@ Rebase.run = async function run() {
           branch_name: <Brackets>{branch_name}</Brackets>,
           origin_branch: <Brackets>{`origin/${master_branch}`}</Brackets>,
         }}
-      />
+      />,
     );
 
     actions.unregister_abort_handler();
@@ -180,7 +180,7 @@ Rebase.run = async function run() {
     actions.output(
       <Ink.Text color={colors.yellow}>
         Restoring <Brackets>{branch_name}</Brackets>…
-      </Ink.Text>
+      </Ink.Text>,
     );
 
     restore_git();
@@ -188,7 +188,7 @@ Rebase.run = async function run() {
     actions.output(
       <Ink.Text color={colors.yellow}>
         Restored <Brackets>{branch_name}</Brackets>.
-      </Ink.Text>
+      </Ink.Text>,
     );
   }
 };

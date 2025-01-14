@@ -14,19 +14,19 @@ export async function command() {
       .command("$0", "Sync commit ranges to Github", (yargs) => yargs.options(DefaultOptions))
 
       .command("fixup [commit]", "Amend staged changes to a specific commit in history", (yargs) =>
-        yargs.positional("commit", FixupOptions.commit)
+        yargs.positional("commit", FixupOptions.commit),
       )
 
       .command(
         "log [args...]",
         "Print an abbreviated log with numbered commits, useful for git stack fixup",
-        (yargs) => yargs.strict(false)
+        (yargs) => yargs.strict(false),
       )
 
       .command(
         "rebase",
         "Update local branch via rebase with latest changes from origin master branch",
-        (yargs) => yargs
+        (yargs) => yargs,
       )
 
       .option("verbose", GlobalOptions.verbose)

@@ -39,7 +39,7 @@ async function run() {
           values={{
             branch: <Brackets>{argv.branch}</Brackets>,
           }}
-        />
+        />,
       );
 
       master_branch = argv.branch;
@@ -56,7 +56,7 @@ async function run() {
               master: <Brackets>{BRANCH.master}</Brackets>,
               main: <Brackets>{BRANCH.main}</Brackets>,
             }}
-          />
+          />,
         );
 
         master_branch = BRANCH.main;

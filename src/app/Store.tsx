@@ -264,7 +264,7 @@ const BaseStore = createStore<State>()(
         return state.argv?.verbose || false;
       },
     },
-  }))
+  })),
 );
 
 function renderOutputArgs(args: MutateOutputArgs) {

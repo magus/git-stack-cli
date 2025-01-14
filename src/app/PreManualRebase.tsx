@@ -51,7 +51,7 @@ async function run() {
           values={{
             pr_filepath: <Brackets>{pr_template_fn("")}</Brackets>,
           }}
-        />
+        />,
       );
 
       break;
@@ -78,7 +78,7 @@ async function run() {
             count: <Ink.Text color={colors.blue}>{pr_templates.length}</Ink.Text>,
             dir: <Brackets>{PR_TEMPLATE.TemplateDir("")}</Brackets>,
           }}
-        />
+        />,
       );
     }
 

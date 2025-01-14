@@ -55,7 +55,7 @@ function CheckGit(props: Props) {
         actions.output(
           <Ink.Text color={colors.yellow}>
             <Command>git</Command> must be installed.
-          </Ink.Text>
+          </Ink.Text>,
         );
 
         actions.exit(2);
@@ -86,7 +86,7 @@ function CheckGithubCli(props: Props) {
         actions.output(
           <Ink.Text color={colors.yellow}>
             <Command>gh</Command> must be installed.
-          </Ink.Text>
+          </Ink.Text>,
         );
 
         actions.output(
@@ -98,7 +98,7 @@ function CheckGithubCli(props: Props) {
 
               command: <Command>gh</Command>,
             }}
-          />
+          />,
         );
 
         actions.exit(3);
@@ -150,7 +150,7 @@ function CheckGithubCliAuth(props: Props) {
 
               command: <Command>gh auth login</Command>,
             }}
-          />
+          />,
         );
 
         actions.exit(4);
@@ -181,7 +181,7 @@ function CheckGitRevise(props: Props) {
         actions.output(
           <Ink.Text color={colors.yellow}>
             <Command>git revise</Command> must be installed.
-          </Ink.Text>
+          </Ink.Text>,
         );
 
         actions.output(
@@ -199,7 +199,7 @@ function CheckGitRevise(props: Props) {
                 </Parens>
               ),
             }}
-          />
+          />,
         );
 
         actions.exit(10);

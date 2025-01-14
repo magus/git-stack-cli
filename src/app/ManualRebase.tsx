@@ -169,7 +169,7 @@ async function run() {
     actions.output(
       <Ink.Text color={colors.yellow}>
         Restoring <Brackets>{branch_name}</Brackets>…
-      </Ink.Text>
+      </Ink.Text>,
     );
 
     restore_git();
@@ -177,7 +177,7 @@ async function run() {
     actions.output(
       <Ink.Text color={colors.yellow}>
         Restored <Brackets>{branch_name}</Brackets>.
-      </Ink.Text>
+      </Ink.Text>,
     );
   }
 }

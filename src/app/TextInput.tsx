@@ -19,7 +19,7 @@ export function TextInput(props: Props) {
     function sync_value_prop() {
       set_value(get_value(props));
     },
-    [props.value]
+    [props.value],
   );
 
   const [caret_visible, set_caret_visible] = React.useState(false);

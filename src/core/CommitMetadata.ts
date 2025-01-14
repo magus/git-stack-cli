@@ -167,7 +167,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
 async function get_commit_list() {
   const master_branch = Store.getState().master_branch;
   const log_result = await cli(
-    `git log ${master_branch}..HEAD --oneline --format=%H --color=never`
+    `git log ${master_branch}..HEAD --oneline --format=%H --color=never`,
   );
 
   if (!log_result.stdout) {

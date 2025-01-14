@@ -24,7 +24,7 @@ export async function pr_list(): Promise<Array<PullRequest>> {
   invariant(repo_path, "repo_path must exist");
 
   const result_pr_list = await gh_json<Array<PullRequest>>(
-    `pr list --repo ${repo_path} --author ${username} --state open ${JSON_FIELDS}`
+    `pr list --repo ${repo_path} --author ${username} --state open ${JSON_FIELDS}`,
   );
 
   if (result_pr_list instanceof Error) {
@@ -42,7 +42,7 @@ export async function pr_list(): Promise<Array<PullRequest>> {
         <Brackets>{repo_path}</Brackets>
         <Ink.Text>{" authored by "}</Ink.Text>
         <Brackets>{username}</Brackets>
-      </Ink.Text>
+      </Ink.Text>,
     );
   }
 
@@ -77,7 +77,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
           </Ink.Text>
           <Ink.Text> </Ink.Text>
           <Ink.Text dimColor>{branch}</Ink.Text>
-        </Ink.Text>
+        </Ink.Text>,
       );
     }
 
@@ -94,7 +94,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
         </Ink.Text>
         <Ink.Text> </Ink.Text>
         <Ink.Text dimColor>{branch}</Ink.Text>
-      </Ink.Text>
+      </Ink.Text>,
     );
   }
 

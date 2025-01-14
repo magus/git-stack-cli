@@ -71,7 +71,7 @@ export function DirtyCheck(props: Props) {
               actions.output(
                 <Ink.Text color={colors.yellow}>
                   <FormatText message="📦 Changes saved to stash" />
-                </Ink.Text>
+                </Ink.Text>,
               );
 
               actions.set((state) => {

@@ -37,7 +37,7 @@ function SelectCommitRangesInternal(props: Props) {
 
   const [selected_group_id, set_selected_group_id] = React.useState(() => {
     const first_group = props.commit_range.group_list.find(
-      (g) => g.id !== props.commit_range.UNASSIGNED
+      (g) => g.id !== props.commit_range.UNASSIGNED,
     );
 
     if (first_group) {
@@ -54,7 +54,7 @@ function SelectCommitRangesInternal(props: Props) {
       const next_group_list = group_list.concat(group);
       return next_group_list;
     },
-    []
+    [],
   );
 
   const [commit_map, update_commit_map] = React.useReducer(
@@ -71,7 +71,7 @@ function SelectCommitRangesInternal(props: Props) {
       }
 
       return new Map(map);
-    }
+    },
   );
 
   const group_list: Array<SimpleGroup> = [];
@@ -407,7 +407,7 @@ function SelectCommitRangesInternal(props: Props) {
           group: <Brackets>{title}</Brackets>,
           note: <Parens>{id}</Parens>,
         }}
-      />
+      />,
     );
 
     // console.debug("submit_group_input", { title, id });

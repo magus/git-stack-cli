@@ -51,7 +51,7 @@ async function run(args: Args) {
 
   // combine all the above formats into one
   const format = [sha_format, date_format, author_format, decoration_format, subject_format].join(
-    " "
+    " ",
   );
 
   // view the SHA, description and history graph of last 20 commits

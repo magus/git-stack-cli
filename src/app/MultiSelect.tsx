@@ -51,7 +51,7 @@ export function MultiSelect<T>(props: Props<T>) {
       });
 
       return set;
-    }
+    },
   );
 
   // clamp index to keep in item range
@@ -81,7 +81,7 @@ export function MultiSelect<T>(props: Props<T>) {
       }
 
       return 0;
-    }
+    },
   );
 
   const selectRef = React.useRef(false);
