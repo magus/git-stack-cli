@@ -73,10 +73,11 @@ module.exports = {
       plugins: ["@typescript-eslint", "import", "react"],
 
       rules: {
-        "no-console": "error",
-        "prefer-const": "off",
         "linebreak-style": ["error", "unix"],
+        "no-console": "error",
+        "no-inner-declarations": "off",
         "no-unreachable": "error",
+        "prefer-const": "off",
 
         "@typescript-eslint/consistent-type-imports": [
           "error",
