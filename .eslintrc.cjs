@@ -86,6 +86,15 @@ module.exports = {
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-floating-promises": ["error"],
         "@typescript-eslint/no-namespace": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
+            ignoreRestSiblings: true,
+          },
+        ],
 
         ...import_eslint.rules,
       },
