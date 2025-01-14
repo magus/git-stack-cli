@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+
 import * as React from "react";
 
 import * as Ink from "ink-cjs";
@@ -12,6 +14,20 @@ import { pretty_json } from "~/core/pretty_json";
 (async function main() {
   try {
     const argv = await command();
+
+    process.on("uncaughtException", (error) => {
+      console.error("🚨 uncaughtException");
+      console.error(error);
+      maybe_verbose_help();
+      process.exit(237);
+    });
+
+    process.on("unhandledRejection", (reason, _promise) => {
+      console.error("🚨 unhandledRejection");
+      console.error(reason);
+      maybe_verbose_help();
+      process.exit(238);
+    });
 
     const ink = Ink.render(<App />, {
       // If true, each update will be rendered as a separate output, without replacing the previous one.
@@ -32,12 +48,17 @@ import { pretty_json } from "~/core/pretty_json";
     Store.getState().actions.debug(pretty_json(argv as any));
 
     await ink.waitUntilExit();
+
+    function maybe_verbose_help() {
+      if (!argv.verbose) {
+        console.error();
+        console.error("Try again with `--verbose` to see more information.");
+      }
+    }
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error(err);
-    process.exit(235);
+    process.exit(236);
   }
 })().catch((err) => {
-  // eslint-disable-next-line no-console
   console.error(err);
 });
