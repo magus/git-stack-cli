@@ -11,17 +11,27 @@ type Props = {
 };
 
 export function ExitingGate(props: Props) {
-  const is_exiting = Store.useState((state) => state.is_exiting);
+  const exit_mode = Store.useState((state) => state.exit_mode);
 
-  if (!is_exiting) {
+  if (!exit_mode) {
     return props.children;
   }
 
-  return (
-    <Ink.Box flexDirection="column">
-      <Ink.Text color={colors.red}>
-        <FormatText message="🚨 Exiting…" />
-      </Ink.Text>
-    </Ink.Box>
-  );
+  switch (exit_mode) {
+    case "quiet":
+      return null;
+
+    case "normal":
+      return (
+        <Ink.Box flexDirection="column">
+          <Ink.Text color={colors.red}>
+            <FormatText message="🚨 Exiting…" />
+          </Ink.Text>
+        </Ink.Box>
+      );
+
+    default:
+      exit_mode satisfies never;
+      return null;
+  }
 }

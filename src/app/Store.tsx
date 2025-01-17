@@ -33,6 +33,11 @@ type SyncGithubState = {
 // async function that returns exit code
 type AbortHandler = () => Promise<number>;
 
+type ExitArgs = {
+  quiet?: boolean;
+  clear?: boolean;
+};
+
 export type State = {
   // set immediately in `index.tsx` so no `null` scenario
   process_argv: Array<string>;
@@ -53,7 +58,7 @@ export type State = {
   sync_github: null | SyncGithubState;
   is_dirty_check_stash: boolean;
   abort_handler: null | AbortHandler;
-  is_exiting: boolean;
+  exit_mode: null | "normal" | "quiet";
 
   step:
     | "github-api-error"
@@ -74,7 +79,7 @@ export type State = {
   pr: { [branch: string]: PullRequest };
 
   actions: {
-    exit(code: number, clear?: boolean): void;
+    exit(code: number, args?: ExitArgs): void;
     clear(): void;
     unmount(): void;
     newline(): void;
@@ -124,7 +129,7 @@ const BaseStore = createStore<State>()(
     sync_github: null,
     is_dirty_check_stash: false,
     abort_handler: null,
-    is_exiting: false,
+    exit_mode: null,
 
     step: "loading",
 
@@ -134,9 +139,15 @@ const BaseStore = createStore<State>()(
     pr: {},
 
     actions: {
-      exit(code, clear = true) {
+      exit(code, args) {
         set((state) => {
-          state.is_exiting = true;
+          if (args?.quiet ?? code === 0) {
+            state.exit_mode = "quiet";
+          } else {
+            state.exit_mode = "normal";
+          }
+
+          let clear = args?.clear ?? true;
 
           const node = <Exit clear={clear} code={code} />;
           state.mutate.output(state, { node });
