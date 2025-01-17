@@ -112,7 +112,9 @@ GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
   const tmp_git_sequence_editor_path = path.join(os.tmpdir(), "git-sequence-editor.sh");
 
   // replaced at build time with literal contents of `scripts/git-sequence-editor.sh`
-  const GIT_SEQUENCE_EDITOR_SCRIPT = `process.env.GIT_SEQUENCE_EDITOR_SCRIPT`;
+  const GIT_SEQUENCE_EDITOR_SCRIPT = process.env.GIT_SEQUENCE_EDITOR_SCRIPT;
+
+  invariant(GIT_SEQUENCE_EDITOR_SCRIPT, "GIT_SEQUENCE_EDITOR_SCRIPT must exist");
 
   // write script to temporary path
   await fs.writeFile(tmp_git_sequence_editor_path, GIT_SEQUENCE_EDITOR_SCRIPT);
