@@ -75,6 +75,8 @@ async function run_build() {
 if (!WATCH) {
   await run_build();
 } else {
+  await run_build();
+
   console.debug("👀 Watching for changes…");
 
   const { signal } = new AbortController();
