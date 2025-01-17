@@ -5,13 +5,12 @@ import * as file from "~/core/file";
 import { spawn } from "~/core/spawn";
 
 // get paths relative to this script
-const SCRIPT_DIR = import.meta.dir;
-const PROJECT_DIR = path.join(SCRIPT_DIR, "..");
-const DIST_DIR = path.join(PROJECT_DIR, "dist");
-const STANDALONE_DIR = path.join(DIST_DIR, "standalone");
-const HOMEBREW_DIR = path.join(PROJECT_DIR, "homebrew");
+const REPO_ROOT = (await spawn.sync("git rev-parse --show-toplevel")).stdout;
+const DIST_DIR = path.join(REPO_ROOT, "dist");
+const BIN_DIR = path.join(DIST_DIR, "bin");
+const HOMEBREW_DIR = path.join(REPO_ROOT, "homebrew");
 
-const package_json = await file.read_json(path.join(PROJECT_DIR, "package.json"));
+const package_json = await file.read_json(path.join(REPO_ROOT, "package.json"));
 
 const version = package_json.version;
 
@@ -45,24 +44,20 @@ await file.write_text(
   previous_formula,
 );
 
-process.chdir(PROJECT_DIR);
+process.chdir(REPO_ROOT);
 
-// download github asset and calculate sha256
-// prettier-ignore
-await spawn.sync(["gh", "release", "download", version, "-p", `git-stack-cli-${version}.tgz`]);
-// prettier-ignore
 const tarball_asset = await create_asset(`git-stack-cli-${version}.tgz`, { version });
-await file.rm(tarball_asset.filepath);
 
-await spawn(`npm run build:standalone`);
+await spawn(`pnpm run compile`);
 
-process.chdir(STANDALONE_DIR);
+process.chdir(BIN_DIR);
 
-const linux_asset = await create_asset("git-stack-cli-linux", { version });
-const macos_asset = await create_asset("git-stack-cli-macos", { version });
-const win_asset = await create_asset("git-stack-cli-win.exe", { version });
+const linux_x64_asset = await create_asset("git-stack-bun-linux-x64.zip", { version });
+const macos_x64_asset = await create_asset("git-stack-bun-darwin-x64.zip", { version });
+const macos_arm64_asset = await create_asset("git-stack-bun-darwin-arm64.zip", { version });
+const win_x64_asset = await create_asset("git-stack-bun-windows-x64.exe.zip", { version });
 
-console.debug({ linux_asset, macos_asset, win_asset });
+console.debug({ linux_x64_asset, macos_x64_asset, macos_arm64_asset, win_x64_asset });
 
 const re_token = (name: string) => new RegExp(`{{ ${name} }}`, "g");
 
@@ -73,10 +68,12 @@ process.chdir(HOMEBREW_DIR);
 let tap = await file.read_text(path.join("templates", "git-stack.tap.rb.template"));
 
 tap = tap.replace(re_token("version"), version);
-tap = tap.replace(re_token("mac_bin"), macos_asset.filepath);
-tap = tap.replace(re_token("mac_sha256"), macos_asset.sha256);
-tap = tap.replace(re_token("linux_bin"), linux_asset.filepath);
-tap = tap.replace(re_token("linux_sha256"), linux_asset.sha256);
+tap = tap.replace(re_token("mac_x64_bin"), macos_x64_asset.filepath);
+tap = tap.replace(re_token("mac_x64_sha256"), macos_x64_asset.sha256);
+tap = tap.replace(re_token("mac_arm64_bin"), macos_arm64_asset.filepath);
+tap = tap.replace(re_token("mac_arm64_sha256"), macos_arm64_asset.sha256);
+tap = tap.replace(re_token("linux_x64_bin"), linux_x64_asset.filepath);
+tap = tap.replace(re_token("linux_x64_sha256"), linux_x64_asset.sha256);
 
 await file.write_text(path.join("Formula", "git-stack.rb"), tap);
 
@@ -89,12 +86,6 @@ core = core.replace(re_token("tarball_sha256"), tarball_asset.sha256);
 
 await file.write_text(path.join("Formula", "git-stack.core.rb"), core);
 
-// finally upload the assets to the github release
-process.chdir(STANDALONE_DIR);
-await spawn.sync(`gh release upload ${version} ${linux_asset.filepath}`);
-await spawn.sync(`gh release upload ${version} ${macos_asset.filepath}`);
-await spawn.sync(`gh release upload ${version} ${win_asset.filepath}`);
-
 // commit homebrew repo changes
 process.chdir(HOMEBREW_DIR);
 await spawn.sync(`git add .`);
@@ -102,7 +93,7 @@ await spawn.sync(`git commit -m ${version}`);
 await spawn.sync(`git push`);
 
 // commmit changes to main repo
-process.chdir(PROJECT_DIR);
+process.chdir(REPO_ROOT);
 // prettier-ignore
 await spawn.sync(["git", "commit", "-a", "-m", `homebrew-git-stack ${version}`]);
 await spawn.sync(`git push`);

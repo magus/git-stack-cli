@@ -7,15 +7,14 @@ import { spawn } from "~/core/spawn";
 process.env.NODE_ENV = "production";
 
 // get paths relative to this script
-const SCRIPT_DIR = import.meta.dir;
-const PROJECT_DIR = path.join(SCRIPT_DIR, "..");
-const DIST_DIR = path.join(PROJECT_DIR, "dist");
+const REPO_ROOT = (await spawn.sync("git rev-parse --show-toplevel")).stdout;
+const DIST_DIR = path.join(REPO_ROOT, "dist");
 
 // clear entire dist output directory
 await fs.rmdir(DIST_DIR, { recursive: true });
 await fs.mkdir(DIST_DIR, { recursive: true });
 
-process.chdir(PROJECT_DIR);
+process.chdir(REPO_ROOT);
 
 // require clean git status besides changes to package.json version
 const git_status = await spawn.sync("git status --porcelain");
@@ -24,7 +23,7 @@ if (!/^M\s+package.json/.test(git_status.stdout)) {
   process.exit(4);
 }
 
-const package_json = await file.read_json(path.join(PROJECT_DIR, "package.json"));
+const package_json = await file.read_json(path.join(REPO_ROOT, "package.json"));
 
 const version = package_json.version;
 
@@ -38,11 +37,11 @@ if (git_tag.stdout) {
 }
 
 // install all dependencies even though we are NODE_ENV=production
-await spawn(`npm install --production=false`);
+await spawn(`pnpm install --frozen-lockfile --production=false`);
 
-await spawn(`npm run test:all`);
+await spawn(`pnpm run test:all`);
 
-await spawn(`npm run build`);
+await spawn(`pnpm run build`);
 
 // confirm all files specified exist
 for (const filepath of package_json.files) {
@@ -59,7 +58,7 @@ console.info("Publishing to NPM requires a one-time password");
 const otp = await input("Enter OTP: ");
 await spawn(["npm", "publish", `--otp=${otp}`]);
 
-process.chdir(PROJECT_DIR);
+process.chdir(REPO_ROOT);
 
 await spawn.sync(`git commit -a -m ${version}`);
 await spawn.sync(`git push`);

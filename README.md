@@ -128,33 +128,36 @@ Ensure `node --version` is the same across both projects you are using to test t
 ```bash
 git submodule update --init --recursive
 npm i
-npm run dev
-npm run link
-
-# navigate to project to test within
-npm unlink git-stack-cli && npm link git-stack-cli
+pnpm run dev
+pnpm link --global
 
 git stack --verbose
 ```
 
-## Build standalone executable
+Remove global install
 
 ```bash
-npm run build:standalone
+pnpm remove -g git-stack-cli
+```
+
+## Build single-file executable
+
+```bash
+pnpm run compile
 ```
 
 ## Publishing
 
 > [!IMPORTANT]
 >
-> **You must update the `version` in `package.json` before running `npm run release`.
+> **You must update the `version` in `package.json` before running `pnpm run release`.
 > DO NOT use `npm version` or commit the change, the release scripts handle git tags etc.**
 
 ```bash
-npm run release
+pnpm run release
 
 # release individually
-npm run release:npm
-npm run release:github
-npm run release:brew
+pnpm run release:npm
+pnpm run release:github
+pnpm run release:brew
 ```

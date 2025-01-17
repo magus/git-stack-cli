@@ -15,6 +15,10 @@ import { pretty_json } from "~/core/pretty_json";
   try {
     const argv = await command();
 
+    // required to get bun working with ink
+    // https://github.com/oven-sh/bun/issues/6862#issuecomment-2429444852
+    process.stdin.resume();
+
     process.on("uncaughtException", (error) => {
       console.error("🚨 uncaughtException");
       console.error(error);
