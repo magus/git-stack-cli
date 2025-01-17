@@ -131,10 +131,10 @@ GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
     `revise --edit -i ${args.rebase_merge_base}`,
   ];
 
-  // ignore here is important to prevent scrollback clear
-  // change to pipe to see output temporarily
+  // `ignore` hdies output which helps prevent scrollback clear
+  // `pipe` helps see failures when git revise fails
   // https://github.com/magus/git-stack-cli/commit/f9f10e3ac3cd9a35ee75d3e0851a48391967a23f
-  await cli(command, { stdio: ["ignore", "ignore", "ignore"] });
+  await cli(command, { stdio: ["pipe", "pipe", "pipe"] });
 
   // cleanup tmp_git_sequence_editor_path
   await safe_rm(tmp_git_sequence_editor_path);
