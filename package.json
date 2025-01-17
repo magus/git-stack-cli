@@ -32,7 +32,7 @@
     "release": "npm run release:npm && npm run release:github && npm run release:brew",
     "lint:check": "eslint . --cache",
     "lint": "npm run lint:check -- --fix",
-    "prettier:check": "prettier ./src --check --cache",
+    "prettier:check": "prettier src scripts --check --cache",
     "prettier": "npm run prettier:check -- --write",
     "test": "bun test",
     "test:watch": "npm run test -- --watch",

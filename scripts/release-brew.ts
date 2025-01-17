@@ -11,20 +11,14 @@ const DIST_DIR = path.join(PROJECT_DIR, "dist");
 const STANDALONE_DIR = path.join(DIST_DIR, "standalone");
 const HOMEBREW_DIR = path.join(PROJECT_DIR, "homebrew");
 
-const package_json = await file.read_json(
-  path.join(PROJECT_DIR, "package.json")
-);
+const package_json = await file.read_json(path.join(PROJECT_DIR, "package.json"));
 
 const version = package_json.version;
 
 process.chdir(HOMEBREW_DIR);
 
 // before creating new formula, mv the previous into a versioned formula name
-const previous_formula_path = path.join(
-  HOMEBREW_DIR,
-  "Formula",
-  "git-stack.rb"
-);
+const previous_formula_path = path.join(HOMEBREW_DIR, "Formula", "git-stack.rb");
 
 // match either version format from core or tap formula
 //
@@ -44,14 +38,11 @@ const previous_version = previous_version_match.groups.version;
 // convert `1.0.4` to `104`
 const not_dot_version = previous_version.replace(/\./g, "");
 const previous_class = `GitStackAT${not_dot_version}`;
-previous_formula = previous_formula.replace(
-  "class GitStack",
-  `class ${previous_class}`
-);
+previous_formula = previous_formula.replace("class GitStack", `class ${previous_class}`);
 
 await file.write_text(
   path.join(HOMEBREW_DIR, "Formula", `git-stack@${previous_version}.rb`),
-  previous_formula
+  previous_formula,
 );
 
 process.chdir(PROJECT_DIR);
@@ -79,9 +70,7 @@ process.chdir(HOMEBREW_DIR);
 
 // homebrew tap formula (binaries)
 
-let tap = await file.read_text(
-  path.join("templates", "git-stack.tap.rb.template")
-);
+let tap = await file.read_text(path.join("templates", "git-stack.tap.rb.template"));
 
 tap = tap.replace(re_token("version"), version);
 tap = tap.replace(re_token("mac_bin"), macos_asset.filepath);
@@ -93,9 +82,7 @@ await file.write_text(path.join("Formula", "git-stack.rb"), tap);
 
 // homebrew/core formula (build from source)
 
-let core = await file.read_text(
-  path.join("templates", "git-stack.core.rb.template")
-);
+let core = await file.read_text(path.join("templates", "git-stack.core.rb.template"));
 
 core = core.replace(re_token("version"), version);
 core = core.replace(re_token("tarball_sha256"), tarball_asset.sha256);

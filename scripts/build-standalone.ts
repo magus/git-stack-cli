@@ -26,9 +26,7 @@ console.debug(`Building for target [${TARGET}]`);
 await fs.rmdir(DIST_DIR, { recursive: true });
 await fs.mkdir(DIST_DIR, { recursive: true });
 
-const package_json = await file.read_json(
-  path.join(PROJECT_DIR, "package.json")
-);
+const package_json = await file.read_json(path.join(PROJECT_DIR, "package.json"));
 
 // prettier-ignore
 const { name, version, description, author, license, repository } = package_json;
@@ -46,10 +44,7 @@ const standalone_package_json = {
   },
 };
 
-await file.write_json(
-  path.join(STANDALONE_DIR, "package.json"),
-  standalone_package_json
-);
+await file.write_json(path.join(STANDALONE_DIR, "package.json"), standalone_package_json);
 
 process.chdir(PROJECT_DIR);
 
@@ -58,16 +53,9 @@ process.env.NODE_ENV = "production";
 // run typescript build to generate module output
 await spawn("npm run build");
 
-await fs.cp(
-  path.join(CJS_DIR, "index.cjs"),
-  path.join(STANDALONE_DIR, "index.js")
-);
+await fs.cp(path.join(CJS_DIR, "index.cjs"), path.join(STANDALONE_DIR, "index.js"));
 
 process.chdir(STANDALONE_DIR);
 
 // run pkg to build standalone executable
-await spawn([
-  path.join(NODE_MODULES_BIN, "pkg"),
-  "package.json",
-  `--targets=${TARGET}`,
-]);
+await spawn([path.join(NODE_MODULES_BIN, "pkg"), "package.json", `--targets=${TARGET}`]);

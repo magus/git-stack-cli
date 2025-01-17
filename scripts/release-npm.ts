@@ -24,9 +24,7 @@ if (!/^M\s+package.json/.test(git_status.stdout)) {
   process.exit(4);
 }
 
-const package_json = await file.read_json(
-  path.join(PROJECT_DIR, "package.json")
-);
+const package_json = await file.read_json(path.join(PROJECT_DIR, "package.json"));
 
 const version = package_json.version;
 

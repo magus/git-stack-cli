@@ -8,9 +8,7 @@ import { spawn } from "~/core/spawn";
 const SCRIPT_DIR = import.meta.dir;
 const PROJECT_DIR = path.join(SCRIPT_DIR, "..");
 
-const package_json = await file.read_json(
-  path.join(PROJECT_DIR, "package.json")
-);
+const package_json = await file.read_json(path.join(PROJECT_DIR, "package.json"));
 
 const version = package_json.version;
 
