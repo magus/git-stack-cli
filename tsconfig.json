@@ -3,7 +3,7 @@
   "exclude": ["node_modules"],
 
   "compilerOptions": {
-    // prevent outputting any files, rollup will handle that
+    // prevent outputting any files, bundler will handle that
     "noEmit": true,
 
     "module": "es2022",
