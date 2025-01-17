@@ -35,7 +35,7 @@ if (!previous_version_match?.groups) {
 
 const previous_version = previous_version_match.groups.version;
 // convert `1.0.4` to `104`
-const not_dot_version = previous_version.replace(/\./g, "");
+const not_dot_version = previous_version.replace(/[^a-z0-9]/gi, "");
 const previous_class = `GitStackAT${not_dot_version}`;
 previous_formula = previous_formula.replace("class GitStack", `class ${previous_class}`);
 
