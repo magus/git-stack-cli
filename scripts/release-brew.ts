@@ -25,7 +25,7 @@ const previous_formula_path = path.join(HOMEBREW_DIR, "Formula", "git-stack.rb")
 //   version = "1.0.4"
 //
 let previous_formula = await file.read_text(previous_formula_path);
-const re_version = /version(?: =)? "(?<version>\d+\.\d+\.\d+)"/m;
+const re_version = /version(?: =)? "(?<version>\d+\.\d+\.\d+(?:-.+)?)"/m;
 const previous_version_match = previous_formula.match(re_version);
 
 if (!previous_version_match?.groups) {
