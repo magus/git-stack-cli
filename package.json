@@ -52,6 +52,7 @@
     "zustand": "^4.4.4"
   },
   "devDependencies": {
+    "@oven/bun-darwin-aarch64": "1.1.42",
     "@types/chalk": "^2.2.0",
     "@types/lodash": "^4.17.7",
     "@types/luxon": "^3.4.2",
