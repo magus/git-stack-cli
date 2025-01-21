@@ -1,7 +1,7 @@
 import * as React from "react";
 
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 
 import * as Ink from "ink-cjs";
@@ -10,6 +10,7 @@ import { Brackets } from "~/app/Brackets";
 import { Store } from "~/app/Store";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
+import { get_tmp_dir } from "~/core/get_tmp_dir";
 import { invariant } from "~/core/invariant";
 import { safe_quote } from "~/core/safe_quote";
 import { safe_rm } from "~/core/safe_rm";
@@ -228,7 +229,10 @@ const JSON_FIELDS = "--json id,number,state,baseRefName,headRefName,commits,titl
 // consistent handle gh cli commands returning json
 // redirect to tmp file to avoid scrollback overflow causing scrollback to be cleared
 async function gh_json<T>(command: string): Promise<T | Error> {
-  const tmp_pr_json = path.join(os.tmpdir(), "git-stack-gh.json");
+  // hash command for unique short string
+  let hash = crypto.createHash("md5").update(command).digest("hex");
+  let tmp_filename = safe_filename(`gh_json-${hash}`);
+  const tmp_pr_json = path.join(await get_tmp_dir(), `${tmp_filename}.json`);
 
   const options = { ignoreExitCode: true };
   const cli_result = await cli(`gh ${command} > ${tmp_pr_json}`, options);
@@ -238,9 +242,13 @@ async function gh_json<T>(command: string): Promise<T | Error> {
   }
 
   // read from file
-  const json_str = await fs.readFile(tmp_pr_json, "utf-8");
-  const json = JSON.parse(json_str);
-  return json;
+  const json_str = String(await fs.readFile(tmp_pr_json));
+  try {
+    const json = JSON.parse(json_str);
+    return json;
+  } catch (error) {
+    return new Error(`gh_json JSON.parse: ${error}`);
+  }
 }
 
 function handle_error(output: string): never {
@@ -258,21 +266,22 @@ function handle_error(output: string): never {
 async function write_body_file(args: EditPullRequestArgs) {
   invariant(args.body, "args.body must exist");
 
-  const temp_dir = os.tmpdir();
-
   // ensure unique filename is safe for filesystem
   // base (group id) might contain slashes, e.g. dev/magus/gs-3cmrMBSUj
   // the flashes would mess up the filesystem path to this file
-  let temp_filename = `git-stack-body-${args.base}`;
-  temp_filename = temp_filename.replace(RE.non_alphanumeric_dash, "-");
+  let tmp_filename = safe_filename(`git-stack-body-${args.base}`);
 
-  const temp_path = path.join(temp_dir, temp_filename);
+  const temp_path = path.join(await get_tmp_dir(), tmp_filename);
 
   await safe_rm(temp_path);
 
   await fs.writeFile(temp_path, args.body);
 
   return temp_path;
+}
+
+function safe_filename(value: string): string {
+  return value.replace(RE.non_alphanumeric_dash, "-");
 }
 
 type Commit = {
