@@ -4,11 +4,14 @@
 
 import * as React from "react";
 
+import fs from "node:fs/promises";
+
 import * as Ink from "ink-cjs";
 
 import { App } from "~/app/App";
 import { Store } from "~/app/Store";
 import { command } from "~/command";
+import { get_tmp_dir } from "~/core/get_tmp_dir";
 import { pretty_json } from "~/core/pretty_json";
 
 (async function main() {
@@ -32,6 +35,10 @@ import { pretty_json } from "~/core/pretty_json";
       maybe_verbose_help();
       process.exit(238);
     });
+
+    // cleanup leftover temporary files from previous run
+    const tmp_dir = await get_tmp_dir();
+    await fs.rm(tmp_dir, { recursive: true });
 
     const ink = Ink.render(<App />, {
       // If true, each update will be rendered as a separate output, without replacing the previous one.
