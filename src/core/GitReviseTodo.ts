@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
+import { get_tmp_dir } from "~/core/get_tmp_dir";
 import { invariant } from "~/core/invariant";
 import { safe_rm } from "~/core/safe_rm";
 
@@ -109,7 +109,7 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
 
 GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
   // generate temporary directory and drop sequence editor script
-  const tmp_git_sequence_editor_path = path.join(os.tmpdir(), "git-sequence-editor.sh");
+  const tmp_git_sequence_editor_path = path.join(await get_tmp_dir(), "git-sequence-editor.sh");
 
   // replaced at build time with literal contents of `scripts/git-sequence-editor.sh`
   const GIT_SEQUENCE_EDITOR_SCRIPT = process.env.GIT_SEQUENCE_EDITOR_SCRIPT;
