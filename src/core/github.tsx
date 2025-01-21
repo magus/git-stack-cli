@@ -68,7 +68,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
 
   if (cache) {
     if (actions.isDebug()) {
-      actions.output(
+      actions.debug(
         <Ink.Text>
           <Ink.Text dimColor>Github pr_status cache</Ink.Text>
           <Ink.Text> </Ink.Text>
@@ -85,7 +85,7 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
   }
 
   if (actions.isDebug()) {
-    actions.output(
+    actions.debug(
       <Ink.Text>
         <Ink.Text dimColor>Github pr_status cache</Ink.Text>
         <Ink.Text> </Ink.Text>
