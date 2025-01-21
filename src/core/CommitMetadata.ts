@@ -6,7 +6,8 @@ import * as github from "~/core/github";
 export type CommitMetadata = Awaited<ReturnType<typeof commit>>;
 export type CommitRange = Awaited<ReturnType<typeof range>>;
 
-type PullRequest = NonNullable<Awaited<ReturnType<typeof github.pr_status>>>;
+type GithubPRStatus = ReturnType<typeof github.pr_status>;
+type PullRequest = NonNullable<Awaited<GithubPRStatus>>;
 
 type CommitGroup = {
   id: string;
@@ -93,15 +94,31 @@ export async function range(commit_group_map?: CommitGroupMap) {
   const group_list = [];
   let unassigned_group;
 
+  // collect github pr status in parallel
+  const pr_status_promise_list: Record<string, GithubPRStatus> = {};
+  for (const group of group_value_list) {
+    if (group.id !== UNASSIGNED) {
+      pr_status_promise_list[group.id] = github.pr_status(group.id);
+    }
+  }
+
+  await Promise.all(Array.from(Object.values(pr_status_promise_list)));
+
+  for (const [group_id, pr_status_promise] of Object.entries(pr_status_promise_list)) {
+    const pr_status = await pr_status_promise;
+    if (pr_status) {
+      pr_lookup[group_id] = pr_status;
+    }
+  }
+
   for (let i = 0; i < group_value_list.length; i++) {
     const group = group_value_list[i];
 
     if (group.id !== UNASSIGNED) {
-      const pr_result = await github.pr_status(group.id);
+      let pr_result = pr_lookup[group.id];
 
       if (pr_result && pr_result.state !== "CLOSED") {
         group.pr = pr_result;
-        pr_lookup[group.id] = pr_result;
       }
     }
 
