@@ -108,7 +108,7 @@ export function DetectInitialPR(props: Props) {
     const commit_range = Store.getState().commit_range;
 
     invariant(branch_name, "branch_name must exist");
-    invariant(commit_range, "branch_name must exist");
+    invariant(commit_range, "commit_range must exist");
 
     try {
       let has_existing_metadata = false;
@@ -149,7 +149,7 @@ export function DetectInitialPR(props: Props) {
     const commit_range = cloneDeep(Store.getState().commit_range);
 
     invariant(branch_name, "branch_name must exist");
-    invariant(commit_range, "branch_name must exist");
+    invariant(commit_range, "commit_range must exist");
 
     for (const group of commit_range.group_list) {
       group.id = branch_name;
