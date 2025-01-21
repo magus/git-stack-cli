@@ -118,4 +118,6 @@ async function run() {
       actions.output(<Ink.Text color={colors.green}>✅ Changes restored from stash</Ink.Text>);
     }
   }
+
+  actions.exit(0);
 }

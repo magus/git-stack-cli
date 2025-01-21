@@ -65,4 +65,6 @@ async function run(args: Args) {
   const result = await cli(command);
 
   actions.output(result.stdout);
+
+  actions.exit(0);
 }
