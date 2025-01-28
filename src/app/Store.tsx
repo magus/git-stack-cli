@@ -84,7 +84,7 @@ export type State = {
     unmount(): void;
     newline(): void;
     json(value: pretty_json.JSONValue): void;
-    error(message: string): void;
+    error(error: unknown): void;
     output(node: React.ReactNode): void;
     debug(node: React.ReactNode, id?: string): void;
 
@@ -176,9 +176,24 @@ const BaseStore = createStore<State>()(
         });
       },
 
-      error(message) {
+      error(error) {
+        let node: React.ReactNode;
+
+        if (typeof error === "string") {
+          node = <Ink.Text color={colors.red}>{error}</Ink.Text>;
+        } else if (error instanceof Error) {
+          node = (
+            <Ink.Box flexDirection="column">
+              <Ink.Text color={colors.red}>{error.stack}</Ink.Text>
+            </Ink.Box>
+          );
+        } else {
+          node = (
+            <Ink.Text color={colors.red}>{`Unhandled error: ${JSON.stringify(error)}`}</Ink.Text>
+          );
+        }
+
         set((state) => {
-          const node = <Ink.Text color={colors.red}>{message}</Ink.Text>;
           state.mutate.output(state, { node });
         });
       },
