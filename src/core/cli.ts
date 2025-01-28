@@ -79,8 +79,7 @@ export async function cli(
 
       state.actions.set((state) => state.mutate.end_pending_output(state, id));
       state.actions.debug(log.end(result));
-      state.actions.debug(result.output);
-      state.actions.debug("\n");
+      state.actions.debug(log.output(result));
 
       if (!options.ignoreExitCode && result.code !== 0) {
         reject(new Error(log.error(result)));
@@ -131,7 +130,7 @@ cli.sync = function cli_sync(
   };
 
   state.actions.debug(log.end(result));
-  state.actions.debug(result.output);
+  state.actions.debug(log.output(result));
 
   if (!options.ignoreExitCode && result.code !== 0) {
     throw new Error(log.error(result));
@@ -152,6 +151,10 @@ const log = {
   end(result: Return) {
     const { command, code, duration } = result;
     return `[end] ${command} (exit_code=${code} duration=${duration})`;
+  },
+
+  output(result: Return) {
+    return `${result.output}\n`;
   },
 
   error(result: Return) {
