@@ -126,8 +126,10 @@ Managing even a few stacked diffs requires a relatively strong knowledge of `git
 Ensure `node --version` is the same across both projects you are using to test the `git-stack` cli
 
 ```bash
+corepack enable
+
 git submodule update --init --recursive
-npm i
+pnpm i
 pnpm run dev
 pnpm link --global
 
