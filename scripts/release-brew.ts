@@ -64,6 +64,8 @@ console.debug({ linux_x64_asset, macos_x64_asset, macos_arm64_asset, win_x64_ass
 const re_token = (name: string) => new RegExp(`{{ ${name} }}`, "g");
 
 process.chdir(HOMEBREW_DIR);
+await spawn.sync(`git reset --hard`);
+await spawn.sync(`git checkout master`);
 
 // homebrew tap formula (binaries)
 
