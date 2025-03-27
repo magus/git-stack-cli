@@ -58,7 +58,7 @@ async function compile_target(args: CompileTargetArgs) {
 
   const start = Date.now();
 
-  // bun build --compile --target=bun-darwin-x64 ./path/to/my/app.ts --outfile myapp
+  // pnpm bun build --compile --target=bun-darwin-arm64 ./dist/js/index.js --outfile git-stack-bun-darwin-arm64
   const bun_compile = await spawn.sync([
     "bun",
     "build",
