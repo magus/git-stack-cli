@@ -125,14 +125,17 @@ export async function pr_create(args: CreatePullRequestArgs) {
 
   // explicit refs/heads head branch to avoid creation failing
   //
-  //   ❯ gh pr create --head origin/gs-ED2etrzv2 --base gs-6LAx-On45 --title="2024-01-05 test" --body=""
+  //   ❯ gh pr create --head refs/heads/gs-ED2etrzv2 --base gs-6LAx-On45 --title="2024-01-05 test" --body=""
   //   pull request create failed: GraphQL: Head sha can't be blank, Base sha can't be blank, No commits between gs-6LAx-On45 and origin/gs-ED2etrzv2, Head ref must be a branch (createPullRequest)
   //
   // https://github.com/cli/cli/issues/5465
+
+  const base = args.base.replace(/^origin\//, "");
+
   let command_parts = [
     "gh pr create",
     `--head refs/heads/${args.branch}`,
-    `--base ${args.base}`,
+    `--base ${base}`,
     `--title="${title}"`,
     `--body="${args.body}"`,
   ];
@@ -158,7 +161,8 @@ type EditPullRequestArgs = {
 };
 
 export async function pr_edit(args: EditPullRequestArgs) {
-  const command_parts = [`gh pr edit ${args.branch} --base ${args.base}`];
+  const base = args.base.replace(/^origin\//, "");
+  const command_parts = [`gh pr edit ${args.branch} --base ${base}`];
 
   let body_file: string | undefined;
 
@@ -269,7 +273,8 @@ async function write_body_file(args: EditPullRequestArgs) {
   // ensure unique filename is safe for filesystem
   // base (group id) might contain slashes, e.g. dev/magus/gs-3cmrMBSUj
   // the flashes would mess up the filesystem path to this file
-  let tmp_filename = safe_filename(`git-stack-body-${args.base}`);
+  const base = args.base.replace(/^origin\//, "");
+  let tmp_filename = safe_filename(`git-stack-body-${base}`);
 
   const temp_path = path.join(await get_tmp_dir(), tmp_filename);
 

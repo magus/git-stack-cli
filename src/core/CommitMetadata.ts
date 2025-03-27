@@ -132,7 +132,8 @@ export async function range(commit_group_map?: CommitGroupMap) {
     }
 
     if (i === 0) {
-      group.base = master_branch;
+      const master_branch_name = master_branch.replace(/^origin\//, "");
+      group.base = master_branch_name;
     } else {
       const last_group = group_value_list[i - 1];
       // console.debug("  ", "last_group", last_group.pr?.title.substring(0, 40));
