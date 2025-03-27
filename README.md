@@ -1,4 +1,8 @@
-# git-stack-cli
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c6267f97-890e-4528-ad54-fe2f7e1c4444" alt="Logo" height=240>
+</p>
+
+# `git stack`
 
 - ✨ **[Stacked diffs](https://graphite.dev/guides/stacked-diffs) for `git`**
 - 🚀 **Simple one-branch workflow**
