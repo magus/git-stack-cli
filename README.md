@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/ca7a7b73-a7ce-46e4-9481-a645c8daa3ae" alt="Logo" height=240>
+  <img src="https://github.com/user-attachments/assets/3fba8b2d-2cb2-446b-8bf4-523643636565" alt="Logo" height=240>
 </p>
 
 # `git stack`
