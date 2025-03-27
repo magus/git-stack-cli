@@ -37,9 +37,15 @@ spawn.sync = async function spawnSync(unsafe_cmd: CommandLike) {
 
   const stdout = String(proc.stdout).trim();
   const stderr = String(proc.stderr).trim();
+  const exit_code = proc.exitCode;
 
-  console.debug("[end]", cmd.str);
-  console.debug({ stdout, stderr });
+  const display_cmd_exit = `${cmd.str} (${exit_code})`;
+  console.debug("[end]", display_cmd_exit);
+  console.debug({ stdout, stderr, exit_code });
+
+  if (exit_code) {
+    throw new Error(`[failed] ${display_cmd_exit}`);
+  }
 
   return { proc, stdout, stderr };
 };
