@@ -53,8 +53,9 @@ Rebase.run = async function run() {
     process.chdir(repo_root);
     await cli(`pwd`);
 
-    // update local master to match remote
-    await cli(`git fetch --no-tags -v origin ${master_branch}:${master_branch}`);
+    // fetch origin master branch for latest sha
+    const master_branch_name = master_branch.replace(/^origin\//, "");
+    await cli(`git fetch --no-tags -v origin ${master_branch_name}`);
 
     const master_sha = (await cli(`git rev-parse ${master_branch}`)).stdout;
     const rebase_merge_base = master_sha;

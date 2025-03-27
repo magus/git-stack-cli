@@ -160,7 +160,7 @@ export function DetectInitialPR(props: Props) {
       }
     }
 
-    // get latest merge_base relative to local master
+    // get latest merge_base relative to origin/master
     const rebase_group_index = 0;
 
     const rebase_merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;

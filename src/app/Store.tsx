@@ -119,7 +119,7 @@ const BaseStore = createStore<State>()(
     username: null,
     repo_path: null,
     repo_root: null,
-    master_branch: "master",
+    master_branch: "origin/master",
     head: null,
     branch_name: null,
     commit_range: null,

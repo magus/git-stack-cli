@@ -92,7 +92,7 @@ const DefaultOptions = {
     type: "string",
     alias: ["b"],
     description:
-      'Set the master branch name, defaults to "master" (or "main" if "master" is not found)',
+      'Set the master branch name, defaults to "origin/master" (or "origin/main" if "origin/master" is not found)',
   },
 
   "draft": {

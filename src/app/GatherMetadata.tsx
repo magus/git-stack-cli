@@ -44,7 +44,9 @@ async function run() {
 
       master_branch = argv.branch;
     } else {
-      const detect_master = await cli(`git branch --list "${BRANCH.master}" --color=never`);
+      const detect_master = await cli(
+        `git branch --list --remote "${BRANCH.master}" --color=never`,
+      );
 
       if (detect_master.stdout !== "") {
         master_branch = BRANCH.master;
@@ -63,6 +65,8 @@ async function run() {
       }
     }
 
+    actions.debug(`master_branch = ${master_branch}`);
+
     const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
 
     // handle detahed head state
@@ -73,7 +77,7 @@ async function run() {
     }
 
     // handle when there are no detected changes
-    if (branch_name === master_branch) {
+    if (`origin/${branch_name}` === master_branch) {
       actions.error("Must run within a branch.");
       actions.exit(0);
       return;
@@ -124,6 +128,6 @@ const RE = {
 };
 
 const BRANCH = {
-  master: "master",
-  main: "main",
+  master: "origin/master",
+  main: "origin/main",
 };
