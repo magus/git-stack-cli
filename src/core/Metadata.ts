@@ -1,5 +1,4 @@
 import { invariant } from "~/core/invariant";
-import { safe_quote } from "~/core/safe_quote";
 
 type InputMetadataValues = {
   id: string;
@@ -24,8 +23,6 @@ export function write(message: string, values: InputMetadataValues) {
   }
 
   let new_message = line_list.join("\n");
-
-  new_message = safe_quote(new_message);
 
   return new_message;
 }

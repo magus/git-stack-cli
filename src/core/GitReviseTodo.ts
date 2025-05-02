@@ -91,8 +91,6 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
 
     let message_with_id = unsafe_message_with_id;
 
-    message_with_id = message_with_id.replace(/[^\\]"/g, '\\"');
-
     // get first 12 characters of commit sha
     const sha = commit.sha.slice(0, 12);
 
