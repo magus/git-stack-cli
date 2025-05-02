@@ -17,19 +17,31 @@ echo "CLI=$0 $*"
 echo "PWD=$(pwd)"
 
 # ensure `GIT_REVISE_TODO` is not empty
-if [ -z "$GIT_REVISE_TODO" ]; then
-  echo "🚨 GIT_REVISE_TODO environment variable is empty" >&2
+if [ ! -f "$GIT_REVISE_TODO" ]; then
+  echo "🚨 GIT_REVISE_TODO file must exist" >&2
   exit 1
 fi
 
 # first argument into git sequence editor is git-revise-todo file
 git_revise_todo_path="$1"
 
-# debug print git-revise-todo file passed into command
-echo "$git_revise_todo_path"
+# print content of git-revise-todo file passed into command
+echo
+echo "BEFORE git_revise_todo_path=$git_revise_todo_path"
 echo "----- START -----"
 cat "$git_revise_todo_path"
+echo
 echo "------ END ------"
+echo
 
-# write content of `GIT_REVISE_TODO` env variable to `git_revise_todo_path`
-echo "$GIT_REVISE_TODO" > "$git_revise_todo_path"
+# copy content of file at `GIT_REVISE_TODO` env variable to `git_revise_todo_path`
+cp "$GIT_REVISE_TODO" "$git_revise_todo_path"
+
+# print content of git-revise-todo file after copy above
+echo
+echo "AFTER git_revise_todo_path=$git_revise_todo_path"
+echo "----- START -----"
+cat "$git_revise_todo_path"
+echo
+echo "------ END ------"
+echo

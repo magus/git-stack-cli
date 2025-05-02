@@ -108,27 +108,25 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
 };
 
 GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
-  // generate temporary directory and drop sequence editor script
-  const tmp_git_sequence_editor_path = path.join(await get_tmp_dir(), "git-sequence-editor.sh");
-
   // replaced at build time with literal contents of `scripts/git-sequence-editor.sh`
   const GIT_SEQUENCE_EDITOR_SCRIPT = process.env.GIT_SEQUENCE_EDITOR_SCRIPT;
-
   invariant(GIT_SEQUENCE_EDITOR_SCRIPT, "GIT_SEQUENCE_EDITOR_SCRIPT must exist");
 
-  // write script to temporary path
+  // generate temporary directory and drop sequence editor script
+  // write script to temporary path and ensure script is executable
+  const tmp_git_sequence_editor_path = path.join(await get_tmp_dir(), "git-sequence-editor.sh");
   await fs.writeFile(tmp_git_sequence_editor_path, GIT_SEQUENCE_EDITOR_SCRIPT);
-
-  // ensure script is executable
   await fs.chmod(tmp_git_sequence_editor_path, "755");
 
-  const git_revise_todo = GitReviseTodo(args);
+  // write git revise todo to a temp path for use by sequence editor script
+  const tmp_path_git_revise_todo = path.join(await get_tmp_dir(), "git-revise-todo.txt");
+  await fs.writeFile(tmp_path_git_revise_todo, GitReviseTodo(args));
 
   // execute cli with temporary git sequence editor script
   // revise from merge base to pick correct commits
   const command = [
     `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
-    `GIT_REVISE_TODO="${git_revise_todo}"`,
+    `GIT_REVISE_TODO="${tmp_path_git_revise_todo}"`,
     `git`,
     `revise --edit -i ${args.rebase_merge_base}`,
   ];
