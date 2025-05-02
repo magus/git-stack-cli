@@ -66,6 +66,8 @@ const re_token = (name: string) => new RegExp(`{{ ${name} }}`, "g");
 process.chdir(HOMEBREW_DIR);
 await spawn.sync(`git reset --hard`);
 await spawn.sync(`git checkout master`);
+await spawn.sync("git fetch --prune");
+await spawn.sync("git reset --hard origin/master");
 
 // homebrew tap formula (binaries)
 
