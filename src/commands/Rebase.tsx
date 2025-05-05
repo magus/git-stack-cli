@@ -121,28 +121,7 @@ Rebase.run = async function run() {
 
     restore_git();
 
-    const next_commit_range = await CommitMetadata.range();
-
-    actions.output(
-      <FormatText
-        wrapper={<Ink.Text color={colors.green} />}
-        message="✅ {branch_name} in sync with {origin_branch}"
-        values={{
-          branch_name: <Brackets>{branch_name}</Brackets>,
-          origin_branch: <Brackets>{master_branch}</Brackets>,
-        }}
-      />,
-    );
-
     actions.unregister_abort_handler();
-
-    actions.set((state) => {
-      state.commit_range = next_commit_range;
-    });
-
-    actions.output(<Status />);
-
-    actions.exit(0);
   } catch (err) {
     actions.error("Unable to rebase.");
 
@@ -152,9 +131,29 @@ Rebase.run = async function run() {
       }
     }
 
-    handle_exit();
     actions.exit(20);
   }
+
+  const next_commit_range = await CommitMetadata.range();
+
+  actions.output(
+    <FormatText
+      wrapper={<Ink.Text color={colors.green} />}
+      message="✅ {branch_name} in sync with {origin_branch}"
+      values={{
+        branch_name: <Brackets>{branch_name}</Brackets>,
+        origin_branch: <Brackets>{master_branch}</Brackets>,
+      }}
+    />,
+  );
+
+  actions.set((state) => {
+    state.commit_range = next_commit_range;
+  });
+
+  actions.output(<Status />);
+
+  actions.exit(0);
 
   // cleanup git operations if cancelled during manual rebase
   function restore_git() {

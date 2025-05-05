@@ -142,7 +142,6 @@ async function run() {
       actions.error("Try again with `--verbose` to see more information.");
     }
 
-    handle_exit();
     actions.exit(18);
   }
 
