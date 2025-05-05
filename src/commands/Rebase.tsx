@@ -7,7 +7,6 @@ import * as Ink from "ink-cjs";
 import { Await } from "~/app/Await";
 import { Brackets } from "~/app/Brackets";
 import { FormatText } from "~/app/FormatText";
-import { Parens } from "~/app/Parens";
 import { Status } from "~/app/Status";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
@@ -72,35 +71,32 @@ Rebase.run = async function run() {
 
       // drop commits that are in groups of merged PRs
       const merged_pr = commit_pr?.state === "MERGED";
+      const commit_message = <Ink.Text color={colors.blue}>{commit.subject_line}</Ink.Text>;
 
       if (merged_pr) {
-        if (actions.isDebug()) {
-          actions.output(
-            <FormatText
-              wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
-              message="Dropping {commit_message} {pr_status}"
-              values={{
-                commit_message: <Brackets>{commit.subject_line}</Brackets>,
-                pr_status: <Parens>MERGED</Parens>,
-              }}
-            />,
-          );
-        }
+        actions.output(
+          <FormatText
+            wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
+            message="Dropping {pr_status} {commit_message}"
+            values={{
+              pr_status: <Ink.Text color={colors.purple}>MERGED</Ink.Text>,
+              commit_message,
+            }}
+          />,
+        );
 
         continue;
       }
 
-      if (actions.isDebug()) {
-        actions.output(
-          <FormatText
-            wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
-            message="Picking {commit_message}"
-            values={{
-              commit_message: <Brackets>{commit.subject_line}</Brackets>,
-            }}
-          />,
-        );
-      }
+      actions.output(
+        <FormatText
+          wrapper={<Ink.Text color={colors.yellow} wrap="truncate-end" />}
+          message="Picking {commit_message}"
+          values={{
+            commit_message,
+          }}
+        />,
+      );
 
       picked_commit_list.push(commit);
     }
