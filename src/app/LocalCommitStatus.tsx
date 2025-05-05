@@ -57,9 +57,7 @@ async function run() {
     actions.error("Unable to retrieve local commit status.");
 
     if (err instanceof Error) {
-      if (actions.isDebug()) {
-        actions.error(err.message);
-      }
+      actions.error(err.message);
     }
   }
 }

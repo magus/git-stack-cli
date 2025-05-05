@@ -112,9 +112,7 @@ async function run() {
     actions.error("Unable to gather git metadata.");
 
     if (err instanceof Error) {
-      if (actions.isDebug()) {
-        actions.error(err.message);
-      }
+      actions.error(err.message);
     }
 
     actions.exit(7);

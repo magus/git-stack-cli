@@ -84,12 +84,8 @@ export function CherryPickCheck(props: Props) {
 
       patch({ status: "done" });
     } catch (err) {
-      actions.error("Must be run from within a git repository.");
-
       if (err instanceof Error) {
-        if (actions.isDebug()) {
-          actions.error(err.message);
-        }
+        actions.error(err.message);
       }
 
       actions.exit(11);

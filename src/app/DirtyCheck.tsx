@@ -112,12 +112,8 @@ export function DirtyCheck(props: Props) {
         patch({ status: "prompt" });
       }
     } catch (err) {
-      actions.error("Must be run from within a git repository.");
-
       if (err instanceof Error) {
-        if (actions.isDebug()) {
-          actions.error(err.message);
-        }
+        actions.error(err.message);
       }
 
       actions.exit(12);

@@ -34,9 +34,7 @@ async function run() {
     actions.error("Unable to log verbose debug information.");
 
     if (err instanceof Error) {
-      if (actions.isDebug()) {
-        actions.error(err.message);
-      }
+      actions.error(err.message);
     }
 
     actions.exit(14);
