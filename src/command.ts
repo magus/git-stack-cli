@@ -9,6 +9,7 @@ export async function command() {
   // https://yargs.js.org/docs/#api-reference-optionkey-opt
   return (
     yargs(hideBin(process.argv))
+      .scriptName("git stack")
       .usage("Usage: git stack [command] [options]")
 
       .command("$0", "Sync commit ranges to Github", (yargs) => yargs.options(DefaultOptions))
