@@ -82,6 +82,7 @@ export async function cli(
       state.actions.debug(log.output(result));
 
       if (!options.ignoreExitCode && result.code !== 0) {
+        state.actions.debug(log.non_zero_exit(result));
         reject(new Error(log.error(result)));
       } else {
         resolve(result);
@@ -133,6 +134,7 @@ cli.sync = function cli_sync(
   state.actions.debug(log.output(result));
 
   if (!options.ignoreExitCode && result.code !== 0) {
+    state.actions.debug(log.non_zero_exit(result));
     throw new Error(log.error(result));
   }
 
@@ -157,8 +159,13 @@ const log = {
     return `${result.output}\n`;
   },
 
-  error(result: Return) {
+  non_zero_exit(result: Return) {
     const { command, code, duration } = result;
     return `${command} (exit_code=${code} duration=${duration})`;
+  },
+
+  error(result: Return) {
+    const lines = [result.output, this.non_zero_exit(result)];
+    return lines.join("\n");
   },
 };
