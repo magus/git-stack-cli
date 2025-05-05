@@ -73,11 +73,16 @@ export function CherryPickCheck(props: Props) {
       const git_dir = (await cli(`git rev-parse --absolute-git-dir`)).stdout;
 
       const cherry_pick_file = path.join(git_dir, "CHERRY_PICK_HEAD");
-      const is_cherry_pick = await safe_exists(cherry_pick_file);
+      if (await safe_exists(cherry_pick_file)) {
+        return patch({ status: "prompt" });
+      }
 
-      const status = is_cherry_pick ? "prompt" : "done";
+      const git_sequencer_dir = (await cli(`git rev-parse --git-path sequencer`)).stdout;
+      if (await safe_exists(git_sequencer_dir)) {
+        return patch({ status: "prompt" });
+      }
 
-      patch({ status });
+      patch({ status: "done" });
     } catch (err) {
       actions.error("Must be run from within a git repository.");
 
