@@ -8,6 +8,7 @@ import { Await } from "~/app/Await";
 import { Brackets } from "~/app/Brackets";
 import { FormatText } from "~/app/FormatText";
 import { Parens } from "~/app/Parens";
+import { Status } from "~/app/Status";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
 import { cli } from "~/core/cli";
@@ -128,7 +129,7 @@ Rebase.run = async function run() {
         message="✅ {branch_name} in sync with {origin_branch}"
         values={{
           branch_name: <Brackets>{branch_name}</Brackets>,
-          origin_branch: <Brackets>{`origin/${master_branch}`}</Brackets>,
+          origin_branch: <Brackets>{master_branch}</Brackets>,
         }}
       />,
     );
@@ -137,8 +138,11 @@ Rebase.run = async function run() {
 
     actions.set((state) => {
       state.commit_range = next_commit_range;
-      state.step = "status";
     });
+
+    actions.output(<Status />);
+
+    actions.exit(0);
   } catch (err) {
     actions.error("Unable to rebase.");
 
