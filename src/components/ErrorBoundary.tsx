@@ -3,6 +3,7 @@ import * as React from "react";
 
 import * as Ink from "ink-cjs";
 
+import { Exit } from "~/app/Exit";
 import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import { colors } from "~/core/colors";
@@ -36,7 +37,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
     if (component_stack) {
       // remove first line of component_stack
       component_stack = component_stack.split("\n").slice(1).join("\n");
-      this.setState({ component_stack });
+      this.setState({ component_stack }, async () => {
+        await Exit.handle_exit({ code: 30, clear: true });
+      });
     }
   }
 
