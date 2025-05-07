@@ -15,16 +15,20 @@ import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 import { short_id } from "~/core/short_id";
 
-export function Rebase() {
+type Props = {
+  onComplete?: () => void;
+};
+
+export function Rebase(props: Props) {
   return (
     <Await
       fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>}
-      function={Rebase.run}
+      function={() => Rebase.run(props)}
     />
   );
 }
 
-Rebase.run = async function run() {
+Rebase.run = async function run(props: Props) {
   const state = Store.getState();
   const actions = state.actions;
   const branch_name = state.branch_name;
@@ -145,9 +149,12 @@ Rebase.run = async function run() {
     state.commit_range = next_commit_range;
   });
 
-  actions.output(<Status />);
-
-  actions.exit(0);
+  if (props.onComplete) {
+    props.onComplete();
+  } else {
+    actions.output(<Status />);
+    actions.exit(0);
+  }
 
   // cleanup git operations if cancelled during manual rebase
   function restore_git() {
