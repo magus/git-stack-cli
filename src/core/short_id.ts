@@ -59,7 +59,7 @@ function interleave_bits(a: number, b: number) {
 }
 
 function encode(value: number) {
-  // base64 encode (64 characters)
+  // base37 encode (37 characters)
   // max character necessary to encode is equal to maximum number
   // of bits in value divided by bits per character in encoding
   //
@@ -67,8 +67,10 @@ function encode(value: number) {
   //   in base64 each characters can represent 6 bits (2^6 = 64)
   //   53 bits / 6 bits = 8.833333333333334 characters (9 characters)
   //
+  // We use only lowercase letters and numbers to avoid confusing
+  // file system issues with git branch names.
   // prettier-ignore
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-+";
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyz-";
 
   const bits_per_char = Math.log2(chars.length);
   const max_value_bits = 53;
