@@ -55,11 +55,6 @@ for (const filepath of package_json.files) {
   }
 }
 
-process.env.GS_RELEASE_NPM = "true";
-console.info("Publishing to NPM requires a one-time password");
-const otp = await input("Enter OTP: ");
-await spawn(["npm", "publish", `--otp=${otp}`]);
-
 process.chdir(REPO_ROOT);
 
 await spawn.sync(`git commit -a -m ${version}`);
@@ -69,6 +64,11 @@ await spawn.sync(`git push`);
 // -m: message
 await spawn.sync(`git tag -a ${version} -m ${version}`);
 await spawn.sync(`git push origin ${version}`);
+
+process.env.GS_RELEASE_NPM = "true";
+console.info("Publishing to NPM requires a one-time password");
+const otp = await input("Enter OTP: ");
+await spawn(["npm", "publish", `--otp=${otp}`]);
 
 console.debug();
 console.debug("✅", "published", version);
