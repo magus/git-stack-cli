@@ -1,89 +1,70 @@
 import crypto from "node:crypto";
 
 export function short_id() {
-  const timestamp = Date.now();
+  // wall-clock milliseconds
+  const timestamp = BigInt(Date.now());
 
-  // 9 223 372 036 854 775 808
-  // 9 trillion possible values
-  // (2^53) * (2^10) = 2^63 = 9,223,372,036,854,775,808
-  const js_max_bits = 53;
+  // random int value between 0 and 2^RANDOM_BITS - 1
+  const random = BigInt(crypto.randomInt(0, 1 << RANDOM_BITS));
 
-  const timestamp_bits = Math.floor(Math.log2(timestamp)) + 1;
+  // concatenate timestamp (high bits) and random value
+  const combined = (timestamp << BigInt(RANDOM_BITS)) | random;
 
-  // padding needed to reach 53 bits
-  const padding_bits = js_max_bits - timestamp_bits;
+  const id = encode(combined, ID_LENGTH);
 
-  // random between 0 and 2^padding_bits - 1
-  const random = crypto.randomInt(0, Math.pow(2, padding_bits));
-
-  // combine timestamp and random value
-  const combined = interleave_bits(timestamp, random);
-
-  // console.debug({ combined, timestamp, random, padding_bits, timestamp_bits });
-
-  return encode(combined);
+  // console.debug({ id, timestamp, random, combined });
+  return id;
 }
 
-function binary(value: number) {
-  return BigInt(value).toString(2);
-}
-
-function rand_index(list: Array<any>) {
-  return Math.floor(Math.random() * list.length);
-}
-
-function interleave_bits(a: number, b: number) {
-  const a_binary = binary(a).split("");
-
-  const b_binary = binary(b).split("");
-
-  while (b_binary.length) {
-    // pull random bit out of b_binary
-
-    const b_index = rand_index(b_binary);
-
-    const [selected] = b_binary.splice(b_index, 1);
-
-    // insert random bit into a_binary
-
-    const a_index = rand_index(a_binary);
-
-    a_binary.splice(a_index, 0, selected);
-  }
-
-  // convert binary list back to integer
-
-  const a_value = parseInt(a_binary.join(""), 2);
-
-  return a_value;
-}
-
-function encode(value: number) {
-  // base37 encode (37 characters)
-  // max character necessary to encode is equal to maximum number
-  // of bits in value divided by bits per character in encoding
-  //
-  // Example
-  //   in base64 each characters can represent 6 bits (2^6 = 64)
-  //   53 bits / 6 bits = 8.833333333333334 characters (9 characters)
-  //
-  // We use only lowercase letters and numbers to avoid confusing
-  // file system issues with git branch names.
-  // prettier-ignore
-  const chars = "0123456789abcdefghijklmnopqrstuvwxyz-";
-
-  const bits_per_char = Math.log2(chars.length);
-  const max_value_bits = 53;
-  const max_char_size = Math.ceil(max_value_bits / bits_per_char);
-
+// converting value into base based on available chars
+function encode(value: bigint, length?: number) {
   let result = "";
 
-  while (value > 0) {
-    result = chars[value % chars.length] + result;
+  // avoid zero division
+  if (value > 0n) {
+    while (value > 0n) {
+      // convert least significant digit
+      const digit = to_number(value % BASE);
+      result = CHARS[digit] + result;
 
-    value = Math.floor(value / chars.length);
+      // drop the digit we just divided by
+      value /= BASE;
+    }
   }
 
-  // pad the result to necessary characters
-  return result.padStart(max_char_size, "=");
+  // left pad with 0 to guarantee chars
+  if (length) {
+    result = result.padStart(length, PAD);
+  }
+
+  return result;
 }
+
+function to_number(value: bigint) {
+  if (value >= BigInt(Number.MIN_SAFE_INTEGER) && value <= BigInt(Number.MAX_SAFE_INTEGER)) {
+    return Number(value);
+  }
+
+  throw new Error("BigInt value outside safe integer range");
+}
+
+// valid characters to use for the short id
+// use only lowercase letters and numbers to avoid
+// confusing file system issues with git branch names
+const CHARS = "-0123456789_abcdefghijklmnopqrstuvwxyz".split("").sort().join("");
+const PAD = CHARS[0];
+const BASE = BigInt(CHARS.length);
+// bits carried by each char log2(BASE) ≈ 5.32
+const CHAR_BITS = Math.log2(to_number(BASE));
+
+// javascript Date.now returns a Number that will overflow eventually
+// 2^53 max integer, overflows in 2^53 milliseconds (285_616 years)
+// (1n<<53n) / 1_000n / 60n / 60n / 24n / 365n ≈ 285616n
+const TIMESTAMP_BITS = 53;
+
+// collision probability for identical timestamps (milliseconds)
+// ≈ 1 / 2^30 ≈ 1 / 1_073_741_824 (1.1 billion)
+const RANDOM_BITS = 30;
+
+const ID_BITS = TIMESTAMP_BITS + RANDOM_BITS;
+const ID_LENGTH = Math.ceil(ID_BITS / CHAR_BITS);
