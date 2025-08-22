@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import { Store } from "~/app/Store";
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
 import { get_tmp_dir } from "~/core/get_tmp_dir";
@@ -106,6 +107,9 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
 };
 
 GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
+  const argv = Store.getState().argv;
+  const actions = Store.getState().actions;
+
   // replaced at build time with literal contents of `scripts/git-sequence-editor.sh`
   const GIT_SEQUENCE_EDITOR_SCRIPT = process.env.GIT_SEQUENCE_EDITOR_SCRIPT;
   invariant(GIT_SEQUENCE_EDITOR_SCRIPT, "GIT_SEQUENCE_EDITOR_SCRIPT must exist");
@@ -126,13 +130,31 @@ GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
     `GIT_EDITOR="${tmp_git_sequence_editor_path}"`,
     `GIT_REVISE_TODO="${tmp_path_git_revise_todo}"`,
     `git`,
-    `revise --edit -i ${args.rebase_merge_base}`,
   ];
 
-  // `ignore` hdies output which helps prevent scrollback clear
-  // `pipe` helps see failures when git revise fails
-  // https://github.com/magus/git-stack-cli/commit/f9f10e3ac3cd9a35ee75d3e0851a48391967a23f
-  await cli(command, { stdio: ["pipe", "pipe", "pipe"] });
+  if (!argv["revise-sign"]) {
+    command.push(...["-c", "commit.gpgsign=false"]);
+  }
+
+  command.push(`revise --edit -i ${args.rebase_merge_base}`);
+
+  try {
+    // `ignore` hdies output which helps prevent scrollback clear
+    // `pipe` helps see failures when git revise fails
+    // https://github.com/magus/git-stack-cli/commit/f9f10e3ac3cd9a35ee75d3e0851a48391967a23f
+    await cli(command, { stdio: ["pipe", "pipe", "pipe"] });
+  } catch (err) {
+    if (err instanceof Error) {
+      actions.error(err.message);
+      if (err.message.includes("gpg failed to sign commit")) {
+        actions.error("\n\n");
+        actions.error("🚨 git revise failed to sign commit");
+        actions.error("💡 Try again with `--no-revise-sign`?");
+        actions.error("\n\n");
+        actions.exit(21);
+      }
+    }
+  }
 
   // cleanup tmp_git_sequence_editor_path
   await safe_rm(tmp_git_sequence_editor_path);

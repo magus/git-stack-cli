@@ -116,6 +116,12 @@ const DefaultOptions = {
     description: "Prefix for generated branch names, e.g. dev/magus/",
   },
 
+  "revise-sign": {
+    type: "boolean",
+    default: true,
+    description: "Disable GPG signing for git revise with --no-revise-sign",
+  },
+
   "template": {
     type: "boolean",
     default: true,
