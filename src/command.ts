@@ -79,7 +79,11 @@ const DefaultOptions = {
   "verify": {
     type: "boolean",
     default: true,
-    description: "Run git hooks such as pre-commit and pre-push, disable with --no-verify",
+    description: [
+      // force line break
+      "Run git hooks such as pre-commit and pre-push",
+      "Disable with --no-verify",
+    ].join("\n"),
   },
 
   "update": {
@@ -92,8 +96,11 @@ const DefaultOptions = {
   "branch": {
     type: "string",
     alias: ["b"],
-    description:
-      'Set the master branch name, defaults to "origin/master" (or "origin/main" if "origin/master" is not found)',
+    description: [
+      // force line break
+      "Set the master branch name, defaults to 'origin/master'",
+      "(or 'origin/main' if 'origin/master' is not found)",
+    ].join("\n"),
   },
 
   "draft": {
@@ -112,8 +119,11 @@ const DefaultOptions = {
   "template": {
     type: "boolean",
     default: true,
-    description:
-      "Use automatic Github PR template, e.g. .github/pull_request_template.md, disable with --no-template",
+    description: [
+      // force line break
+      "Use automatic Github PR template, e.g. .github/pull_request_template.md",
+      "Disable with --no-template",
+    ].join("\n"),
   },
 
   "write-state-json": {
