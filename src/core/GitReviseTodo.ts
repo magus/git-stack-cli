@@ -139,7 +139,7 @@ GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
   command.push(`revise --edit -i ${args.rebase_merge_base}`);
 
   try {
-    // `ignore` hdies output which helps prevent scrollback clear
+    // `ignore` hides output which helps prevent scrollback clear
     // `pipe` helps see failures when git revise fails
     // https://github.com/magus/git-stack-cli/commit/f9f10e3ac3cd9a35ee75d3e0851a48391967a23f
     await cli(command, { stdio: ["pipe", "pipe", "pipe"] });
