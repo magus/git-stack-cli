@@ -35,13 +35,6 @@ async function run() {
   const commit_range = sync_github.commit_range;
   const rebase_group_index = sync_github.rebase_group_index;
 
-  // immediately register abort_handler in case of ctrl+c exit
-  actions.register_abort_handler(async function abort_sync_github() {
-    actions.output(<Ink.Text color={colors.red}>🚨 Abort</Ink.Text>);
-    handle_exit();
-    return 17;
-  });
-
   let DEFAULT_PR_BODY = "";
   if (state.pr_template_body) {
     DEFAULT_PR_BODY = state.pr_template_body;
@@ -52,13 +45,10 @@ async function run() {
   // for all push targets in push_group_list
   // things that can be done in parallel are grouped by numbers
   //
-  // -----------------------------------
-  // 1 (before_push) temp mark draft
   // --------------------------------------
-  // 2 push simultaneously to github
+  // 1 push simultaneously to github
   // --------------------------------------
   // 2 create PR / edit PR
-  // 2 (after_push) undo temp mark draft
   // --------------------------------------
 
   try {
@@ -170,25 +160,10 @@ async function run() {
 
     invariant(group.base, "group.base must exist");
 
-    // we may temporarily mark PR as a draft before editing it
-    // if it is not already a draft PR, to avoid notification spam
-    let is_temp_draft = !group.pr?.isDraft;
-
     // before pushing reset base to master temporarily
     // avoid accidentally pointing to orphaned parent commit
     // should hopefully fix issues where a PR includes a bunch of commits after pushing
     if (group.pr) {
-      if (!group.pr.isDraft) {
-        is_temp_draft = true;
-      }
-
-      if (is_temp_draft) {
-        await github.pr_draft({
-          branch: group.id,
-          draft: true,
-        });
-      }
-
       await github.pr_edit({
         branch: group.id,
         base: master_branch,
@@ -214,18 +189,6 @@ async function run() {
           selected_url,
         }),
       });
-
-      // we may temporarily mark PR as a draft before editing it
-      // if it is not already a draft PR, to avoid notification spam
-      let is_temp_draft = !group.pr?.isDraft;
-
-      if (is_temp_draft) {
-        // mark pr as ready for review again
-        await github.pr_draft({
-          branch: group.id,
-          draft: false,
-        });
-      }
     } else {
       // create pr in github
       const pr_url = await github.pr_create({
@@ -278,28 +241,6 @@ async function run() {
         body: update_body,
       });
     }
-  }
-
-  function handle_exit() {
-    actions.output(<Ink.Text color={colors.yellow}>Restoring PR state…</Ink.Text>);
-
-    for (const group of push_group_list) {
-      // we may temporarily mark PR as a draft before editing it
-      // if it is not already a draft PR, to avoid notification spam
-      let is_temp_draft = !group.pr?.isDraft;
-
-      // restore PR to non-draft state
-      if (is_temp_draft) {
-        github
-          .pr_draft({
-            branch: group.id,
-            draft: false,
-          })
-          .catch(actions.error);
-      }
-    }
-
-    actions.output(<Ink.Text color={colors.yellow}>Restored PR state.</Ink.Text>);
   }
 }
 
