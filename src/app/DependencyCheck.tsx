@@ -15,14 +15,17 @@ import * as gh from "~/github/gh";
 
 type Props = {
   children: React.ReactNode;
+  disableGithubCli?: boolean;
+  disableGithubCliAuth?: boolean;
+  disableGitRevise?: boolean;
 };
 
 export function DependencyCheck(props: Props) {
   return (
     <CheckGit>
-      <CheckGithubCli>
-        <CheckGithubCliAuth>
-          <CheckGitRevise>
+      <CheckGithubCli {...props}>
+        <CheckGithubCliAuth {...props}>
+          <CheckGitRevise {...props}>
             {/* force line break */}
             {props.children}
           </CheckGitRevise>
@@ -69,6 +72,10 @@ function CheckGit(props: Props) {
 function CheckGithubCli(props: Props) {
   const actions = Store.useActions();
 
+  if (props.disableGithubCli) {
+    return <>{props.children}</>;
+  }
+
   return (
     <Await
       fallback={
@@ -111,6 +118,10 @@ function CheckGithubCli(props: Props) {
 
 function CheckGithubCliAuth(props: Props) {
   const actions = Store.useActions();
+
+  if (props.disableGithubCliAuth) {
+    return <>{props.children}</>;
+  }
 
   return (
     <Await
@@ -163,6 +174,10 @@ function CheckGithubCliAuth(props: Props) {
 
 function CheckGitRevise(props: Props) {
   const actions = Store.useActions();
+
+  if (props.disableGitRevise) {
+    return <>{props.children}</>;
+  }
 
   return (
     <Await
