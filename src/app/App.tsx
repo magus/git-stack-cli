@@ -61,13 +61,11 @@ export function App() {
             }}
           >
             <VerboseDebugInfo>
-              <DependencyCheck>
-                <RebaseCheck>
-                  <CherryPickCheck>
-                    <MaybeMain />
-                  </CherryPickCheck>
-                </RebaseCheck>
-              </DependencyCheck>
+              <RebaseCheck>
+                <CherryPickCheck>
+                  <MaybeMain />
+                </CherryPickCheck>
+              </RebaseCheck>
             </VerboseDebugInfo>
           </AutoUpdate>
 
@@ -100,15 +98,17 @@ function MaybeMain() {
     <React.Fragment>
       {!argv.verbose ? null : <GithubApiError />}
 
-      <GatherMetadata>
-        <DirtyCheck>
-          <LocalCommitStatus>
-            <DetectInitialPR>
-              <Main />
-            </DetectInitialPR>
-          </LocalCommitStatus>
-        </DirtyCheck>
-      </GatherMetadata>
+      <DependencyCheck>
+        <GatherMetadata>
+          <DirtyCheck>
+            <LocalCommitStatus>
+              <DetectInitialPR>
+                <Main />
+              </DetectInitialPR>
+            </LocalCommitStatus>
+          </DirtyCheck>
+        </GatherMetadata>
+      </DependencyCheck>
     </React.Fragment>
   );
 }
