@@ -36,7 +36,7 @@
     "test": "bun test",
     "test:watch": "pnpm run test --watch",
     "test:types": "tsc",
-    "test:all": "pnpm run prettier:check && pnpm run lint:check && pnpm run test:types",
+    "test:all": "pnpm run prettier:check && pnpm run lint:check && pnpm run test:types && pnpm run test",
     "prepublishOnly": "bun run scripts/npm-prepublishOnly.ts"
   },
   "dependencies": {
