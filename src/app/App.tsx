@@ -28,7 +28,7 @@ export function App() {
   const ink = Store.useState((state) => state.ink);
   const argv = Store.useState((state) => state.argv);
 
-  if (!ink || !argv) {
+  if (!ink || !argv || !argv.$0) {
     return null;
   }
 
