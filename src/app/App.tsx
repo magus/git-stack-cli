@@ -86,11 +86,15 @@ function MaybeMain() {
     return <Log />;
   } else if (positional_list.has("rebase")) {
     return (
-      <GatherMetadata>
-        <LocalCommitStatus>
-          <Rebase />
-        </LocalCommitStatus>
-      </GatherMetadata>
+      <DependencyCheck>
+        <DirtyCheck>
+          <GatherMetadata>
+            <LocalCommitStatus>
+              <Rebase />
+            </LocalCommitStatus>
+          </GatherMetadata>
+        </DirtyCheck>
+      </DependencyCheck>
     );
   }
 
@@ -99,15 +103,15 @@ function MaybeMain() {
       {!argv.verbose ? null : <GithubApiError />}
 
       <DependencyCheck>
-        <GatherMetadata>
-          <DirtyCheck>
+        <DirtyCheck>
+          <GatherMetadata>
             <LocalCommitStatus>
               <DetectInitialPR>
                 <Main />
               </DetectInitialPR>
             </LocalCommitStatus>
-          </DirtyCheck>
-        </GatherMetadata>
+          </GatherMetadata>
+        </DirtyCheck>
       </DependencyCheck>
     </React.Fragment>
   );
