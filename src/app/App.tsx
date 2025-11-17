@@ -19,6 +19,7 @@ import { VerboseDebugInfo } from "~/app/VerboseDebugInfo";
 import { Fixup } from "~/commands/Fixup";
 import { Log } from "~/commands/Log";
 import { Rebase } from "~/commands/Rebase";
+import { Update } from "~/commands/Update";
 import { ErrorBoundary } from "~/components/ErrorBoundary";
 import { ExitingGate } from "~/components/ExitingGate";
 
@@ -42,6 +43,9 @@ export function App() {
   //   </React.Fragment>
   // );
 
+  const positional_list = new Set(argv["_"]);
+  const is_update = positional_list.has("update") || positional_list.has("upgrade");
+
   return (
     <Providers>
       <ErrorBoundary>
@@ -51,11 +55,12 @@ export function App() {
         <ExitingGate>
           <AutoUpdate
             name="git-stack-cli"
-            verbose={argv.verbose || argv.update}
-            timeoutMs={argv.update ? 30 * 1000 : 2 * 1000}
+            verbose={argv.verbose}
+            force={is_update}
+            timeoutMs={is_update ? 30 * 1000 : 2 * 1000}
             onOutput={actions.output}
             onDone={() => {
-              if (argv.update) {
+              if (is_update) {
                 actions.exit(0);
               }
             }}
@@ -84,6 +89,8 @@ function MaybeMain() {
     return <Fixup />;
   } else if (positional_list.has("log")) {
     return <Log />;
+  } else if (positional_list.has("update")) {
+    return <Update />;
   } else if (positional_list.has("rebase")) {
     return (
       <DependencyCheck>

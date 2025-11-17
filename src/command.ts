@@ -30,6 +30,12 @@ export async function command() {
         (yargs) => yargs,
       )
 
+      .command(
+        ["update", "upgrade"],
+        "Check and install the latest version of git stack",
+        (yargs) => yargs,
+      )
+
       .option("verbose", GlobalOptions.verbose)
 
       // yargs default wraps to 80 columns
@@ -84,13 +90,6 @@ const DefaultOptions = {
       "Run git hooks such as pre-commit and pre-push",
       "Disable with --no-verify",
     ].join("\n"),
-  },
-
-  "update": {
-    type: "boolean",
-    alias: ["u", "upgrade"],
-    default: false,
-    description: "Check and install the latest version",
   },
 
   "branch": {

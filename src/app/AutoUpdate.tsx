@@ -17,6 +17,7 @@ type Props = {
   name: string;
   children: React.ReactNode;
   verbose?: boolean;
+  force?: boolean;
   timeoutMs?: number;
   onError?: (error: Error) => void;
   onOutput?: (output: React.ReactNode) => void;
@@ -65,13 +66,14 @@ export function AutoUpdate(props: Props) {
     let is_brew_bun_standalone = false;
 
     const local_version = process.env.CLI_VERSION;
+    const is_output = props_ref.current.verbose || props_ref.current.force;
 
     async function auto_update() {
       if (!local_version) {
         throw new Error("Auto update requires process.env.CLI_VERSION to be set");
       }
 
-      if (props_ref.current.verbose) {
+      if (is_output) {
         handle_output(<Ink.Text key="init">Checking for latest version...</Ink.Text>);
       }
 
@@ -126,6 +128,13 @@ export function AutoUpdate(props: Props) {
       const semver_result = semver_compare(latest_version, local_version);
 
       if (semver_result === 0) {
+        if (is_output) {
+          handle_output(
+            <Ink.Text>
+              ✅ Everything up to date. <Brackets>{latest_version}</Brackets>
+            </Ink.Text>,
+          );
+        }
         return;
       }
 
@@ -181,7 +190,14 @@ export function AutoUpdate(props: Props) {
             message={
               <Ink.Box flexDirection="column">
                 <Ink.Text color={colors.yellow}>
-                  New version available, would you like to update?
+                  <FormatText
+                    wrapper={<Ink.Text />}
+                    message="New version available {latest_version}, would you like to update?"
+                    values={{
+                      latest_version: <Brackets>{state.latest_version}</Brackets>,
+                    }}
+                  />
+                  ,
                 </Ink.Text>
                 <Ink.Text> </Ink.Text>
                 <Command>{install_command}</Command>
