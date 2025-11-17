@@ -173,7 +173,7 @@ export function AutoUpdate(props: Props) {
         if (state.is_brew_bun_standalone) {
           install_command = `npm install -g ${props.name}@latest`;
         } else {
-          install_command = `HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade magus/git-stack/git-stack`;
+          install_command = "brew upgrade magus/git-stack/git-stack";
         }
 
         return (
