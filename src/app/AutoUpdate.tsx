@@ -125,8 +125,6 @@ export function AutoUpdate(props: Props) {
 
       const semver_result = semver_compare(latest_version, local_version);
 
-      status = "prompt";
-
       if (semver_result === 0) {
         return;
       }
