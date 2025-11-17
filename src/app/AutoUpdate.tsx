@@ -1,18 +1,15 @@
 import * as React from "react";
 
-import fs from "node:fs/promises";
-import path from "node:path";
-
 import * as Ink from "ink-cjs";
 
 import { Brackets } from "~/app/Brackets";
+import { Command } from "~/app/Command";
 import { FormatText } from "~/app/FormatText";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { fetch_json } from "~/core/fetch_json";
 import { is_finite_value } from "~/core/is_finite_value";
-import { read_json } from "~/core/read_json";
 import { semver_compare } from "~/core/semver_compare";
 import { sleep } from "~/core/sleep";
 
@@ -31,6 +28,7 @@ type State = {
   local_version: null | string;
   latest_version: null | string;
   status: "init" | "prompt" | "install" | "done" | "exit";
+  is_brew_bun_standalone: boolean;
 };
 
 function reducer(state: State, patch: Partial<State>) {
@@ -48,6 +46,7 @@ export function AutoUpdate(props: Props) {
     local_version: null,
     latest_version: null,
     status: "init",
+    is_brew_bun_standalone: false,
   });
 
   function handle_output(node: React.ReactNode) {
@@ -62,10 +61,16 @@ export function AutoUpdate(props: Props) {
 
   React.useEffect(() => {
     let status: State["status"] = "done";
-    let local_version: string | null = null;
     let latest_version: string | null = null;
+    let is_brew_bun_standalone = false;
+
+    const local_version = process.env.CLI_VERSION;
 
     async function auto_update() {
+      if (!local_version) {
+        throw new Error("Auto update requires process.env.CLI_VERSION to be set");
+      }
+
       if (props_ref.current.verbose) {
         handle_output(<Ink.Text key="init">Checking for latest version...</Ink.Text>);
       }
@@ -86,21 +91,23 @@ export function AutoUpdate(props: Props) {
         throw new Error("Unable to retrieve latest version from npm");
       }
 
-      const script_path = await fs.realpath(process.argv[1]);
-      const script_dir = path.dirname(script_path);
+      const binary_path = process.argv[1];
 
-      // dist/ts/index.js
-      const package_json_path = path.join(script_dir, "..", "..", "package.json");
-
-      type PackageJson = { version: string };
-      const package_json = await read_json<PackageJson>(package_json_path);
-
-      if (!package_json) {
-        // unable to find read package.json, skip auto update
-        throw new Error(`Unable to read package.json [${package_json_path}]`);
+      if (props_ref.current.verbose) {
+        handle_output(<Ink.Text dimColor>{JSON.stringify({ binary_path })}</Ink.Text>);
       }
 
-      local_version = package_json.version;
+      is_brew_bun_standalone = binary_path.startsWith("/$bunfs");
+
+      if (props_ref.current.verbose) {
+        if (is_brew_bun_standalone) {
+          handle_output(
+            <Ink.Text dimColor>brew install detected (compiled bun standalone)</Ink.Text>,
+          );
+        } else {
+          handle_output(<Ink.Text dimColor>npm install detected</Ink.Text>);
+        }
+      }
 
       if (props_ref.current.verbose) {
         handle_output(
@@ -117,6 +124,8 @@ export function AutoUpdate(props: Props) {
       }
 
       const semver_result = semver_compare(latest_version, local_version);
+
+      status = "prompt";
 
       if (semver_result === 0) {
         return;
@@ -137,10 +146,10 @@ export function AutoUpdate(props: Props) {
 
     auto_update()
       .then(() => {
-        patch({ status, local_version, latest_version });
+        patch({ status, local_version, latest_version, is_brew_bun_standalone });
       })
       .catch((error) => {
-        patch({ status, error, local_version, latest_version });
+        patch({ status, error, local_version, latest_version, is_brew_bun_standalone });
         onError(error);
 
         if (props_ref.current.verbose) {
@@ -161,13 +170,29 @@ export function AutoUpdate(props: Props) {
       case "init":
         return null;
 
-      case "prompt":
+      case "prompt": {
+        let install_command = "";
+        if (state.is_brew_bun_standalone) {
+          install_command = `npm install -g ${props.name}@latest`;
+        } else {
+          install_command = `HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade magus/git-stack/git-stack`;
+        }
+
         return (
           <YesNoPrompt
             message={
-              <Ink.Text color={colors.yellow}>
-                New version available, would you like to update?
-              </Ink.Text>
+              <Ink.Box flexDirection="column">
+                <Ink.Text color={colors.yellow}>
+                  New version available, would you like to update?
+                </Ink.Text>
+                <Ink.Text> </Ink.Text>
+                <Command>{install_command}</Command>
+                <Ink.Text> </Ink.Text>
+                <FormatText
+                  wrapper={<Ink.Text color={colors.yellow} />}
+                  message="Would you like to run the above command to update?"
+                />
+              </Ink.Box>
             }
             onYes={async () => {
               handle_output(
@@ -184,7 +209,7 @@ export function AutoUpdate(props: Props) {
 
               patch({ status: "install" });
 
-              await cli(`npm install -g ${props.name}@latest`);
+              await cli(install_command);
 
               patch({ status: "exit" });
 
@@ -195,6 +220,7 @@ export function AutoUpdate(props: Props) {
             }}
           />
         );
+      }
 
       case "install":
         return null;
