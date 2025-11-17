@@ -67,10 +67,10 @@ test("git-revise-todo handles double quotes in commit message", () => {
     [
       //force line break
       "++ pick f143d03c723c",
-      '[new] invalid \\"by me\\" quotes',
+      '[new] invalid "by me" quotes',
       "",
       "git-stack-id: 6Ak-qn+5Z",
-      'git-stack-title: [new] invalid \\"by me\\" quotes',
+      'git-stack-title: [new] invalid "by me" quotes',
     ].join("\n"),
   );
 });

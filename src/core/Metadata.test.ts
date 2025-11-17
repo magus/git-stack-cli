@@ -129,10 +129,10 @@ test("write handles double quotes", () => {
   expect(Metadata.write(body, metadata)).toEqual(
     [
       // force line break
-      'Revert \\"[abc / 123] subject (#1234)\\"',
+      'Revert "[abc / 123] subject (#1234)"',
       "",
       "git-stack-id: abc123",
-      'git-stack-title: Revert \\"[abc / 123] subject (#1234)\\"',
+      'git-stack-title: Revert "[abc / 123] subject (#1234)"',
     ].join("\n"),
   );
 });
