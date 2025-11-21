@@ -2,13 +2,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import { Store } from "~/app/Store";
+import * as CommitMetadata from "~/core/CommitMetadata";
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
 import { get_tmp_dir } from "~/core/get_tmp_dir";
 import { invariant } from "~/core/invariant";
 import { safe_rm } from "~/core/safe_rm";
-
-import * as CommitMetadata from "~/core/CommitMetadata";
 
 // https://git-revise.readthedocs.io/en/latest/man.html#interactive-mode
 //

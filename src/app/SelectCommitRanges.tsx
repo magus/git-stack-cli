@@ -3,12 +3,12 @@ import * as React from "react";
 import * as Ink from "ink-cjs";
 
 import { Brackets } from "~/app/Brackets";
+import { Command } from "~/app/Command";
 import { FormatText } from "~/app/FormatText";
 import { MultiSelect } from "~/app/MultiSelect";
 import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import { TextInput } from "~/app/TextInput";
-import { Command } from "~/app/Command";
 import { colors } from "~/core/colors";
 import { gs_short_id } from "~/core/gs_short_id";
 import { invariant } from "~/core/invariant";
