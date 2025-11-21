@@ -10,6 +10,7 @@ type Props = {
   value?: string;
   onChange?: (value: string) => void;
   onSubmit?: (value: string) => void;
+  onCancel?: () => void;
 };
 
 export function TextInput(props: Props) {
@@ -44,7 +45,13 @@ export function TextInput(props: Props) {
 
     // console.debug("[useInput]", { input, key });
 
-    if (key.backspace || key.delete) {
+    if (key.escape) {
+      if (value === "") {
+        props.onCancel?.();
+      } else {
+        next_value = "";
+      }
+    } else if (key.backspace || key.delete) {
       next_value = value.slice(0, -1);
     } else if (key.return) {
       props.onSubmit?.(next_value);
