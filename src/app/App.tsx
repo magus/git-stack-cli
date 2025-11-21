@@ -14,6 +14,7 @@ import { Main } from "~/app/Main";
 import { Output } from "~/app/Output";
 import { Providers } from "~/app/Providers";
 import { RebaseCheck } from "~/app/RebaseCheck";
+import { RequireBranch } from "~/app/RequireBranch";
 import { Store } from "~/app/Store";
 import { VerboseDebugInfo } from "~/app/VerboseDebugInfo";
 import { Fixup } from "~/commands/Fixup";
@@ -112,11 +113,13 @@ function MaybeMain() {
       <DependencyCheck>
         <DirtyCheck>
           <GatherMetadata>
-            <LocalCommitStatus>
-              <DetectInitialPR>
-                <Main />
-              </DetectInitialPR>
-            </LocalCommitStatus>
+            <RequireBranch>
+              <LocalCommitStatus>
+                <DetectInitialPR>
+                  <Main />
+                </DetectInitialPR>
+              </LocalCommitStatus>
+            </RequireBranch>
           </GatherMetadata>
         </DirtyCheck>
       </DependencyCheck>

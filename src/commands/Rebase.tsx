@@ -22,7 +22,7 @@ type Props = {
 export function Rebase(props: Props) {
   return (
     <Await
-      fallback={<Ink.Text color={colors.yellow}>Rebasing commits…</Ink.Text>}
+      fallback={<Ink.Text color={colors.yellow}>Rebasing…</Ink.Text>}
       function={() => Rebase.run(props)}
     />
   );
@@ -48,6 +48,7 @@ Rebase.run = async function run(props: Props) {
     return 19;
   });
 
+  const master_branch_name = master_branch.replace(/^origin\//, "");
   const temp_branch_name = `${branch_name}_${short_id()}`;
 
   try {
@@ -58,8 +59,55 @@ Rebase.run = async function run(props: Props) {
     await cli(`pwd`);
 
     // fetch origin master branch for latest sha
-    const master_branch_name = master_branch.replace(/^origin\//, "");
     await cli(`git fetch --no-tags -v origin ${master_branch_name}`);
+
+    if (branch_name === master_branch_name) {
+      await rebase_master();
+    } else {
+      await rebase_branch();
+    }
+
+    actions.unregister_abort_handler();
+  } catch (err) {
+    actions.error("Unable to rebase.");
+
+    if (err instanceof Error) {
+      actions.error(err.message);
+    }
+
+    actions.exit(20);
+  }
+
+  const next_commit_range = await CommitMetadata.range();
+
+  actions.output(
+    <FormatText
+      wrapper={<Ink.Text color={colors.green} />}
+      message="✅ {branch_name} in sync with {origin_branch}"
+      values={{
+        branch_name: <Brackets>{branch_name}</Brackets>,
+        origin_branch: <Brackets>{master_branch}</Brackets>,
+      }}
+    />,
+  );
+
+  actions.set((state) => {
+    state.commit_range = next_commit_range;
+  });
+
+  if (props.onComplete) {
+    props.onComplete();
+  } else {
+    actions.output(<Status />);
+    actions.exit(0);
+  }
+
+  async function rebase_master() {
+    await cli(`git switch -C "${master_branch_name}" "${master_branch}"`);
+  }
+
+  async function rebase_branch() {
+    invariant(commit_range, "commit_range must exist");
 
     const master_sha = (await cli(`git rev-parse ${master_branch}`)).stdout;
     const rebase_merge_base = master_sha;
@@ -120,40 +168,6 @@ Rebase.run = async function run(props: Props) {
     await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
 
     restore_git();
-
-    actions.unregister_abort_handler();
-  } catch (err) {
-    actions.error("Unable to rebase.");
-
-    if (err instanceof Error) {
-      actions.error(err.message);
-    }
-
-    actions.exit(20);
-  }
-
-  const next_commit_range = await CommitMetadata.range();
-
-  actions.output(
-    <FormatText
-      wrapper={<Ink.Text color={colors.green} />}
-      message="✅ {branch_name} in sync with {origin_branch}"
-      values={{
-        branch_name: <Brackets>{branch_name}</Brackets>,
-        origin_branch: <Brackets>{master_branch}</Brackets>,
-      }}
-    />,
-  );
-
-  actions.set((state) => {
-    state.commit_range = next_commit_range;
-  });
-
-  if (props.onComplete) {
-    props.onComplete();
-  } else {
-    actions.output(<Status />);
-    actions.exit(0);
   }
 
   // cleanup git operations if cancelled during manual rebase

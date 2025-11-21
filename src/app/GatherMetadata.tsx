@@ -67,32 +67,9 @@ async function run() {
 
     actions.debug(`master_branch = ${master_branch}`);
 
-    const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
-
-    // handle detahed head state
-    if (branch_name === "HEAD") {
-      actions.error("Must run within a branch.");
-      actions.exit(0);
-      return;
-    }
-
-    // handle when there are no detected changes
-    if (`origin/${branch_name}` === master_branch) {
-      actions.error("Must run within a branch.");
-      actions.exit(0);
-      return;
-    }
-
     const head = (await cli("git rev-parse HEAD")).stdout;
+    const branch_name = (await cli("git rev-parse --abbrev-ref HEAD")).stdout;
     const merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;
-
-    // handle when there are no detected changes
-    if (head === merge_base) {
-      actions.newline();
-      actions.output(<Ink.Text color={colors.gray}>No changes detected.</Ink.Text>);
-      actions.exit(0);
-      return;
-    }
 
     // git@github.com:magus/git-multi-diff-playground.git
     // https://github.com/magus/git-multi-diff-playground.git
@@ -107,6 +84,7 @@ async function run() {
       state.master_branch = master_branch;
       state.head = head;
       state.branch_name = branch_name;
+      state.merge_base = merge_base;
     });
   } catch (err) {
     actions.error("Unable to gather git metadata.");

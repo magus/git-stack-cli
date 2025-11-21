@@ -51,6 +51,7 @@ export type State = {
   master_branch: string;
   head: null | string;
   branch_name: null | string;
+  merge_base: null | string;
   commit_range: null | CommitMetadata.CommitRange;
   commit_map: null | CommitMap;
   pr_templates: Array<string>;
@@ -122,6 +123,7 @@ const BaseStore = createStore<State>()(
     master_branch: "origin/master",
     head: null,
     branch_name: null,
+    merge_base: null,
     commit_range: null,
     commit_map: null,
     pr_templates: [],
