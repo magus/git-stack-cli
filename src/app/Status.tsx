@@ -42,11 +42,7 @@ async function run() {
     Store.setState((state) => {
       state.step = "pre-local-merge-rebase";
     });
-  } else if (needs_update) {
-    Store.setState((state) => {
-      state.step = "pre-select-commit-ranges";
-    });
-  } else if (argv.force) {
+  } else if (needs_update || argv.force) {
     Store.setState((state) => {
       state.step = "select-commit-ranges";
     });

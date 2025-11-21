@@ -67,7 +67,6 @@ export type State = {
     | "status"
     | "pre-local-merge-rebase"
     | "local-merge-rebase"
-    | "pre-select-commit-ranges"
     | "select-commit-ranges"
     | "pre-manual-rebase"
     | "manual-rebase"
