@@ -8,7 +8,7 @@ import { get_tmp_dir } from "~/core/get_tmp_dir";
 import { invariant } from "~/core/invariant";
 import { safe_rm } from "~/core/safe_rm";
 
-import type * as CommitMetadata from "~/core/CommitMetadata";
+import * as CommitMetadata from "~/core/CommitMetadata";
 
 // https://git-revise.readthedocs.io/en/latest/man.html#interactive-mode
 //
@@ -58,6 +58,7 @@ export function GitReviseTodo(args: Args): string {
   const commit_list = [];
 
   const group_list = args.commit_range.group_list;
+  // console.debug({ group_list });
 
   for (let i = args.rebase_group_index; i < group_list.length; i++) {
     const group = group_list[i];
@@ -67,6 +68,7 @@ export function GitReviseTodo(args: Args): string {
     }
   }
 
+  // console.debug({ commit_list });
   const todo = GitReviseTodo.todo({ commit_list });
   return todo;
 }
@@ -79,26 +81,28 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
   const entry_list = [];
 
   for (const commit of args.commit_list) {
-    // update git commit message with stack id
-    const id = commit.branch_id;
-    const title = commit.title;
-
-    invariant(id, "commit.branch_id must exist");
-    invariant(title, "commit.title must exist");
-
-    const metadata = { id, title };
-
-    const unsafe_message_with_id = Metadata.write(commit.full_message, metadata);
-
-    let message_with_id = unsafe_message_with_id;
-
     // get first 12 characters of commit sha
     const sha = commit.sha.slice(0, 12);
 
     // generate git revise entry
-    const entry_lines = [`++ pick ${sha}`, message_with_id];
-    const entry = entry_lines.join("\n");
+    const entry_lines = [`++ pick ${sha}`];
 
+    // update git commit message with stack id
+    const id = commit.branch_id;
+    if (id == null || id === CommitMetadata.UNASSIGNED) {
+      entry_lines.push(commit.full_message);
+    } else {
+      // console.debug({ commit });
+      const title = commit.title;
+      invariant(title, "commit.title must exist");
+
+      const metadata = { id, title };
+      const unsafe_message_with_id = Metadata.write(commit.full_message, metadata);
+      const message_with_id = unsafe_message_with_id;
+      entry_lines.push(message_with_id);
+    }
+
+    const entry = entry_lines.join("\n");
     entry_list.push(entry);
   }
 

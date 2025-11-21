@@ -59,6 +59,11 @@ async function run() {
       commit.title = group_from_map.title;
     }
 
+    // // capture commit_range for GitReviseTodo test
+    // // doc-link capture-git-revise-todo
+    // console.debug(JSON.stringify(commit_range, null, 2));
+    // throw new Error("STOP");
+
     await GitReviseTodo.execute({
       rebase_group_index: 0,
       rebase_merge_base: merge_base,

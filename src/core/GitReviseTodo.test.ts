@@ -75,6 +75,59 @@ test("git-revise-todo handles double quotes in commit message", () => {
   );
 });
 
+test("git-revise-todo from commit range with single new commit", () => {
+  const rebase_group_index = 0;
+  const commit_range = SYNC_WITH_UNASSIGNED;
+
+  const git_revise_todo = GitReviseTodo({ rebase_group_index, commit_range });
+
+  const expected = [
+    "++ pick 55771391b49e",
+    "head~7",
+    "",
+    "git-stack-id: gs---4gvxa-5v-2mx26",
+    "git-stack-title: pr-title",
+    "",
+    "++ pick 391476bbfc6b",
+    "head~6",
+    "",
+    "git-stack-id: gs---4gvxa-5v-2mx26",
+    "git-stack-title: pr-title",
+    "",
+    "++ pick 5a98cf8f0406",
+    "head~5",
+    "",
+    "git-stack-id: gs---4gvxa-5v-2mx26",
+    "git-stack-title: pr-title",
+    "",
+    "++ pick e820018cb370",
+    "head~4",
+    "",
+    "git-stack-id: gs---4gvxa-5v-2mx26",
+    "git-stack-title: pr-title",
+    "",
+    "++ pick e6d1dfc7ec00",
+    "head~3",
+    "",
+    "git-stack-id: gs---4gvxa-5v-2mx26",
+    "git-stack-title: pr-title",
+    "",
+    "++ pick a26f21025a55",
+    "head~2",
+    "",
+    "git-stack-id: gs---4gvxa-5v-2mx26",
+    "git-stack-title: pr-title",
+    "",
+    "++ pick 90667fe97e05",
+    "head~1",
+    "",
+    "++ pick b61c5b09a4b7",
+    "head",
+  ].join("\n");
+
+  expect(git_revise_todo).toBe(expected);
+});
+
 const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
   invalid: false,
   group_list: [
@@ -649,6 +702,148 @@ const COMMIT_MESSAGE_WITH_QUOTES: CommitMetadata.CommitRange = {
       subject_line: '[new] invalid "by me" quotes',
       branch_id: "6Ak-qn+5Z",
       title: '[new] invalid "by me" quotes',
+    },
+  ],
+  pr_lookup: {},
+  UNASSIGNED: "unassigned",
+};
+
+// capture via `throw new Error` in `ManualRebase`
+// doc-link capture-git-revise-todo
+const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
+  invalid: false,
+  group_list: [
+    {
+      id: "gs---4gvxa-5v-2mx26",
+      title: "pr-title",
+      pr: null,
+      base: "master",
+      dirty: true,
+      commits: [
+        {
+          sha: "55771391b49e301f51b22cbc2b745e8d3e4a357a",
+          full_message: "head~7",
+          subject_line: "head~7",
+          branch_id: "gs---4gvxa-5v-2mx26",
+          title: "pr-title",
+        },
+        {
+          sha: "391476bbfc6b77b60a3ef7fa97155496a9f8f27f",
+          full_message: "head~6",
+          subject_line: "head~6",
+          branch_id: "gs---4gvxa-5v-2mx26",
+          title: "pr-title",
+        },
+        {
+          sha: "5a98cf8f0406712405d41af07c3a012f72ad36fa",
+          full_message: "head~5",
+          subject_line: "head~5",
+          branch_id: "gs---4gvxa-5v-2mx26",
+          title: "pr-title",
+        },
+        {
+          sha: "e820018cb370bb6cda118dc649e841c75d797188",
+          full_message: "head~4",
+          subject_line: "head~4",
+          branch_id: "gs---4gvxa-5v-2mx26",
+          title: "pr-title",
+        },
+        {
+          sha: "e6d1dfc7ec007468712bfc015884cc22bfa79e1d",
+          full_message: "head~3",
+          subject_line: "head~3",
+          branch_id: "gs---4gvxa-5v-2mx26",
+          title: "pr-title",
+        },
+        {
+          sha: "a26f21025a558968554c439ab9b942d5fe84bccb",
+          full_message: "head~2",
+          subject_line: "head~2",
+          branch_id: "gs---4gvxa-5v-2mx26",
+          title: "pr-title",
+        },
+      ],
+    },
+    {
+      id: "unassigned",
+      title: "allow_unassigned",
+      pr: null,
+      base: null,
+      dirty: true,
+      commits: [
+        {
+          sha: "90667fe97e059e8285e070d6268f2b4035b2ebd4",
+          full_message: "head~1",
+          subject_line: "head~1",
+          branch_id: "unassigned",
+          title: "allow_unassigned",
+        },
+        {
+          sha: "b61c5b09a4b7c9dcff9a9071386b134997569a01",
+          full_message: "head",
+          subject_line: "head",
+          branch_id: "unassigned",
+          title: "allow_unassigned",
+        },
+      ],
+    },
+  ],
+  commit_list: [
+    {
+      sha: "55771391b49e301f51b22cbc2b745e8d3e4a357a",
+      full_message: "head~7",
+      subject_line: "head~7",
+      branch_id: "gs---4gvxa-5v-2mx26",
+      title: "pr-title",
+    },
+    {
+      sha: "391476bbfc6b77b60a3ef7fa97155496a9f8f27f",
+      full_message: "head~6",
+      subject_line: "head~6",
+      branch_id: "gs---4gvxa-5v-2mx26",
+      title: "pr-title",
+    },
+    {
+      sha: "5a98cf8f0406712405d41af07c3a012f72ad36fa",
+      full_message: "head~5",
+      subject_line: "head~5",
+      branch_id: "gs---4gvxa-5v-2mx26",
+      title: "pr-title",
+    },
+    {
+      sha: "e820018cb370bb6cda118dc649e841c75d797188",
+      full_message: "head~4",
+      subject_line: "head~4",
+      branch_id: "gs---4gvxa-5v-2mx26",
+      title: "pr-title",
+    },
+    {
+      sha: "e6d1dfc7ec007468712bfc015884cc22bfa79e1d",
+      full_message: "head~3",
+      subject_line: "head~3",
+      branch_id: "gs---4gvxa-5v-2mx26",
+      title: "pr-title",
+    },
+    {
+      sha: "a26f21025a558968554c439ab9b942d5fe84bccb",
+      full_message: "head~2",
+      subject_line: "head~2",
+      branch_id: "gs---4gvxa-5v-2mx26",
+      title: "pr-title",
+    },
+    {
+      sha: "90667fe97e059e8285e070d6268f2b4035b2ebd4",
+      full_message: "head~1",
+      subject_line: "head~1",
+      branch_id: "unassigned",
+      title: "allow_unassigned",
+    },
+    {
+      sha: "b61c5b09a4b7c9dcff9a9071386b134997569a01",
+      full_message: "head",
+      subject_line: "head",
+      branch_id: "unassigned",
+      title: "allow_unassigned",
     },
   ],
   pr_lookup: {},
