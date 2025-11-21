@@ -42,6 +42,9 @@ async function run() {
 
   const push_group_list = get_push_group_list();
 
+  // console.debug({ push_group_list });
+  // throw new Error("STOP");
+
   // for all push targets in push_group_list
   // things that can be done in parallel are grouped by numbers
   //
@@ -92,7 +95,7 @@ async function run() {
 
     await cli(git_push_command);
 
-    const pr_url_list = commit_range.group_list.map(get_group_url);
+    const pr_url_list = push_group_list.map(get_group_url);
 
     const after_push_tasks = [];
     for (const group of push_group_list) {
@@ -105,8 +108,8 @@ async function run() {
     // this step must come after the after_push since that step may create new PRs
     // we need the urls for all prs at this step so we run it after the after_push
     const update_pr_body_tasks = [];
-    for (let i = 0; i < commit_range.group_list.length; i++) {
-      const group = commit_range.group_list[i];
+    for (let i = 0; i < push_group_list.length; i++) {
+      const group = push_group_list[i];
 
       // use the updated pr_url_list to get the actual selected_url
       const selected_url = pr_url_list[i];
@@ -149,7 +152,9 @@ async function run() {
 
       const group = commit_range.group_list[index];
 
-      push_group_list.unshift(group);
+      if (group.id !== commit_range.UNASSIGNED) {
+        push_group_list.unshift(group);
+      }
     }
 
     return push_group_list;
