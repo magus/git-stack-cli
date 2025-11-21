@@ -14,6 +14,7 @@ type Props<T> = {
   disabled?: boolean;
   disableSelect?: boolean;
   maxWidth?: number;
+  startIndex?: number;
 };
 
 type Item<T> = {
@@ -67,11 +68,13 @@ export function MultiSelect<T>(props: Props<T>) {
       for (let i = props.items.length - 1; i >= 0; i--) {
         const item = props.items[i];
 
-        if (!item.disabled) {
-          last_enabled = i;
+        if (item.disabled) {
+          continue;
         }
 
-        if (!item.selected && !item.disabled) {
+        last_enabled = i;
+
+        if (!item.selected) {
           return i;
         }
       }
@@ -80,7 +83,7 @@ export function MultiSelect<T>(props: Props<T>) {
         return last_enabled;
       }
 
-      return 0;
+      return props.startIndex || 0;
     },
   );
 
