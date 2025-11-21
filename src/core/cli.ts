@@ -7,6 +7,7 @@ type SpawnOptions = Parameters<typeof child.spawn>[2];
 
 type Options = SpawnOptions & {
   ignoreExitCode?: boolean;
+  onOutput?: (data: string) => void;
 };
 
 type Return = {
@@ -51,6 +52,7 @@ export async function cli(
     function write_output(value: string) {
       output += value;
       state.actions.debug(value, id);
+      options.onOutput?.(value);
     }
 
     childProcess.stdout?.on("data", (data: Buffer) => {
