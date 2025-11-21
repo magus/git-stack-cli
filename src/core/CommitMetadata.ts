@@ -39,6 +39,8 @@ export async function range(commit_group_map?: CommitGroupMap) {
     let id = commit.branch_id;
     let title = commit.title || id;
 
+    // console.debug({ commit, id });
+
     // use commit map if provided (via select commit ranges)
     if (commit_group_map) {
       const group = commit_group_map[commit.sha];
@@ -50,7 +52,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
     }
 
     if (!id) {
-      // console.debug("INVALID", "MISSING ID", commit.message);
+      // console.debug("INVALID", "MISSING ID");
       invalid = true;
     }
 
@@ -61,13 +63,12 @@ export async function range(commit_group_map?: CommitGroupMap) {
       if (group_map.has(id) && last_key !== id) {
         // if we've seen this id before and it's not
         // the last added key then we are out of order
-        // console.debug("INVALID", "OUT OF ORDER", commit.message, id);
+        // console.debug("INVALID", "OUT OF ORDER");
         invalid = true;
       }
     } else {
-      // console.debug("INVALID", "NEW COMMIT", { commit });
+      // console.debug("INVALID", "NEW COMMIT");
       invalid = true;
-
       id = UNASSIGNED;
     }
 
@@ -231,4 +232,4 @@ function lines(value: string) {
   return value.split("\n");
 }
 
-const UNASSIGNED = "unassigned";
+export const UNASSIGNED = "unassigned";
