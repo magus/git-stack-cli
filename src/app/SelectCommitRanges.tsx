@@ -8,6 +8,7 @@ import { MultiSelect } from "~/app/MultiSelect";
 import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import { TextInput } from "~/app/TextInput";
+import { Command } from "~/app/Command";
 import { colors } from "~/core/colors";
 import { gs_short_id } from "~/core/gs_short_id";
 import { invariant } from "~/core/invariant";
@@ -78,10 +79,13 @@ function SelectCommitRangesInternal(props: Props) {
 
   // detect if there are unassigned commits
   let unassigned_count = 0;
+  let assigned_count = 0;
   for (const [, group_id] of commit_map.entries()) {
     if (group_id === null) {
       // console.debug("unassigned commit detected", sha);
       unassigned_count++;
+    } else {
+      assigned_count++;
     }
   }
 
@@ -118,36 +122,54 @@ function SelectCommitRangesInternal(props: Props) {
     current_index = 0;
   }
 
+  const has_unassigned_commits = unassigned_count > 0;
+  const has_assigned_commits = assigned_count > 0;
+
+  const sync_status = detect_sync_status();
+  // console.debug({ sync_status });
+
   Ink.useInput((input, key) => {
-    const inputLower = input.toLowerCase();
+    const input_lower = input.toLowerCase();
 
-    const hasUnassignedCommits = unassigned_count > 0;
+    if (input_lower === SYMBOL.s) {
+      // do not allow sync when inputting group title
+      if (group_input) {
+        return;
+      }
 
-    if (!hasUnassignedCommits && inputLower === "s") {
+      if (sync_status === "disabled") {
+        return;
+      }
+
       actions.set((state) => {
-        state.commit_map = {};
+        const state_commit_map: Record<string, SimpleGroup> = {};
 
-        for (const [sha, id] of commit_map.entries()) {
-          if (id) {
-            const group = group_list.find((g) => g.id === id);
-            // console.debug({ sha, id, group });
-            if (group) {
-              state.commit_map[sha] = group;
-            }
+        for (let [sha, id] of commit_map.entries()) {
+          // console.debug({ sha, id });
+
+          // handle allow_unassigned case
+          if (!id) {
+            id = props.commit_range.UNASSIGNED;
+            const title = "allow_unassigned";
+            state_commit_map[sha] = { id, title };
+            continue;
           }
+
+          const group = group_list.find((g) => g.id === id);
+          invariant(group, "group must exist");
+          // console.debug({ group });
+          state_commit_map[sha] = group;
         }
 
-        switch (inputLower) {
-          case "s":
-            state.step = "pre-manual-rebase";
-            break;
-        }
+        state.commit_map = state_commit_map;
+        state.step = "pre-manual-rebase";
       });
+
       return;
     }
 
     // only allow create when on unassigned group
-    if (hasUnassignedCommits && inputLower === "c") {
+    if (has_unassigned_commits && input_lower === SYMBOL.c) {
       set_group_input(true);
       return;
     }
@@ -170,6 +192,10 @@ function SelectCommitRangesInternal(props: Props) {
   const multiselect_disabled = group_input;
   const multiselect_disableSelect = group.id === props.commit_range.UNASSIGNED;
 
+  const max_width = 80;
+  const [focused, set_focused] = React.useState("");
+  const has_groups = group.id !== props.commit_range.UNASSIGNED;
+
   const items = props.commit_range.commit_list.map((commit) => {
     const commit_metadata_id = commit_map.get(commit.sha);
 
@@ -178,6 +204,8 @@ function SelectCommitRangesInternal(props: Props) {
     let disabled;
 
     if (group_input) {
+      disabled = true;
+    } else if (!has_groups) {
       disabled = true;
     } else {
       disabled = Boolean(selected && commit_metadata_id !== group.id);
@@ -193,127 +221,60 @@ function SelectCommitRangesInternal(props: Props) {
 
   items.reverse();
 
-  // <-  (2/4) #742 Title A ->
-
-  const left_arrow = `${SYMBOL.left} `;
-  const right_arrow = ` ${SYMBOL.right}`;
-  const group_position = `(${current_index + 1}/${group_list.length}) `;
-
-  const max_group_label_width = 80;
-  let group_title_width = max_group_label_width;
-  group_title_width -= group_position.length;
-  group_title_width -= left_arrow.length + right_arrow.length;
-  group_title_width = Math.min(group.title.length, group_title_width);
-
-  let max_item_width = max_group_label_width;
-  max_item_width -= left_arrow.length + right_arrow.length;
-
-  const [focused, set_focused] = React.useState("");
-
   return (
     <Ink.Box flexDirection="column">
       <Ink.Box height={1} />
 
-      <MultiSelect
-        items={items}
-        maxWidth={max_item_width}
-        disabled={multiselect_disabled}
-        disableSelect={multiselect_disableSelect}
-        onFocus={(args) => {
-          // console.debug("onFocus", args);
-
-          set_focused(args.item.subject_line);
-        }}
-        onSelect={(args) => {
-          // console.debug("onSelect", args);
-
-          const key = args.item.sha;
-
-          let value;
-          if (args.selected) {
-            value = group.id;
-          } else {
-            value = null;
-          }
-
-          update_commit_map({ key, value });
-        }}
-      />
-
-      <Ink.Box height={1} />
-
-      <Ink.Box width={max_group_label_width} flexDirection="row">
-        <Ink.Text>{left_arrow}</Ink.Text>
-        <Ink.Text>{group_position}</Ink.Text>
-
-        <Ink.Box width={group_title_width} justifyContent="center">
-          <Ink.Text wrap="truncate-end">{group.title}</Ink.Text>
+      {has_groups || group_input ? null : (
+        <Ink.Box flexDirection="column">
+          <Ink.Text bold color={colors.blue}>
+            👋 Welcome to <Command>git stack</Command>!
+          </Ink.Text>
+          <Ink.Text color={colors.blue}>
+            <FormatText
+              message="Press {c} to {create} a new PR group"
+              values={{
+                c: (
+                  <Ink.Text bold color={colors.green}>
+                    c
+                  </Ink.Text>
+                ),
+                create: (
+                  <Ink.Text bold color={colors.green}>
+                    <Parens>c</Parens>reate
+                  </Ink.Text>
+                ),
+              }}
+            />
+          </Ink.Text>
         </Ink.Box>
+      )}
 
-        <Ink.Text>{right_arrow}</Ink.Text>
-      </Ink.Box>
-
-      <Ink.Box height={1} />
-
-      {unassigned_count > 0 ? (
-        <FormatText
-          wrapper={<Ink.Text color={colors.gray} />}
-          message="{count} unassigned commits, press {c} to {create} a new group"
-          values={{
-            count: (
-              <Ink.Text color={colors.yellow} bold>
-                {unassigned_count}
-              </Ink.Text>
-            ),
-            c: (
-              <Ink.Text bold color={colors.green}>
-                c
-              </Ink.Text>
-            ),
-            create: (
-              <Ink.Text bold color={colors.green}>
-                <Parens>c</Parens>reate
-              </Ink.Text>
-            ),
-          }}
-        />
-      ) : (
+      {!has_groups || group_input ? null : (
         <React.Fragment>
-          {argv.sync ? (
-            <FormatText
-              wrapper={<Ink.Text />}
-              message="🎉 Done! Press {s} to {sync} the commits to Github"
-              values={{
-                s: (
-                  <Ink.Text bold color={colors.green}>
-                    s
-                  </Ink.Text>
-                ),
-                sync: (
-                  <Ink.Text bold color={colors.green}>
-                    <Parens>s</Parens>ync
-                  </Ink.Text>
-                ),
-              }}
-            />
-          ) : (
-            <FormatText
-              wrapper={<Ink.Text />}
-              message="🎉 Done! Press {s} to {save} the commits locally"
-              values={{
-                s: (
-                  <Ink.Text bold color={colors.green}>
-                    s
-                  </Ink.Text>
-                ),
-                save: (
-                  <Ink.Text bold color={colors.green}>
-                    <Parens>s</Parens>save
-                  </Ink.Text>
-                ),
-              }}
-            />
-          )}
+          <Ink.Box width={max_width} flexDirection="row">
+            <Ink.Box flexDirection="row">
+              <Ink.Text bold color={colors.green}>
+                {SYMBOL.left}
+              </Ink.Text>
+              <Ink.Box width={1} />
+              <Ink.Text color={colors.gray}>Pull request</Ink.Text>
+              <Ink.Box width={1} />
+              <Ink.Text color={colors.gray}>
+                {`(${current_index + 1}/${group_list.length})`}
+              </Ink.Text>
+              <Ink.Box width={1} />
+              <Ink.Text bold color={colors.green}>
+                {SYMBOL.right}
+              </Ink.Text>
+            </Ink.Box>
+          </Ink.Box>
+
+          <Ink.Box width={max_width}>
+            <Ink.Text wrap="truncate-end" bold color={colors.green}>
+              {group.title}
+            </Ink.Text>
+          </Ink.Box>
         </React.Fragment>
       )}
 
@@ -342,9 +303,108 @@ function SelectCommitRangesInternal(props: Props) {
             }}
           />
 
-          <TextInput defaultValue={focused} onSubmit={submit_group_input} />
+          <TextInput
+            defaultValue={focused}
+            onSubmit={submit_group_input}
+            onCancel={() => set_group_input(false)}
+          />
+        </React.Fragment>
+      )}
 
-          <Ink.Box height={1} />
+      <Ink.Box height={1} />
+
+      <MultiSelect
+        startIndex={items.length - 1}
+        items={items}
+        maxWidth={max_width}
+        disabled={multiselect_disabled}
+        disableSelect={multiselect_disableSelect}
+        onFocus={(args) => {
+          // console.debug("onFocus", args);
+
+          set_focused(args.item.subject_line);
+        }}
+        onSelect={(args) => {
+          // console.debug("onSelect", args);
+
+          const key = args.item.sha;
+
+          let value;
+          if (args.selected) {
+            value = group.id;
+          } else {
+            value = null;
+          }
+
+          update_commit_map({ key, value });
+        }}
+      />
+
+      <Ink.Box height={1} />
+
+      {has_unassigned_commits ? (
+        <React.Fragment>
+          <FormatText
+            wrapper={<Ink.Text color={colors.gray} />}
+            message="{count} unassigned commits"
+            values={{
+              count: (
+                <Ink.Text color={colors.yellow} bold>
+                  {unassigned_count}
+                </Ink.Text>
+              ),
+            }}
+          />
+
+          {group_input ? null : (
+            <FormatText
+              wrapper={<Ink.Text color={colors.gray} />}
+              message="Press {c} to {create} a new PR group"
+              values={{
+                c: (
+                  <Ink.Text bold color={colors.green}>
+                    c
+                  </Ink.Text>
+                ),
+                create: (
+                  <Ink.Text bold color={colors.green}>
+                    <Parens>c</Parens>reate
+                  </Ink.Text>
+                ),
+              }}
+            />
+          )}
+
+          {sync_status !== "allow_unassigned" ? null : (
+            <FormatText
+              wrapper={<Ink.Text color={colors.gray} />}
+              message="Press {s} to {sync} the {count} assigned commits to Github"
+              values={{
+                ...S_TO_SYNC_VALUES,
+                count: (
+                  <Ink.Text color={colors.yellow} bold>
+                    {assigned_count}
+                  </Ink.Text>
+                ),
+              }}
+            />
+          )}
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          {argv.sync ? (
+            <FormatText
+              wrapper={<Ink.Text />}
+              message="🎉 Done! Press {s} to {sync} the commits to Github"
+              values={S_TO_SYNC_VALUES}
+            />
+          ) : (
+            <FormatText
+              wrapper={<Ink.Text />}
+              message="🎉 Done! Press {s} to {save} the commits locally"
+              values={S_TO_SYNC_VALUES}
+            />
+          )}
         </React.Fragment>
       )}
 
@@ -396,13 +456,14 @@ function SelectCommitRangesInternal(props: Props) {
 
     return `${branch_prefix}${gs_short_id()}`;
   }
+
   function submit_group_input(title: string) {
     const id = get_group_id();
 
     actions.output(
       <FormatText
         wrapper={<Ink.Text dimColor />}
-        message="Created new group {group} {note}"
+        message="Created new PR group {group} {note}"
         values={{
           group: <Brackets>{title}</Brackets>,
           note: <Parens>{id}</Parens>,
@@ -415,10 +476,64 @@ function SelectCommitRangesInternal(props: Props) {
     set_selected_group_id(id);
     set_group_input(false);
   }
+
+  function detect_sync_status() {
+    if (!has_unassigned_commits) {
+      return "allow";
+    }
+
+    if (!has_assigned_commits) {
+      return "disabled";
+    }
+
+    let allow_unassigned_sync = null;
+
+    for (let i = 0; i < props.commit_range.commit_list.length; i++) {
+      const commit = props.commit_range.commit_list[i];
+      const group_id = commit_map.get(commit.sha);
+      // console.debug(commit.sha, group_id);
+
+      // before detecting unassigned we are null
+      if (allow_unassigned_sync === null) {
+        if (group_id === null) {
+          // console.debug("allow_unassigned_sync TRUE", { i });
+          allow_unassigned_sync = true;
+        }
+      } else {
+        // after detecting unassigned we assume we can unassigned sync
+        // unless we detect an invariant violation, i.e. commit assigned to group
+        if (group_id) {
+          // console.debug("allow_unassigned_sync FALSE", { i });
+          allow_unassigned_sync = false;
+        }
+      }
+    }
+
+    if (allow_unassigned_sync) {
+      return "allow_unassigned";
+    }
+
+    return "disabled";
+  }
 }
 
 const SYMBOL = {
   left: "←",
   right: "→",
   enter: "Enter",
+  c: "c",
+  s: "s",
+};
+
+const S_TO_SYNC_VALUES = {
+  s: (
+    <Ink.Text bold color={colors.green}>
+      s
+    </Ink.Text>
+  ),
+  sync: (
+    <Ink.Text bold color={colors.green}>
+      <Parens>s</Parens>ync
+    </Ink.Text>
+  ),
 };
