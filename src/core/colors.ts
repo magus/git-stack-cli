@@ -1,7 +1,7 @@
 // ink uses chalk internally
 // https://github.com/vadimdemedes/ink#color
 
-export const colors = {
+export const colors = Object.freeze({
   red: "rgb(248, 81, 73)",
   // red-emphasis rgb(218, 54, 51)
 
@@ -20,4 +20,6 @@ export const colors = {
   gray: "rgb(110, 118, 129)",
 
   lightGray: "rgb(125, 133, 144)",
-};
+
+  white: "whiteBright",
+});
