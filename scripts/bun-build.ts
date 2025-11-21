@@ -111,6 +111,11 @@ if (!WATCH) {
       continue;
     }
 
+    // ignore bun build files
+    if (filename.includes(".bun-build")) {
+      continue;
+    }
+
     log(`⚠️ Change ${filename}`);
 
     if (VERBOSE) {
