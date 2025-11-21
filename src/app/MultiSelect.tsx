@@ -191,7 +191,6 @@ type ItemRowProps = {
 
 function ItemRow(props: ItemRowProps) {
   let color;
-  let bold;
   let underline;
   let dimColor;
 
@@ -200,14 +199,8 @@ function ItemRow(props: ItemRowProps) {
     underline = true;
   }
 
-  if (props.selected) {
-    // color = "";
-    bold = true;
-  }
-
   if (props.disabled) {
     color = "";
-    bold = false;
     underline = false;
     dimColor = true;
   }
@@ -218,7 +211,7 @@ function ItemRow(props: ItemRowProps) {
 
       <Ink.Box width={props.maxWidth}>
         <Ink.Text
-          bold={bold}
+          // force line break
           underline={underline}
           color={color}
           dimColor={dimColor}

@@ -271,7 +271,7 @@ function SelectCommitRangesInternal(props: Props) {
           </Ink.Box>
 
           <Ink.Box width={max_width}>
-            <Ink.Text wrap="truncate-end" bold color={colors.green}>
+            <Ink.Text wrap="truncate-end" bold color={colors.white}>
               {group.title}
             </Ink.Text>
           </Ink.Box>
