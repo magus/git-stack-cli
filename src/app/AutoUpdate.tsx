@@ -6,6 +6,7 @@ import { Brackets } from "~/app/Brackets";
 import { Command } from "~/app/Command";
 import { FormatText } from "~/app/FormatText";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
+import { assertNever } from "~/core/assertNever";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { fetch_json } from "~/core/fetch_json";
@@ -28,7 +29,7 @@ type State = {
   error: null | Error;
   local_version: null | string;
   latest_version: null | string;
-  status: "init" | "prompt" | "install" | "done" | "exit";
+  status: "init" | "prompt" | "install" | "done";
   is_brew_bun_standalone: boolean;
 };
 
@@ -61,7 +62,24 @@ export function AutoUpdate(props: Props) {
   }
 
   React.useEffect(() => {
-    let status: State["status"] = "done";
+    switch (state.status) {
+      case "init":
+      case "prompt":
+      case "install":
+        break;
+
+      case "done": {
+        props.onDone?.();
+        break;
+      }
+
+      default:
+        assertNever(state.status);
+    }
+  }, [state.status]);
+
+  React.useEffect(() => {
+    let status: State["status"] = "init";
     let latest_version: string | null = null;
     let is_brew_bun_standalone = false;
 
@@ -73,17 +91,13 @@ export function AutoUpdate(props: Props) {
         throw new Error("Auto update requires process.env.CLI_VERSION to be set");
       }
 
-      if (is_output) {
-        handle_output(<Ink.Text key="init">Checking for latest version...</Ink.Text>);
-      }
-
       const timeout_ms = is_finite_value(props.timeoutMs) ? props.timeoutMs : 2 * 1000;
 
       const npm_json = await Promise.race([
         fetch_json(`https://registry.npmjs.org/${props.name}`),
 
         sleep(timeout_ms).then(() => {
-          throw new Error("Timeout");
+          throw new Error("AutoUpdate timeout");
         }),
       ]);
 
@@ -126,8 +140,13 @@ export function AutoUpdate(props: Props) {
       }
 
       const semver_result = semver_compare(latest_version, local_version);
+      if (props_ref.current.verbose) {
+        handle_output(<Ink.Text dimColor>{JSON.stringify({ semver_result })}</Ink.Text>);
+      }
 
       if (semver_result === 0) {
+        status = "done";
+
         if (is_output) {
           handle_output(
             <Ink.Text>
@@ -138,15 +157,12 @@ export function AutoUpdate(props: Props) {
         return;
       }
 
-      if (semver_result === -1) {
-        // latest version is less than or equal to local version, skip auto update
-        throw new Error(
-          `latest version < local_version, skipping auto update [${latest_version} < ${local_version}]`,
-        );
+      if (semver_result === 1) {
+        // trigger yes no prompt
+        status = "prompt";
       }
 
-      // trigger yes no prompt
-      status = "prompt";
+      throw new Error("AutoUpdate failed");
     }
 
     const onError = props_ref.current.onError || (() => {});
@@ -156,9 +172,6 @@ export function AutoUpdate(props: Props) {
         patch({ status, local_version, latest_version, is_brew_bun_standalone });
       })
       .catch((error) => {
-        patch({ status, error, local_version, latest_version, is_brew_bun_standalone });
-        onError(error);
-
         if (props_ref.current.verbose) {
           handle_output(
             <Ink.Text key="error" color={colors.red}>
@@ -166,9 +179,11 @@ export function AutoUpdate(props: Props) {
             </Ink.Text>,
           );
         }
-      })
-      .finally(() => {
-        props.onDone?.();
+
+        // ensure we always exit
+        status = "done";
+        patch({ status, error, local_version, latest_version, is_brew_bun_standalone });
+        onError(error);
       });
   }, []);
 
@@ -180,54 +195,60 @@ export function AutoUpdate(props: Props) {
       case "prompt": {
         let install_command = "";
         if (state.is_brew_bun_standalone) {
-          install_command = `npm install -g ${props.name}@latest`;
+          install_command = "brew install magus/git-stack/git-stack";
         } else {
-          install_command = "brew upgrade magus/git-stack/git-stack";
+          install_command = `npm install -g ${props.name}@latest`;
         }
 
         return (
           <YesNoPrompt
             message={
               <Ink.Box flexDirection="column">
-                <Ink.Text color={colors.yellow}>
+                <Ink.Box flexDirection="column">
+                  <Ink.Text color={colors.yellow}>
+                    <FormatText
+                      wrapper={<Ink.Text />}
+                      message="New version available {latest_version}"
+                      values={{
+                        latest_version: <Brackets>{state.latest_version}</Brackets>,
+                      }}
+                    />
+                    ,
+                  </Ink.Text>
+                  <Ink.Text> </Ink.Text>
+                  <Command>{install_command}</Command>
+                  <Ink.Text> </Ink.Text>
+                </Ink.Box>
+                <Ink.Box>
                   <FormatText
-                    wrapper={<Ink.Text />}
-                    message="New version available {latest_version}, would you like to update?"
-                    values={{
-                      latest_version: <Brackets>{state.latest_version}</Brackets>,
-                    }}
+                    wrapper={<Ink.Text color={colors.yellow} />}
+                    message="Would you like to run the above command to update?"
                   />
-                  ,
-                </Ink.Text>
-                <Ink.Text> </Ink.Text>
-                <Command>{install_command}</Command>
-                <Ink.Text> </Ink.Text>
-                <FormatText
-                  wrapper={<Ink.Text color={colors.yellow} />}
-                  message="Would you like to run the above command to update?"
-                />
+                </Ink.Box>
               </Ink.Box>
             }
             onYes={async () => {
-              handle_output(
-                <FormatText
-                  key="install"
-                  wrapper={<Ink.Text />}
-                  message="Installing {name}@{version}..."
-                  values={{
-                    name: <Ink.Text color={colors.yellow}>{props.name}</Ink.Text>,
-                    version: <Ink.Text color={colors.blue}>{state.latest_version}</Ink.Text>,
-                  }}
-                />,
-              );
+              handle_output(<Command>{install_command}</Command>);
 
               patch({ status: "install" });
 
-              await cli(install_command);
+              await cli(install_command, {
+                env: {
+                  ...process.env,
+                  HOMEBREW_COLOR: "1",
+                },
+                onOutput: (data: string) => {
+                  handle_output(<Ink.Text>{data}</Ink.Text>);
+                },
+              });
 
-              patch({ status: "exit" });
+              handle_output(
+                <Ink.Text key="done">
+                  ✅ Installed <Brackets>{state.latest_version}</Brackets>
+                </Ink.Text>,
+              );
 
-              handle_output(<Ink.Text key="done">Auto update done.</Ink.Text>);
+              patch({ status: "done" });
             }}
             onNo={() => {
               patch({ status: "done" });
@@ -237,9 +258,6 @@ export function AutoUpdate(props: Props) {
       }
 
       case "install":
-        return null;
-
-      case "exit":
         return null;
 
       case "done":
