@@ -232,7 +232,7 @@ function SelectCommitRangesInternal(props: Props) {
           </Ink.Text>
           <Ink.Text color={colors.blue}>
             <FormatText
-              message="Press {c} to {create} a new PR group"
+              message="Press {c} to {create} a new PR"
               values={{
                 c: (
                   <Ink.Text bold color={colors.green}>
@@ -359,7 +359,7 @@ function SelectCommitRangesInternal(props: Props) {
           {group_input ? null : (
             <FormatText
               wrapper={<Ink.Text color={colors.gray} />}
-              message="Press {c} to {create} a new PR group"
+              message="Press {c} to {create} a new PR"
               values={{
                 c: (
                   <Ink.Text bold color={colors.green}>
@@ -411,7 +411,7 @@ function SelectCommitRangesInternal(props: Props) {
       <Ink.Box>
         <FormatText
           wrapper={<Ink.Text color={colors.gray} />}
-          message="Press {left} and {right} to view PR groups"
+          message="Press {left} and {right} to view PRs"
           values={{
             left: (
               <Ink.Text bold color={colors.green}>
@@ -463,7 +463,7 @@ function SelectCommitRangesInternal(props: Props) {
     actions.output(
       <FormatText
         wrapper={<Ink.Text dimColor />}
-        message="Created new PR group {group} {note}"
+        message="Created new PR {group} {note}"
         values={{
           group: <Brackets>{title}</Brackets>,
           note: <Parens>{id}</Parens>,
