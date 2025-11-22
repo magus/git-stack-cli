@@ -109,12 +109,6 @@ const DefaultOptions = {
     description: "Open all PRs as drafts",
   },
 
-  "branch-prefix": {
-    type: "string",
-    default: "",
-    description: "Prefix for generated branch names, e.g. dev/magus/",
-  },
-
   "revise-sign": {
     type: "boolean",
     default: true,

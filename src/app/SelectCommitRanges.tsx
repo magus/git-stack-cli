@@ -10,8 +10,8 @@ import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import { TextInput } from "~/app/TextInput";
 import { colors } from "~/core/colors";
-import { gs_short_id } from "~/core/gs_short_id";
 import { invariant } from "~/core/invariant";
+import { short_id } from "~/core/short_id";
 import { wrap_index } from "~/core/wrap_index";
 
 import type { State } from "~/app/Store";
@@ -35,6 +35,8 @@ function SelectCommitRangesInternal(props: Props) {
   const actions = Store.useActions();
 
   const argv = Store.useState((state) => state.argv);
+  const branch_name = Store.useState((state) => state.branch_name);
+  invariant(branch_name, "branch_name must exist");
 
   const [selected_group_id, set_selected_group_id] = React.useState(() => {
     const first_group = props.commit_range.group_list.find(
@@ -444,17 +446,7 @@ function SelectCommitRangesInternal(props: Props) {
   );
 
   function get_group_id() {
-    let branch_prefix = "";
-
-    // branch prefix via cli flag or env var
-    // cli flag takes precedence since it is more explicit
-    if (argv["branch-prefix"]) {
-      branch_prefix = argv["branch-prefix"];
-    } else if (process.env.GIT_STACK_BRANCH_PREFIX) {
-      branch_prefix = process.env.GIT_STACK_BRANCH_PREFIX;
-    }
-
-    return `${branch_prefix}${gs_short_id()}`;
+    return `${branch_name}-${short_id()}`;
   }
 
   function submit_group_input(title: string) {
