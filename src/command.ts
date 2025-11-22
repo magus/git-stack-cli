@@ -1,54 +1,78 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-import type { Options, InferredOptionTypes, Arguments } from "yargs";
+import type { Options, InferredOptionTypes, Arguments, ParserConfigurationOptions } from "yargs";
 
 export type Argv = Arguments & TGlobalOptions & TFixupOptions & TDefaultOptions;
 
-export async function command() {
+type CommandOptions = {
+  env_config?: Partial<Argv>;
+  parserConfiguration?: Partial<ParserConfigurationOptions>;
+};
+
+export async function command(argv: string[], options: CommandOptions = {}) {
   // https://yargs.js.org/docs/#api-reference-optionkey-opt
-  return (
-    yargs(hideBin(process.argv))
-      .scriptName("git stack")
-      .usage("Usage: git stack [command] [options]")
+  let builder = yargs(hideBin(argv));
 
-      .command("$0", "Sync commit ranges to Github", (yargs) => yargs.options(DefaultOptions))
+  if (options.parserConfiguration) {
+    builder = builder.parserConfiguration(options.parserConfiguration);
+  }
 
-      .command("fixup [commit]", "Amend staged changes to a specific commit in history", (yargs) =>
-        yargs.positional("commit", FixupOptions.commit),
-      )
+  // apply overrides from config
+  // higher precedence than defaults, but lower precendence than cli flags
+  // perfect since that's what we want, prefer config only if not explicitly set on cli
+  if (options.env_config) {
+    builder = builder.config(options.env_config);
+  }
 
-      .command(
-        "log [args...]",
-        "Print an abbreviated log with numbered commits, useful for git stack fixup",
-        (yargs) => yargs.strict(false),
-      )
+  const parsed = await builder
+    .scriptName("git stack")
+    .usage("Usage: git stack [command] [options]")
 
-      .command(
-        "rebase",
-        "Update local branch via rebase with latest changes from origin master branch",
-        (yargs) => yargs,
-      )
+    .command("$0", "Sync commit ranges to Github", (yargs) => yargs.options(DefaultOptions))
 
-      .command(
-        ["update", "upgrade"],
-        "Check and install the latest version of git stack",
-        (yargs) => yargs,
-      )
+    .command("fixup [commit]", "Amend staged changes to a specific commit in history", (yargs) =>
+      yargs.positional("commit", FixupOptions.commit),
+    )
 
-      .option("verbose", GlobalOptions.verbose)
+    .command(
+      "log [args...]",
+      "Print an abbreviated log with numbered commits, useful for git stack fixup",
+      (yargs) => yargs.strict(false),
+    )
 
-      // yargs default wraps to 80 columns
-      // passing null will wrap to terminal width
-      // value below if what seems to look decent
-      .wrap(123)
+    .command(
+      "rebase",
+      "Update local branch via rebase with latest changes from origin master branch",
+      (yargs) => yargs,
+    )
 
-      // disallow unknown options
-      .strict()
-      .version(process.env.CLI_VERSION || "unknown")
-      .showHidden("show-hidden", "Show hidden options via `git stack help --show-hidden`")
-      .help("help", "Show usage via `git stack help`").argv as unknown as Promise<Argv>
-  );
+    .command(
+      ["update", "upgrade"],
+      "Check and install the latest version of git stack",
+      (yargs) => yargs,
+    )
+    .command(
+      "config",
+      "Generate a one-time configuration json based on the passed arguments",
+      (yargs) => yargs.options(DefaultOptions),
+    )
+
+    .option("verbose", GlobalOptions.verbose)
+
+    // yargs default wraps to 80 columns
+    // passing null will wrap to terminal width
+    // value below if what seems to look decent
+    .wrap(123)
+
+    // disallow unknown options
+    .strict()
+    .version(process.env.CLI_VERSION || "unknown")
+    .showHidden("show-hidden", "Show hidden options via `git stack help --show-hidden`")
+    .help("help", "Show usage via `git stack help`");
+
+  const result = parsed.argv as unknown as Argv;
+  return result;
 }
 
 const GlobalOptions = {

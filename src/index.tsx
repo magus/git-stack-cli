@@ -11,13 +11,13 @@ import * as Ink from "ink-cjs";
 
 import { App } from "~/app/App";
 import { Store } from "~/app/Store";
-import { command } from "~/command";
+import { argv_with_config_from_env } from "~/commands/Config";
 import { get_tmp_dir } from "~/core/get_tmp_dir";
 import { pretty_json } from "~/core/pretty_json";
 
 (async function main() {
   try {
-    const argv = await command();
+    const argv = await argv_with_config_from_env();
 
     // required to get bun working with ink
     // https://github.com/oven-sh/bun/issues/6862#issuecomment-2429444852

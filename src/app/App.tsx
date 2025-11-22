@@ -17,6 +17,7 @@ import { RebaseCheck } from "~/app/RebaseCheck";
 import { RequireBranch } from "~/app/RequireBranch";
 import { Store } from "~/app/Store";
 import { VerboseDebugInfo } from "~/app/VerboseDebugInfo";
+import { Config } from "~/commands/Config";
 import { Fixup } from "~/commands/Fixup";
 import { Log } from "~/commands/Log";
 import { Rebase } from "~/commands/Rebase";
@@ -92,6 +93,8 @@ function MaybeMain() {
     return <Log />;
   } else if (positional_list.has("update")) {
     return <Update />;
+  } else if (positional_list.has("config")) {
+    return <Config />;
   } else if (positional_list.has("rebase")) {
     return (
       <DependencyCheck>

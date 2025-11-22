@@ -102,6 +102,23 @@ By default `git stack` generates a unique identifier and appends it to your loca
 
 For example, if you are locally working in `dev/feature-a`, PRs branch names will look like `dev/feature-a-3cmrMBSUj`.
 
+### Overriding defaults
+
+`git stack` has many optional flags to control its behavior.
+You can view them by running `git stack help` and set them as needed.
+
+If you prefer to set them once in your environment, you can use the command below to generate a one-time configuration.
+
+```bash
+❯ git stack config --draft --force
+
+Add the line below to your shell rc file (.zshrc, .bashrc, etc.)
+
+export GIT_STACK_CONFIG="{\"draft\":true,\"force\":true}"
+```
+
+Copy this environment variable into your shell configuration, e.g. `.zshrc`, `.bashrc`, etc.
+
 ## Why?
 
 The goal of `git stack` is to combine the **simplicity of developing in a single branch** in order to **preserve your commit history** while also **grouping commits into pull requests for code review**.
