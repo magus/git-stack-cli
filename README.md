@@ -58,6 +58,15 @@ git stack --no-verify # skip git hooks such as pre-commit and pre-push
 git stack help        # print a table of all CLI arguments
 ```
 
+### Adding new commits and pull requests
+
+Adding commits to a PR is as simple as running `git stack` and adding commits to a PR.
+
+1. Run `git stack`
+1. Press `c` to create a new PR
+1. Use `↑↓` and `space`/`enter` to navigate and assign commits to the PR
+1. Press `s` to sync created PRs and commits to Github
+
 ### Editing existing commits and pull requests
 
 Sometimes you want to add changes to an existing commit or pull request.
