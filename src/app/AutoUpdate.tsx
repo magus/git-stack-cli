@@ -5,6 +5,7 @@ import * as Ink from "ink-cjs";
 import { Brackets } from "~/app/Brackets";
 import { Command } from "~/app/Command";
 import { FormatText } from "~/app/FormatText";
+import { Url } from "~/app/Url";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
 import { assertNever } from "~/core/assertNever";
 import { cli } from "~/core/cli";
@@ -26,10 +27,9 @@ type Props = {
 };
 
 type State = {
-  error: null | Error;
+  status: "init" | "prompt" | "install" | "done";
   local_version: null | string;
   latest_version: null | string;
-  status: "init" | "prompt" | "install" | "done";
   is_brew_bun_standalone: boolean;
 };
 
@@ -44,24 +44,94 @@ export function AutoUpdate(props: Props) {
   const [output, set_output] = React.useState<Array<React.ReactNode>>([]);
 
   const [state, patch] = React.useReducer(reducer, {
-    error: null,
+    status: "init",
     local_version: null,
     latest_version: null,
-    status: "init",
     is_brew_bun_standalone: false,
+
+    // // debugging
+    // status: "prompt",
+    // local_version: "2.5.3",
+    // latest_version: "2.7.0",
+    // is_brew_bun_standalone: true,
   });
 
-  function handle_output(node: React.ReactNode) {
-    if (typeof props.onOutput === "function") {
-      props.onOutput(node);
-    } else {
-      set_output((current) => {
-        return [...current, node];
-      });
+  React.useEffect(handle_init_state, []);
+  React.useEffect(handle_status, [state.latest_version]);
+  React.useEffect(handle_on_done, [state.status]);
+
+  const status = render_status();
+
+  return (
+    <React.Fragment>
+      {output}
+      {status}
+    </React.Fragment>
+  );
+
+  function render_status() {
+    switch (state.status) {
+      case "init":
+        return null;
+
+      case "install":
+        return null;
+
+      case "done":
+        return props.children;
+
+      case "prompt": {
+        let install_command = "";
+        if (state.is_brew_bun_standalone) {
+          install_command = "brew install magus/git-stack/git-stack";
+        } else {
+          install_command = `npm install -g ${props.name}@latest`;
+        }
+
+        return (
+          <YesNoPrompt
+            message={
+              <Ink.Box flexDirection="column" gap={1}>
+                <Command>{install_command}</Command>
+                <FormatText
+                  wrapper={<Ink.Text color={colors.yellow} />}
+                  message="Would you like to run the above command to update?"
+                />
+              </Ink.Box>
+            }
+            onNo={() => {
+              patch({ status: "done" });
+            }}
+            onYes={async () => {
+              info(<Command>{install_command}</Command>);
+
+              patch({ status: "install" });
+
+              await cli(install_command, {
+                env: {
+                  ...process.env,
+                  HOMEBREW_COLOR: "1",
+                },
+                onOutput: (data: string) => {
+                  info(<Ink.Text>{data}</Ink.Text>);
+                },
+              });
+
+              info(
+                <Ink.Text key="done">
+                  ✅ Installed <Brackets>{state.latest_version}</Brackets>
+                </Ink.Text>,
+              );
+
+              patch({ status: "done" });
+            }}
+          />
+        );
+      }
     }
   }
 
-  React.useEffect(() => {
+  function handle_on_done() {
     switch (state.status) {
       case "init":
       case "prompt":
@@ -76,199 +146,165 @@ export function AutoUpdate(props: Props) {
       default:
         assertNever(state.status);
     }
-  }, [state.status]);
+  }
 
-  React.useEffect(() => {
-    let status: State["status"] = "init";
-    let latest_version: string | null = null;
-    let is_brew_bun_standalone = false;
+  function handle_init_state() {
+    init_state().catch(abort);
 
-    const local_version = process.env.CLI_VERSION;
-    const is_output = props_ref.current.verbose || props_ref.current.force;
+    async function init_state() {
+      if (state.latest_version !== null) return;
 
-    async function auto_update() {
-      if (!local_version) {
-        throw new Error("Auto update requires process.env.CLI_VERSION to be set");
-      }
+      const local_version = process.env.CLI_VERSION;
+      const latest_version = await get_latest_version();
+      const is_brew_bun_standalone = get_is_brew_bun_standalone();
+      patch({ local_version, latest_version, is_brew_bun_standalone });
+    }
 
+    async function get_latest_version() {
       const timeout_ms = is_finite_value(props.timeoutMs) ? props.timeoutMs : 2 * 1000;
 
       const npm_json = await Promise.race([
         fetch_json(`https://registry.npmjs.org/${props.name}`),
 
         sleep(timeout_ms).then(() => {
-          throw new Error("AutoUpdate timeout");
+          abort(new Error("AutoUpdate timeout"));
         }),
       ]);
 
-      latest_version = npm_json?.["dist-tags"]?.latest;
+      const maybe_version = npm_json?.["dist-tags"]?.latest;
 
-      if (!latest_version) {
-        throw new Error("Unable to retrieve latest version from npm");
+      if (typeof maybe_version === "string") {
+        return maybe_version;
       }
 
+      throw new Error("Unable to retrieve latest version from npm");
+    }
+
+    function get_is_brew_bun_standalone() {
       const binary_path = process.argv[1];
+      debug(<Ink.Text dimColor>{JSON.stringify({ binary_path })}</Ink.Text>);
 
-      if (props_ref.current.verbose) {
-        handle_output(<Ink.Text dimColor>{JSON.stringify({ binary_path })}</Ink.Text>);
+      const is_bunfs_path = binary_path.startsWith("/$bunfs");
+      debug(
+        <Ink.Text dimColor>
+          {is_bunfs_path
+            ? "brew install detected (compiled bun standalone)"
+            : "npm install detected"}
+        </Ink.Text>,
+      );
+
+      return is_bunfs_path;
+    }
+  }
+
+  function handle_status() {
+    const latest_version = state.latest_version;
+
+    if (latest_version === null) {
+      return;
+    }
+
+    const local_version = state.local_version;
+
+    if (!local_version) {
+      throw new Error("Auto update requires process.env.CLI_VERSION to be set");
+    }
+
+    debug(
+      <FormatText
+        key="versions"
+        wrapper={<Ink.Text dimColor />}
+        message="Auto update found latest version {latest_version} and current local version {local_version}"
+        values={{
+          latest_version: <Brackets>{latest_version}</Brackets>,
+          local_version: <Brackets>{local_version}</Brackets>,
+        }}
+      />,
+    );
+
+    const semver_result = semver_compare(latest_version, local_version);
+    debug(<Ink.Text dimColor>{JSON.stringify({ semver_result })}</Ink.Text>);
+
+    switch (semver_result) {
+      case 0: {
+        info(
+          <Ink.Text>
+            ✅ Everything up to date. <Brackets>{latest_version}</Brackets>
+          </Ink.Text>,
+        );
+
+        return patch({ status: "done" });
       }
 
-      is_brew_bun_standalone = binary_path.startsWith("/$bunfs");
+      case 1: {
+        const old_tag = local_version;
+        const new_tag = state.latest_version;
+        const url = `https://github.com/magus/git-stack-cli/compare/${old_tag}...${new_tag}`;
 
-      if (props_ref.current.verbose) {
-        if (is_brew_bun_standalone) {
-          handle_output(
-            <Ink.Text dimColor>brew install detected (compiled bun standalone)</Ink.Text>,
-          );
-        } else {
-          handle_output(<Ink.Text dimColor>npm install detected</Ink.Text>);
-        }
+        info(
+          <Ink.Box flexDirection="column" gap={1} paddingTop={1} paddingBottom={1}>
+            <Ink.Text>
+              🆕 New version available! <Brackets>{latest_version}</Brackets>
+            </Ink.Text>
+            <Ink.Box flexDirection="column">
+              <Ink.Text dimColor>Changelog</Ink.Text>
+              <Url>{url}</Url>
+            </Ink.Box>
+          </Ink.Box>,
+        );
+
+        return patch({ status: "prompt" });
       }
 
-      if (props_ref.current.verbose) {
-        handle_output(
+      case -1: {
+        info(
           <FormatText
-            key="versions"
-            wrapper={<Ink.Text />}
-            message="Auto update found latest version {latest_version} and current local version {local_version}"
+            message="⚠️ Local version {local_version} is newer than latest version {latest_version}"
             values={{
-              latest_version: <Brackets>{latest_version}</Brackets>,
               local_version: <Brackets>{local_version}</Brackets>,
+              latest_version: <Brackets>{latest_version}</Brackets>,
             }}
           />,
         );
+
+        return patch({ status: "done" });
       }
 
-      const semver_result = semver_compare(latest_version, local_version);
-      if (props_ref.current.verbose) {
-        handle_output(<Ink.Text dimColor>{JSON.stringify({ semver_result })}</Ink.Text>);
+      default: {
+        assertNever(semver_result);
+        abort(new Error("AutoUpdate failed"));
       }
-
-      if (semver_result === 0) {
-        status = "done";
-
-        if (is_output) {
-          handle_output(
-            <Ink.Text>
-              ✅ Everything up to date. <Brackets>{latest_version}</Brackets>
-            </Ink.Text>,
-          );
-        }
-        return;
-      }
-
-      if (semver_result === 1) {
-        // trigger yes no prompt
-        status = "prompt";
-      }
-
-      throw new Error("AutoUpdate failed");
     }
+  }
 
-    const onError = props_ref.current.onError || (() => {});
+  function info(node: React.ReactNode) {
+    if (props_ref.current.verbose || props_ref.current.force) {
+      handle_output(node);
+    }
+  }
 
-    auto_update()
-      .then(() => {
-        patch({ status, local_version, latest_version, is_brew_bun_standalone });
-      })
-      .catch((error) => {
-        if (props_ref.current.verbose) {
-          handle_output(
-            <Ink.Text key="error" color={colors.red}>
-              {error?.message}
-            </Ink.Text>,
-          );
-        }
+  function debug(node: React.ReactNode) {
+    if (props_ref.current.verbose) {
+      handle_output(node);
+    }
+  }
+  function abort(error: Error) {
+    info(
+      <Ink.Text key="error" color={colors.red}>
+        {error.message}
+      </Ink.Text>,
+    );
+    patch({ status: "done" });
+    props_ref.current.onError?.(error);
+  }
 
-        // ensure we always exit
-        status = "done";
-        patch({ status, error, local_version, latest_version, is_brew_bun_standalone });
-        onError(error);
+  function handle_output(node: React.ReactNode) {
+    if (typeof props.onOutput === "function") {
+      props.onOutput(node);
+    } else {
+      set_output((current) => {
+        return [...current, node];
       });
-  }, []);
-
-  const status = (function render_status() {
-    switch (state.status) {
-      case "init":
-        return null;
-
-      case "prompt": {
-        let install_command = "";
-        if (state.is_brew_bun_standalone) {
-          install_command = "brew install magus/git-stack/git-stack";
-        } else {
-          install_command = `npm install -g ${props.name}@latest`;
-        }
-
-        return (
-          <YesNoPrompt
-            message={
-              <Ink.Box flexDirection="column">
-                <Ink.Box flexDirection="column">
-                  <Ink.Text color={colors.yellow}>
-                    <FormatText
-                      wrapper={<Ink.Text />}
-                      message="New version available {latest_version}"
-                      values={{
-                        latest_version: <Brackets>{state.latest_version}</Brackets>,
-                      }}
-                    />
-                    ,
-                  </Ink.Text>
-                  <Ink.Text> </Ink.Text>
-                  <Command>{install_command}</Command>
-                  <Ink.Text> </Ink.Text>
-                </Ink.Box>
-                <Ink.Box>
-                  <FormatText
-                    wrapper={<Ink.Text color={colors.yellow} />}
-                    message="Would you like to run the above command to update?"
-                  />
-                </Ink.Box>
-              </Ink.Box>
-            }
-            onYes={async () => {
-              handle_output(<Command>{install_command}</Command>);
-
-              patch({ status: "install" });
-
-              await cli(install_command, {
-                env: {
-                  ...process.env,
-                  HOMEBREW_COLOR: "1",
-                },
-                onOutput: (data: string) => {
-                  handle_output(<Ink.Text>{data}</Ink.Text>);
-                },
-              });
-
-              handle_output(
-                <Ink.Text key="done">
-                  ✅ Installed <Brackets>{state.latest_version}</Brackets>
-                </Ink.Text>,
-              );
-
-              patch({ status: "done" });
-            }}
-            onNo={() => {
-              patch({ status: "done" });
-            }}
-          />
-        );
-      }
-
-      case "install":
-        return null;
-
-      case "done":
-        return props.children;
     }
-  })();
-
-  return (
-    <React.Fragment>
-      {output}
-      {status}
-    </React.Fragment>
-  );
+  }
 }
