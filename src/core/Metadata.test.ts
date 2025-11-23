@@ -17,6 +17,7 @@ test("read handles bulleted lists", () => {
   const metadata = Metadata.read(body);
 
   expect(metadata).toEqual({
+    subject: "[feat] implement various features",
     id: "DdKIFyufW",
     title: "saved group title",
   });
@@ -63,6 +64,7 @@ test("read handles slashes in branch name", () => {
   const metadata = Metadata.read(body);
 
   expect(metadata).toEqual({
+    subject: "[fix] slash in branch name",
     id: "dev/noah/fix-slash-branch",
     title: "fix slash branch",
   });
@@ -109,6 +111,7 @@ test("read handles double quotes", () => {
   const metadata = Metadata.read(body);
 
   expect(metadata).toEqual({
+    subject: 'Revert "[abc / 123] subject (#1234)"',
     id: "dev/noah/fix-slash-branch",
     title: 'Revert \\"[abc / 123] subject (#1234)\\"',
   });

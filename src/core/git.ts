@@ -1,50 +1,55 @@
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
 
-export type Commit = Awaited<ReturnType<typeof commit>>;
+export type Commit = Awaited<ReturnType<typeof get_commits>>[0];
 
 export async function get_commits(dot_range: string) {
-  const log_result = await cli(`git log ${dot_range} --oneline --format=%H --color=never`);
+  const log_result = await cli(`git log ${dot_range} --format=${FORMAT} --color=never`);
 
   if (!log_result.stdout) {
     return [];
   }
 
-  const sha_list = lines(log_result.stdout).reverse();
+  const commit_list = [];
 
-  const commit_metadata_list = [];
+  for (let record of log_result.stdout.split(SEP.record)) {
+    record = record.replace(/^\n/, "");
+    record = record.replace(/\n$/, "");
 
-  for (let i = 0; i < sha_list.length; i++) {
-    const sha = sha_list[i];
-    const commit_metadata = await commit(sha);
-    commit_metadata_list.push(commit_metadata);
+    if (!record) continue;
+
+    const [sha, full_message] = record.split(SEP.field);
+
+    const metadata = Metadata.read(full_message);
+    const branch_id = metadata.id;
+    const subject_line = metadata.subject || "";
+    const title = metadata.title;
+
+    const commit = {
+      sha,
+      full_message,
+      subject_line,
+      branch_id,
+      title,
+    };
+
+    commit_list.push(commit);
   }
 
-  return commit_metadata_list;
+  commit_list.reverse();
+
+  return commit_list;
 }
 
-async function commit(sha: string) {
-  const full_message = (await cli(`git show -s --format=%B ${sha}`)).stdout;
-  const metadata = await Metadata.read(full_message);
-  const branch_id = metadata?.id;
-  const subject_line = get_subject_line(full_message);
-  const title = metadata?.title;
+// Why these separators?
+// - Rare in human written text
+// - Supported in git %xNN to write bytes
+// - Supported in javascript \xNN to write bytes
+// - Used historically as separators in unicode
+//   https://en.wikipedia.org/wiki/C0_and_C1_control_codes#Field_separators
+const SEP = {
+  record: "\x1e",
+  field: "\x1f",
+};
 
-  return {
-    sha,
-    full_message,
-    subject_line,
-    branch_id,
-    title,
-  };
-}
-
-function get_subject_line(message: string) {
-  const line_list = lines(message);
-  const first_line = line_list[0];
-  return Metadata.remove(first_line);
-}
-
-function lines(value: string) {
-  return value.split("\n");
-}
+const FORMAT = `%H${SEP.field}%B${SEP.record}`;
