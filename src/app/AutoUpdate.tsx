@@ -218,7 +218,7 @@ export function AutoUpdate(props: Props) {
 
     switch (semver_result) {
       case 0: {
-        info(
+        info_quiet(
           <Ink.Text>
             ✅ Everything up to date. <Brackets>{latest_version}</Brackets>
           </Ink.Text>,
@@ -248,7 +248,7 @@ export function AutoUpdate(props: Props) {
       }
 
       case -1: {
-        info(
+        info_quiet(
           <FormatText
             message="⚠️ Local version {local_version} is newer than latest version {latest_version}"
             values={{
@@ -269,6 +269,10 @@ export function AutoUpdate(props: Props) {
   }
 
   function info(node: React.ReactNode) {
+    handle_output(node);
+  }
+
+  function info_quiet(node: React.ReactNode) {
     if (props_ref.current.verbose || props_ref.current.force) {
       handle_output(node);
     }
@@ -280,7 +284,7 @@ export function AutoUpdate(props: Props) {
     }
   }
   function abort(error: Error) {
-    info(
+    info_quiet(
       <Ink.Text key="error" color={colors.red}>
         {error.message}
       </Ink.Text>,
