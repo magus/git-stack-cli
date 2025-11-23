@@ -3,6 +3,7 @@ import path from "node:path";
 import * as util from "util";
 
 import * as file from "~/core/file";
+import { get_local_iso } from "~/core/get_local_iso";
 import { spawn } from "~/core/spawn";
 
 const parsed_args = util.parseArgs({
@@ -25,7 +26,7 @@ const WATCH = parsed_args.values.watch;
 const VERBOSE = parsed_args.values.verbose;
 
 function log(...args: any[]) {
-  const timestamp = new Date().toISOString();
+  const timestamp = get_local_iso(new Date());
   console.debug(`[${timestamp}]`, ...args);
 }
 
