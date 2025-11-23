@@ -11,9 +11,9 @@ import { assertNever } from "~/core/assertNever";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { fetch_json } from "~/core/fetch_json";
+import { get_timeout_fn } from "~/core/get_timeout_fn";
 import { is_finite_value } from "~/core/is_finite_value";
 import { semver_compare } from "~/core/semver_compare";
-import { sleep } from "~/core/sleep";
 
 type Props = {
   name: string;
@@ -162,21 +162,12 @@ export function AutoUpdate(props: Props) {
 
     async function get_latest_version() {
       const timeout_ms = is_finite_value(props.timeoutMs) ? props.timeoutMs : 2 * 1000;
-
-      const npm_json = await Promise.race([
-        fetch_json(`https://registry.npmjs.org/${props.name}`),
-
-        sleep(timeout_ms).then(() => {
-          abort(new Error("AutoUpdate timeout"));
-        }),
-      ]);
-
+      const timeout = get_timeout_fn(timeout_ms, "AutoUpdate timeout");
+      const npm_json = await timeout(fetch_json(`https://registry.npmjs.org/${props.name}`));
       const maybe_version = npm_json?.["dist-tags"]?.latest;
-
       if (typeof maybe_version === "string") {
         return maybe_version;
       }
-
       throw new Error("Unable to retrieve latest version from npm");
     }
 
