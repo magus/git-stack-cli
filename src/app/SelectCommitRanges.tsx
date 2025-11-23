@@ -380,7 +380,11 @@ function SelectCommitRangesInternal(props: Props) {
           {sync_status !== "allow_unassigned" ? null : (
             <FormatText
               wrapper={<Ink.Text color={colors.gray} />}
-              message="Press {s} to {sync} the {count} assigned commits to Github"
+              message={
+                argv.sync
+                  ? "Press {s} to {sync} the {count} assigned commits to Github"
+                  : "Press {s} to {sync} the {count} assigned commits locally"
+              }
               values={{
                 ...S_TO_SYNC_VALUES,
                 count: (
@@ -393,21 +397,15 @@ function SelectCommitRangesInternal(props: Props) {
           )}
         </React.Fragment>
       ) : (
-        <React.Fragment>
-          {argv.sync ? (
-            <FormatText
-              wrapper={<Ink.Text />}
-              message="🎉 Done! Press {s} to {sync} the commits to Github"
-              values={S_TO_SYNC_VALUES}
-            />
-          ) : (
-            <FormatText
-              wrapper={<Ink.Text />}
-              message="🎉 Done! Press {s} to {save} the commits locally"
-              values={S_TO_SYNC_VALUES}
-            />
-          )}
-        </React.Fragment>
+        <FormatText
+          wrapper={<Ink.Text />}
+          message={
+            argv.sync
+              ? "🎉 Done! Press {s} to {sync} the PRs to Github"
+              : "🎉 Done! Press {s} to {sync} the PRs locally"
+          }
+          values={S_TO_SYNC_VALUES}
+        />
       )}
 
       <Ink.Box>
