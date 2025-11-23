@@ -1,9 +1,7 @@
 import { Store } from "~/app/Store";
-import * as Metadata from "~/core/Metadata";
-import { cli } from "~/core/cli";
+import * as git from "~/core/git";
 import * as github from "~/core/github";
 
-export type CommitMetadata = Awaited<ReturnType<typeof commit>>;
 export type CommitRange = Awaited<ReturnType<typeof range>>;
 
 type GithubPRStatus = ReturnType<typeof github.pr_status>;
@@ -15,20 +13,19 @@ type CommitGroup = {
   pr: null | PullRequest;
   base: null | string;
   dirty: boolean;
-  commits: Array<CommitMetadata>;
+  commits: Array<git.Commit>;
 };
 
 export type SimpleGroup = { id: string; title: string };
 type CommitGroupMap = { [sha: string]: SimpleGroup };
 
 export async function range(commit_group_map?: CommitGroupMap) {
-  const master_branch = Store.getState().master_branch;
-
   // gather all open prs in repo first
   // cheaper query to populate cache
   await github.pr_list();
 
-  const commit_list = await get_commit_list();
+  const master_branch = Store.getState().master_branch;
+  const commit_list = await git.get_commits(`${master_branch}..HEAD`);
 
   const pr_lookup: Record<string, void | PullRequest> = {};
 
@@ -181,55 +178,6 @@ export async function range(commit_group_map?: CommitGroupMap) {
   }
 
   return { invalid, group_list, commit_list, pr_lookup, UNASSIGNED };
-}
-
-async function get_commit_list() {
-  const master_branch = Store.getState().master_branch;
-  const log_result = await cli(
-    `git log ${master_branch}..HEAD --oneline --format=%H --color=never`,
-  );
-
-  if (!log_result.stdout) {
-    return [];
-  }
-
-  const sha_list = lines(log_result.stdout).reverse();
-
-  const commit_metadata_list = [];
-
-  for (let i = 0; i < sha_list.length; i++) {
-    const sha = sha_list[i];
-    const commit_metadata = await commit(sha);
-    commit_metadata_list.push(commit_metadata);
-  }
-
-  return commit_metadata_list;
-}
-
-export async function commit(sha: string) {
-  const full_message = (await cli(`git show -s --format=%B ${sha}`)).stdout;
-  const metadata = await Metadata.read(full_message);
-  const branch_id = metadata?.id;
-  const subject_line = get_subject_line(full_message);
-  const title = metadata?.title;
-
-  return {
-    sha,
-    full_message,
-    subject_line,
-    branch_id,
-    title,
-  };
-}
-
-function get_subject_line(message: string) {
-  const line_list = lines(message);
-  const first_line = line_list[0];
-  return Metadata.remove(first_line);
-}
-
-function lines(value: string) {
-  return value.split("\n");
 }
 
 export const UNASSIGNED = "unassigned";

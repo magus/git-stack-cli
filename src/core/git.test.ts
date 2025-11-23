@@ -1,0 +1,54 @@
+import { test, expect } from "bun:test";
+
+import * as git from "~/core/git";
+
+test("get_commits ABC..DEF", async () => {
+  const commits = await git.get_commits("e781ede..8ccf42a");
+  expect(commits).toMatchSnapshot(`
+[
+  {
+    "branch_id": null,
+    "full_message": "homebrew-git-stack 2.7.1",
+    "sha": "ba067f8ad641dda7e65e3c2acb2421c955843829",
+    "subject_line": "homebrew-git-stack 2.7.1",
+    "title": null,
+  },
+  {
+    "branch_id": "noah/paint-test---4gwpqhd033n6y5",
+    "full_message":
+"Rebase: debug logs
+
+git-stack-id: noah/paint-test---4gwpqhd033n6y5
+git-stack-title: Rebase: debug logs"
+,
+    "sha": "7c8da9f5fe681fc7459a0e737241df631983cd3c",
+    "subject_line": "Rebase: debug logs",
+    "title": "Rebase: debug logs",
+  },
+  {
+    "branch_id": "noah/paint-test---4gwpqirewoudxa",
+    "full_message":
+"CommitMetadata: track last group id
+
+git-stack-id: noah/paint-test---4gwpqirewoudxa
+git-stack-title: CommitMetadata: track last group id"
+,
+    "sha": "47a69d37f8c5cc796884a91fa9e93fc1db5297dd",
+    "subject_line": "CommitMetadata: track last group id",
+    "title": "CommitMetadata: track last group id",
+  },
+  {
+    "branch_id": "noah/paint-test---4gwpqjcpu7-isv",
+    "full_message":
+"Github: pr_list duration timer
+
+git-stack-id: noah/paint-test---4gwpqjcpu7-isv
+git-stack-title: Github: pr_list duration timer"
+,
+    "sha": "8ccf42a7c72aa194fafc7c326f5874f5a0a009c6",
+    "subject_line": "Github: pr_list duration timer",
+    "title": "Github: pr_list duration timer",
+  },
+]
+`);
+});
