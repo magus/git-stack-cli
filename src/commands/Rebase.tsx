@@ -78,7 +78,9 @@ Rebase.run = async function run(props: Props) {
     actions.exit(20);
   }
 
+  actions.debug("start CommitMetadata.range");
   const next_commit_range = await CommitMetadata.range();
+  actions.debug("end CommitMetadata.range");
 
   actions.output(
     <FormatText
@@ -167,7 +169,9 @@ Rebase.run = async function run(props: Props) {
     // of original branch to the newly created temporary branch
     await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
 
+    actions.debug("start restore_git()");
     restore_git();
+    actions.debug("end restore_git()");
   }
 
   // cleanup git operations if cancelled during manual rebase
