@@ -8,6 +8,7 @@ import * as Ink from "ink-cjs";
 
 import { Brackets } from "~/app/Brackets";
 import { Store } from "~/app/Store";
+import { Timer } from "~/core/Timer";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { get_tmp_dir } from "~/core/get_tmp_dir";
@@ -18,6 +19,9 @@ import { safe_rm } from "~/core/safe_rm";
 export async function pr_list(): Promise<Array<PullRequest>> {
   const state = Store.getState();
   const actions = state.actions;
+
+  const timer = Timer();
+  actions.debug("start github.pr_list");
 
   const username = state.username;
   const repo_path = state.repo_path;
@@ -53,6 +57,8 @@ export async function pr_list(): Promise<Array<PullRequest>> {
     }
   });
 
+  const duration = timer.duration();
+  actions.debug(`end github.pr_list (duration=${duration})`);
   return result_pr_list;
 }
 
