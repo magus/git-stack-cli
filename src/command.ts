@@ -18,18 +18,22 @@ export async function command(argv: string[], options: CommandOptions = {}) {
     builder = builder.parserConfiguration(options.parserConfiguration);
   }
 
-  // apply overrides from config
-  // higher precedence than defaults, but lower precendence than cli flags
-  // perfect since that's what we want, prefer config only if not explicitly set on cli
-  if (options.env_config) {
-    builder = builder.config(options.env_config);
-  }
-
   const parsed = await builder
     .scriptName("git stack")
     .usage("Usage: git stack [command] [options]")
 
-    .command("$0", "Sync commit ranges to Github", (yargs) => yargs.options(DefaultOptions))
+    .command("$0", "Sync commit ranges to Github", (yargs) => {
+      let builder = yargs.options(DefaultOptions);
+
+      // apply overrides from config
+      // higher precedence than defaults, but lower precendence than cli flags
+      // perfect since that's what we want, prefer config only if not explicitly set on cli
+      if (options.env_config) {
+        builder = builder.config(options.env_config);
+      }
+
+      return builder;
+    })
 
     .command("fixup [commit]", "Amend staged changes to a specific commit in history", (yargs) =>
       yargs.positional("commit", FixupOptions.commit),
@@ -52,6 +56,7 @@ export async function command(argv: string[], options: CommandOptions = {}) {
       "Check and install the latest version of git stack",
       (yargs) => yargs,
     )
+
     .command(
       "config",
       "Generate a one-time configuration json based on the passed arguments",
