@@ -33,6 +33,8 @@ export async function range(commit_group_map?: CommitGroupMap) {
   const pr_lookup: Record<string, void | PullRequest> = {};
 
   let invalid = false;
+  let last_group_id: null | string = null;
+
   const group_map = new Map<string, CommitGroup>();
 
   for (const commit of commit_list) {
@@ -57,10 +59,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
     }
 
     if (id) {
-      const group_key_list = Array.from(group_map.keys());
-      const last_key = group_key_list[group_key_list.length - 1];
-
-      if (group_map.has(id) && last_key !== id) {
+      if (group_map.has(id) && last_group_id !== id) {
         // if we've seen this id before and it's not
         // the last added key then we are out of order
         // console.debug("INVALID", "OUT OF ORDER");
@@ -87,6 +86,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
     group.commits.push(commit);
     group_map.set(id, group);
+    last_group_id = id;
   }
 
   // check each group for dirty state and base
