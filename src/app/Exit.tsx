@@ -38,7 +38,7 @@ Exit.handle_exit = async function handle_exit(props: Props) {
     exit_code = await state.abort_handler();
   }
 
-  if (!state.argv.verbose) {
+  if (!state.argv.verbose && props.code > 0) {
     actions.output(
       <Ink.Text color={colors.gray}>
         <FormatText message="Try again with `--verbose` to see more information." />
