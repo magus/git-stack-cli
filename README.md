@@ -154,21 +154,16 @@ corepack enable
 git submodule update --init --recursive
 pnpm i
 pnpm run dev
-pnpm link --global
 
-git stack --verbose
-```
-
-Remove global install
-
-```bash
-pnpm remove -g git-stack-cli
+node --enable-source-maps ./dist/js/index.js
 ```
 
 ## Build single-file executable
 
 ```bash
 pnpm run compile
+
+./dist/js/with-sourcemaps/git-stack-bun-darwin-arm64 --no-sync
 ```
 
 ## Publishing
