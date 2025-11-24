@@ -141,6 +141,8 @@ const BaseStore = createStore<State>()(
 
     actions: {
       exit(code, args) {
+        const clear = args?.clear ?? true;
+
         set((state) => {
           if (args?.quiet ?? code === 0) {
             state.exit_mode = "quiet";
@@ -148,11 +150,13 @@ const BaseStore = createStore<State>()(
             state.exit_mode = "normal";
           }
 
-          let clear = args?.clear ?? true;
-
           const node = <Exit clear={clear} code={code} />;
           state.mutate.output(state, { node });
         });
+
+        if (code > 0) {
+          throw new Error(`exit(${JSON.stringify({ code, clear })})`);
+        }
       },
 
       clear() {
