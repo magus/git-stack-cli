@@ -74,9 +74,11 @@ import { pretty_json } from "~/core/pretty_json";
       }
     }
   } catch (err) {
+    console.error("🚨 main catch");
     console.error(err);
     process.exit(236);
   }
 })().catch((err) => {
+  console.error("🚨 index catch");
   console.error(err);
 });

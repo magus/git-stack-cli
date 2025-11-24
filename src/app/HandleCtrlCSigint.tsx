@@ -13,6 +13,8 @@ export function HandleCtrlCSigint() {
   Ink.useInput((input, key) => {
     handle_input().catch((err) => {
       // eslint-disable-next-line no-console
+      console.error("🚨 HandleCtrlCSigint catch");
+      // eslint-disable-next-line no-console
       console.error(err);
     });
 
