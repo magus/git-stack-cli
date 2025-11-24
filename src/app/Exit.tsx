@@ -2,6 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink-cjs";
 
+import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
@@ -35,6 +36,14 @@ Exit.handle_exit = async function handle_exit(props: Props) {
   // run abort_handler if it exists
   if (state.abort_handler) {
     exit_code = await state.abort_handler();
+  }
+
+  if (!state.argv.verbose) {
+    actions.output(
+      <Ink.Text color={colors.gray}>
+        <FormatText message="Try again with `--verbose` to see more information." />
+      </Ink.Text>,
+    );
   }
 
   // restore git stash if necessary
