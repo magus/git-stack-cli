@@ -38,7 +38,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       // remove first line of component_stack
       component_stack = component_stack.split("\n").slice(1).join("\n");
       this.setState({ component_stack }, async () => {
-        await Exit.handle_exit({ code: 30, clear: true });
+        await Exit.handle_exit({ code: 30, clear: false });
       });
     }
   }
