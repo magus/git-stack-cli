@@ -29,10 +29,17 @@ export function HandleCtrlCSigint() {
         );
 
         await sleep(1);
-        actions.exit(235);
+
+        try {
+          actions.exit(HandleCtrlCSigint.ExitCode);
+        } catch {
+          // ignore intentional throw from actions.exit
+        }
       }
     }
   });
 
   return null;
 }
+
+HandleCtrlCSigint.ExitCode = 235;
