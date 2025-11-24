@@ -36,7 +36,7 @@ const INPUT_JS = path.join(REPO_ROOT, "/src/index.tsx");
 if (!(await file.exists(INPUT_JS))) {
   console.error(`❌ Missing ${path.relative(REPO_ROOT, INPUT_JS)}`);
   console.debug("Run `pnpm run build` first to generate the input file.");
-  process.exit(12);
+  process.exit(6);
 }
 
 if (TARGET) {
