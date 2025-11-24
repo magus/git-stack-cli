@@ -60,7 +60,7 @@ export async function command(argv: string[], options: CommandOptions = {}) {
     .command(
       "config",
       "Generate a one-time configuration json based on the passed arguments",
-      (yargs) => yargs.options(DefaultOptions),
+      (yargs) => yargs,
     )
 
     .option("verbose", GlobalOptions.verbose)
