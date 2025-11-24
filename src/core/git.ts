@@ -1,3 +1,4 @@
+import { Store } from "~/app/Store";
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
 
@@ -19,6 +20,15 @@ export async function get_commits(dot_range: string) {
     if (!record) continue;
 
     const [sha, full_message] = record.split(SEP.field);
+
+    // ensure sha is a hex string, otherwise we should throw an error
+    if (!RE.git_sha.test(sha)) {
+      const actions = Store.getState().actions;
+      const sep_values = JSON.stringify(Object.values(SEP));
+      const message = `unable to parse git commits, maybe commit message contained ${sep_values}`;
+      actions.error(message);
+      actions.exit(19);
+    }
 
     const metadata = Metadata.read(full_message);
     const branch_id = metadata.id;
@@ -53,3 +63,7 @@ const SEP = {
 };
 
 const FORMAT = `%H${SEP.field}%B${SEP.record}`;
+
+const RE = {
+  git_sha: /^[0-9a-fA-F]{40}$/,
+};
