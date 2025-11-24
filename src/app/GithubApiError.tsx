@@ -10,11 +10,15 @@ import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import * as date from "~/core/date";
 
-export function GithubApiError() {
-  return <Await fallback={null} function={run} />;
+type Props = {
+  exit?: boolean;
+};
+
+export function GithubApiError(props: Props) {
+  return <Await fallback={null} function={() => run(props)} />;
 }
 
-async function run() {
+async function run(props: Props) {
   const actions = Store.getState().actions;
 
   const res = await cli(`gh api https://api.github.com/rate_limit`);
@@ -42,7 +46,7 @@ async function run() {
   }
 
   actions.output(
-    <Ink.Text dimColor>
+    <Ink.Text>
       <Ink.Text>{"Github "}</Ink.Text>
 
       <Brackets>graphql</Brackets>
@@ -71,4 +75,8 @@ async function run() {
       </Parens>
     </Ink.Text>,
   );
+
+  if (props.exit) {
+    actions.exit(0);
+  }
 }

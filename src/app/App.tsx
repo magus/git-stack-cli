@@ -95,6 +95,8 @@ function MaybeMain() {
     return <Update />;
   } else if (positional_list.has("config")) {
     return <Config />;
+  } else if (positional_list.has("api")) {
+    return <GithubApiError exit />;
   } else if (positional_list.has("rebase")) {
     return (
       <DependencyCheck>

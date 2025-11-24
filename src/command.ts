@@ -63,6 +63,13 @@ export async function command(argv: string[], options: CommandOptions = {}) {
       (yargs) => yargs,
     )
 
+    .command(
+      //
+      "api",
+      "Check Github API quota and rate limits",
+      (yargs) => yargs,
+    )
+
     .option("verbose", GlobalOptions.verbose)
 
     // yargs default wraps to 80 columns
