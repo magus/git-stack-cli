@@ -22,17 +22,15 @@ export function cache<T, E>(cacheable: Cacheable<T>) {
     // cacheable is a function to allow deferred reads
     // this will call cacheable to kickoff async promise
     if (!suspender) {
-      suspender = Promise.resolve().then(() => {
-        cacheable()
-          .then((res: T) => {
-            status = "success";
-            response = res;
-          })
-          .catch((err: E) => {
-            status = "error";
-            response = err;
-          });
-      });
+      suspender = cacheable()
+        .then((res: T) => {
+          status = "success";
+          response = res;
+        })
+        .catch((err: E) => {
+          status = "error";
+          response = err;
+        });
     }
 
     switch (status) {
