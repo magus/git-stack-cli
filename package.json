@@ -22,7 +22,7 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "dev": "pnpm run build --watch",
+    "dev": "pnpm run build --dev --watch",
     "build": "bun run scripts/bun-build.ts",
     "compile": "bun run scripts/bun-compile.ts",
     "release:npm": "bun run scripts/release-npm.ts",

@@ -2,6 +2,8 @@ import * as fs from "node:fs/promises";
 import path from "node:path";
 import * as util from "util";
 
+import type { BuildConfig } from "bun";
+
 import * as file from "~/core/file";
 import { get_define } from "~/core/get_define";
 import { get_local_iso } from "~/core/get_local_iso";
@@ -11,6 +13,10 @@ const parsed_args = util.parseArgs({
   args: Bun.argv,
   options: {
     watch: {
+      type: "boolean",
+      default: false,
+    },
+    dev: {
       type: "boolean",
       default: false,
     },
@@ -25,6 +31,7 @@ const parsed_args = util.parseArgs({
 
 const WATCH = parsed_args.values.watch;
 const VERBOSE = parsed_args.values.verbose;
+const DEV = parsed_args.values.dev;
 
 function log(...args: any[]) {
   const timestamp = get_local_iso(new Date());
@@ -39,24 +46,25 @@ if (VERBOSE) {
 
 const REPO_ROOT = (await spawn.sync("git rev-parse --show-toplevel")).stdout;
 
+const define = await get_define();
+
+const BUILD_CONFIG = {
+  entrypoints: ["./src/index.tsx"],
+  outdir: "./dist/js",
+  target: "node",
+  env: "inline",
+  format: "esm",
+  sourcemap: "inline",
+  define,
+  minify: !DEV,
+} satisfies BuildConfig;
+
+log({ BUILD_CONFIG });
+
 async function run_build() {
   const start = Date.now();
 
-  const define = await get_define();
-
-  if (VERBOSE) {
-    log({ define });
-  }
-
-  const result = await Bun.build({
-    entrypoints: ["./src/index.tsx"],
-    outdir: "./dist/js",
-    target: "node",
-    env: "inline",
-    format: "esm",
-    sourcemap: "inline",
-    define,
-  });
+  const result = await Bun.build(BUILD_CONFIG);
 
   const duration_ms = Date.now() - start;
 
