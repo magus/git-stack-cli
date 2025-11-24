@@ -135,7 +135,7 @@ async function run() {
       actions.error("Try again with `--verbose` to see more information.");
     }
 
-    actions.exit(18);
+    actions.exit(15);
   }
 
   function get_push_group_list() {

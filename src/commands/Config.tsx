@@ -69,7 +69,7 @@ function parse_env_config() {
     console.error(`ERROR GIT_STACK_CONFIG=${GIT_STACK_CONFIG}`);
     // eslint-disable-next-line no-console
     console.error("ERROR GIT_STACK_CONFIG environment variable is not valid JSON");
-    process.exit(18);
+    process.exit(6);
   }
 }
 

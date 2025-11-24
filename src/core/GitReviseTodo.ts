@@ -154,7 +154,7 @@ GitReviseTodo.execute = async function grt_execute(args: ExecuteArgs) {
         actions.error("🚨 git revise failed to sign commit");
         actions.error("💡 Try again with `--no-revise-sign`?");
         actions.error("\n\n");
-        actions.exit(21);
+        actions.exit(18);
       }
     }
   }

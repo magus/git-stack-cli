@@ -75,7 +75,7 @@ Rebase.run = async function run(props: Props) {
       actions.error(err.message);
     }
 
-    actions.exit(20);
+    actions.exit(8);
   }
 
   actions.debug("start CommitMetadata.range");
