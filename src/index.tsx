@@ -27,14 +27,14 @@ import { pretty_json } from "~/core/pretty_json";
       console.error("🚨 uncaughtException");
       console.error(error);
       maybe_verbose_help();
-      process.exit(237);
+      process.exit(20);
     });
 
     process.on("unhandledRejection", (reason, _promise) => {
       console.error("🚨 unhandledRejection");
       console.error(reason);
       maybe_verbose_help();
-      process.exit(238);
+      process.exit(21);
     });
 
     // cleanup leftover temporary files from previous run
@@ -76,9 +76,10 @@ import { pretty_json } from "~/core/pretty_json";
   } catch (err) {
     console.error("🚨 main catch");
     console.error(err);
-    process.exit(236);
+    process.exit(22);
   }
 })().catch((err) => {
   console.error("🚨 index catch");
   console.error(err);
+  process.exit(23);
 });
