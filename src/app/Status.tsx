@@ -21,6 +21,10 @@ async function run() {
 
   invariant(commit_range, "commit_range must exist");
 
+  if (commit_range.group_list.length === 0) {
+    return actions.exit(0);
+  }
+
   actions.output(<StatusTable />);
 
   let needs_rebase = false;

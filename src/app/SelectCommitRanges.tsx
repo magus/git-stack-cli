@@ -38,6 +38,8 @@ function SelectCommitRangesInternal(props: Props) {
   const branch_name = Store.useState((state) => state.branch_name);
   invariant(branch_name, "branch_name must exist");
 
+  const [focused, set_focused] = React.useState("");
+
   const [selected_group_id, set_selected_group_id] = React.useState(() => {
     const first_group = props.commit_range.group_list.find(
       (g) => g.id !== props.commit_range.UNASSIGNED,
@@ -78,57 +80,6 @@ function SelectCommitRangesInternal(props: Props) {
   );
 
   const group_list: Array<SimpleGroup> = [];
-
-  // detect if there are unassigned commits
-  let unassigned_count = 0;
-  let assigned_count = 0;
-  for (const [, group_id] of commit_map.entries()) {
-    if (group_id === null) {
-      // console.debug("unassigned commit detected", sha);
-      unassigned_count++;
-    } else {
-      assigned_count++;
-    }
-  }
-
-  const total_group_count = new_group_list.length + props.commit_range.group_list.length;
-
-  for (let i = 0; i < props.commit_range.group_list.length; i++) {
-    const index = props.commit_range.group_list.length - i - 1;
-    const group = props.commit_range.group_list[index];
-
-    if (group.pr?.state === "MERGED") continue;
-
-    if (group.id === props.commit_range.UNASSIGNED) {
-      // only include unassigned group when there are no other groups
-      if (total_group_count === 1) {
-        group_list.push({
-          id: group.id,
-          title: "Unassigned",
-        });
-      }
-
-      continue;
-    }
-
-    group_list.push({
-      id: group.id,
-      title: group.pr?.title || group.title || group.id,
-    });
-  }
-
-  group_list.push(...new_group_list);
-
-  let current_index = group_list.findIndex((g) => g.id === selected_group_id);
-  if (current_index === -1) {
-    current_index = 0;
-  }
-
-  const has_unassigned_commits = unassigned_count > 0;
-  const has_assigned_commits = assigned_count > 0;
-
-  const sync_status = detect_sync_status();
-  // console.debug({ sync_status });
 
   Ink.useInput((input, key) => {
     const input_lower = input.toLowerCase();
@@ -189,13 +140,67 @@ function SelectCommitRangesInternal(props: Props) {
     }
   });
 
+  // detect if there are unassigned commits
+  let unassigned_count = 0;
+  let assigned_count = 0;
+  for (const [, group_id] of commit_map.entries()) {
+    if (group_id === null) {
+      // console.debug("unassigned commit detected", sha);
+      unassigned_count++;
+    } else {
+      assigned_count++;
+    }
+  }
+
+  if (!props.commit_range.group_list.length) {
+    return null;
+  }
+
+  const total_group_count = new_group_list.length + props.commit_range.group_list.length;
+
+  for (let i = 0; i < props.commit_range.group_list.length; i++) {
+    const index = props.commit_range.group_list.length - i - 1;
+    const group = props.commit_range.group_list[index];
+
+    if (group.pr?.state === "MERGED") continue;
+
+    if (group.id === props.commit_range.UNASSIGNED) {
+      // only include unassigned group when there are no other groups
+      if (total_group_count === 1) {
+        group_list.push({
+          id: group.id,
+          title: "Unassigned",
+        });
+      }
+
+      continue;
+    }
+
+    group_list.push({
+      id: group.id,
+      title: group.pr?.title || group.title || group.id,
+    });
+  }
+
+  group_list.push(...new_group_list);
+
+  let current_index = group_list.findIndex((g) => g.id === selected_group_id);
+  if (current_index === -1) {
+    current_index = 0;
+  }
+
+  const has_unassigned_commits = unassigned_count > 0;
+  const has_assigned_commits = assigned_count > 0;
+
+  const sync_status = detect_sync_status();
+  // console.debug({ sync_status });
+
   const group = group_list[current_index];
 
   const multiselect_disabled = group_input;
   const multiselect_disableSelect = group.id === props.commit_range.UNASSIGNED;
 
   const max_width = 80;
-  const [focused, set_focused] = React.useState("");
   const has_groups = group.id !== props.commit_range.UNASSIGNED;
 
   const items = props.commit_range.commit_list.map((commit) => {
