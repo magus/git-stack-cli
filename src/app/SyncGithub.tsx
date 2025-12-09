@@ -169,10 +169,26 @@ async function run() {
     // avoid accidentally pointing to orphaned parent commit
     // should hopefully fix issues where a PR includes a bunch of commits after pushing
     if (group.pr) {
-      await github.pr_edit({
-        branch: group.id,
-        base: master_branch,
-      });
+      // only update base if it is different
+      // github api started returning errors here on 2025-12-08
+      //
+      // ```
+      // [2025-12-08 17:54:44.114] [start] gh pr edit noah/cua-images-chatgpt-prod-tags---4h0tk3liqmmplu --base master
+      // [2025-12-08 17:54:45.935] [end] gh pr edit noah/cua-images-chatgpt-prod-tags---4h0tk3liqmmplu --base master (exit_code=1 duration=1.8s)
+      // [2025-12-08 17:54:45.937] GraphQL: A pull request already exists for base branch 'master' and head branch 'noah/cua-images-chatgpt-prod-tags---4h0tk3liqmmplu' (updatePullRequest)
+      //
+      // [2025-12-08 17:54:45.938] gh pr edit noah/cua-images-chatgpt-prod-tags---4h0tk3liqmmplu --base master (exit_code=1 duration=1.8s)
+      // GraphQL: A pull request already exists for base branch 'master' and head branch 'noah/cua-images-chatgpt-prod-tags---4h0tk3liqmmplu' (updatePullRequest)
+      // gh pr edit noah/cua-images-chatgpt-prod-tags---4h0tk3liqmmplu --base master (exit_code=1 duration=1.8s)
+      // Unable to sync.
+      // ```
+      //
+      if (`origin/${group.pr.baseRefName}` !== master_branch) {
+        await github.pr_edit({
+          branch: group.id,
+          base: master_branch,
+        });
+      }
     }
   }
 
@@ -184,16 +200,28 @@ async function run() {
     const selected_url = get_group_url(group);
 
     if (group.pr) {
-      // ensure base matches pr in github
-      await github.pr_edit({
-        branch: group.id,
-        base: group.base,
-        body: StackSummaryTable.write({
-          body: group.pr.body,
-          pr_url_list,
-          selected_url,
-        }),
-      });
+      if (`origin/${group.pr.baseRefName}` !== master_branch) {
+        // ensure base matches pr in github
+        await github.pr_edit({
+          branch: group.id,
+          base: group.base,
+          body: StackSummaryTable.write({
+            body: group.pr.body,
+            pr_url_list,
+            selected_url,
+          }),
+        });
+      } else {
+        await github.pr_edit({
+          branch: group.id,
+          body: StackSummaryTable.write({
+            body: group.pr.body,
+            pr_url_list,
+            selected_url,
+          }),
+        });
+      }
+
     } else {
       // create pr in github
       const pr_url = await github.pr_create({

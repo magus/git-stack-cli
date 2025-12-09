@@ -162,13 +162,17 @@ export async function pr_create(args: CreatePullRequestArgs) {
 
 type EditPullRequestArgs = {
   branch: string;
-  base: string;
+  base?: string;
   body?: string;
 };
 
 export async function pr_edit(args: EditPullRequestArgs) {
-  const base = args.base.replace(/^origin\//, "");
-  const command_parts = [`gh pr edit ${args.branch} --base ${base}`];
+  const command_parts = [`gh pr edit ${args.branch}`];
+
+  if (args.base) {
+    const base = args.base.replace(/^origin\//, "");
+    command_parts.push(`--base ${base}`);
+  }
 
   let body_file: string | undefined;
 
@@ -279,7 +283,8 @@ async function write_body_file(args: EditPullRequestArgs) {
   // ensure unique filename is safe for filesystem
   // base (group id) might contain slashes, e.g. dev/magus/gs-3cmrMBSUj
   // the flashes would mess up the filesystem path to this file
-  const base = args.base.replace(/^origin\//, "");
+  let base = args.base || "master";
+  base = base.replace(/^origin\//, "");
   let tmp_filename = safe_filename(`git-stack-body-${base}`);
 
   const temp_path = path.join(await get_tmp_dir(), tmp_filename);
