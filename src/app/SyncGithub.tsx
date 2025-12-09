@@ -221,7 +221,6 @@ async function run() {
           }),
         });
       }
-
     } else {
       // create pr in github
       const pr_url = await github.pr_create({
