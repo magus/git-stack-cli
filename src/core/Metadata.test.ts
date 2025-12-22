@@ -2,6 +2,54 @@ import { test, expect } from "bun:test";
 
 import * as Metadata from "~/core/Metadata";
 
+test("read all metadata", () => {
+  const body = [
+    "[test] read all metadata",
+    "",
+    "git-stack-id: noah/test---4h783e3zbtavw4",
+    "git-stack-title: read all metadata",
+    "git-stack-base: master",
+  ].join("\n");
+
+  const metadata = Metadata.read(body);
+
+  expect(metadata).toEqual({
+    subject: "[test] read all metadata",
+    id: "noah/test---4h783e3zbtavw4",
+    title: "read all metadata",
+    base: "master",
+  });
+});
+
+test("write all metadata", () => {
+  const body = [
+    "[test] write all metadata",
+    "",
+    "- details about this commit",
+    "",
+    "git-stack-id: DdKIFyufW",
+    "git-stack-title: old title",
+  ].join("\n");
+
+  const metadata = {
+    id: "noah/test---4h783e3zbtavw4",
+    title: "read all metadata",
+    base: "master",
+  };
+
+  expect(Metadata.write(body, metadata)).toEqual(
+    [
+      "[test] write all metadata",
+      "",
+      "- details about this commit",
+      "",
+      "git-stack-id: noah/test---4h783e3zbtavw4",
+      "git-stack-title: read all metadata",
+      "git-stack-base: master",
+    ].join("\n"),
+  );
+});
+
 test("read handles bulleted lists", () => {
   const body = [
     "[feat] implement various features",
@@ -20,6 +68,7 @@ test("read handles bulleted lists", () => {
     subject: "[feat] implement various features",
     id: "DdKIFyufW",
     title: "saved group title",
+    base: null,
   });
 });
 
@@ -67,6 +116,7 @@ test("read handles slashes in branch name", () => {
     subject: "[fix] slash in branch name",
     id: "dev/noah/fix-slash-branch",
     title: "fix slash branch",
+    base: null,
   });
 });
 
@@ -114,6 +164,7 @@ test("read handles double quotes", () => {
     subject: 'Revert "[abc / 123] subject (#1234)"',
     id: "dev/noah/fix-slash-branch",
     title: 'Revert \\"[abc / 123] subject (#1234)\\"',
+    base: null,
   });
 });
 
