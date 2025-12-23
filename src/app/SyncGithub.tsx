@@ -112,24 +112,40 @@ async function run() {
       await cli(git_push_command);
     }
 
-    const pr_url_list = push_group_list.map(get_group_url);
+    const pr_url_by_group_id: Record<string, string> = {};
 
     const after_push_tasks = [];
     for (const group of push_group_list) {
-      after_push_tasks.push(after_push({ group, pr_url_list }));
+      after_push_tasks.push(after_push({ group, pr_url_by_group_id }));
     }
 
     await Promise.all(after_push_tasks);
 
-    // finally, ensure all prs have the updated stack table from updated pr_url_list
+    // finally, ensure all prs have the updated stack table from updated pr_url_by_group_id
     // this step must come after the after_push since that step may create new PRs
     // we need the urls for all prs at this step so we run it after the after_push
-    const update_pr_body_tasks = [];
-    for (let i = 0; i < push_group_list.length; i++) {
-      const group = push_group_list[i];
+    const all_pr_groups: Array<CommitMetadataGroup> = [];
+    // collect all groups and existing pr urls
+    for (const group of commit_range.group_list) {
+      if (group.id !== commit_range.UNASSIGNED) {
+        // collect all groups
+        all_pr_groups.push(group);
 
-      // use the updated pr_url_list to get the actual selected_url
-      const selected_url = pr_url_list[i];
+        if (group.pr) {
+          pr_url_by_group_id[group.id] = group.pr.url;
+        }
+      }
+    }
+
+    // get pr url list for all pr groups
+    const pr_url_list = all_pr_groups.map((g) => pr_url_by_group_id[g.id]);
+
+    // update PR body for all pr groups (not just push_group_list)
+    const update_pr_body_tasks = [];
+    for (let i = 0; i < all_pr_groups.length; i++) {
+      const group = all_pr_groups[i];
+
+      const selected_url = pr_url_by_group_id[group.id];
 
       const task = update_pr_body({ group, selected_url, pr_url_list });
       update_pr_body_tasks.push(task);
@@ -209,34 +225,20 @@ async function run() {
     }
   }
 
-  async function after_push(args: { group: CommitMetadataGroup; pr_url_list: Array<string> }) {
-    const { group, pr_url_list } = args;
+  async function after_push(args: {
+    group: CommitMetadataGroup;
+    pr_url_by_group_id: Record<string, string>;
+  }) {
+    const { group } = args;
 
     invariant(group.base, "group.base must exist");
-
-    const selected_url = get_group_url(group);
 
     if (group.pr) {
       if (!is_master_base(group)) {
         // ensure base matches pr in github
-        await github.pr_edit({
-          branch: group.id,
-          base: group.base,
-          body: StackSummaryTable.write({
-            body: group.pr.body,
-            pr_url_list,
-            selected_url,
-          }),
-        });
+        await github.pr_edit({ branch: group.id, base: group.base });
       } else {
-        await github.pr_edit({
-          branch: group.id,
-          body: StackSummaryTable.write({
-            body: group.pr.body,
-            pr_url_list,
-            selected_url,
-          }),
-        });
+        await github.pr_edit({ branch: group.id });
       }
     } else {
       // create pr in github
@@ -252,13 +254,8 @@ async function run() {
         throw new Error("unable to create pr");
       }
 
-      // update pr_url_list with created pr_url
-      for (let i = 0; i < pr_url_list.length; i++) {
-        const url = pr_url_list[i];
-        if (url === selected_url) {
-          pr_url_list[i] = pr_url;
-        }
-      }
+      // update pr_url_by_group_id with created pr_url
+      args.pr_url_by_group_id[group.id] = pr_url;
     }
   }
 
@@ -330,4 +327,3 @@ async function run() {
 }
 
 type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
-const get_group_url = (group: CommitMetadataGroup) => group.pr?.url || group.id;
