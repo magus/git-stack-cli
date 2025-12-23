@@ -67,10 +67,11 @@ async function run_build() {
   const result = await Bun.build(BUILD_CONFIG);
 
   const duration_ms = Date.now() - start;
+  const status = result.success ? "✅" : "❌";
 
-  log(`✅ Build (${duration_ms}ms)`);
+  log(`${status} build (${duration_ms}ms)`);
 
-  if (VERBOSE) {
+  if (VERBOSE || !result.success) {
     log({ result });
   }
 }
