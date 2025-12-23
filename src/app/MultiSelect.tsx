@@ -87,6 +87,25 @@ export function MultiSelect<T>(props: Props<T>) {
     },
   );
 
+  // ensure current index is valid and not disabled
+  React.useEffect(ensure_selectable_focus, [props.items]);
+  function ensure_selectable_focus() {
+    const current = props.items[index];
+    if (current && !current.disabled) {
+      return;
+    }
+
+    for (let i = 0; i < props.items.length; i++) {
+      // search items backwards
+      const index = props.items.length - 1 - i;
+      const item = props.items[index];
+      if (!item.disabled) {
+        set_index(index);
+        break;
+      }
+    }
+  }
+
   const selectRef = React.useRef(false);
 
   React.useEffect(() => {
