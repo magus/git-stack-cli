@@ -1,8 +1,11 @@
 import { Store } from "~/app/Store";
 import * as Metadata from "~/core/Metadata";
 import { cli } from "~/core/cli";
+import { invariant } from "~/core/invariant";
 
-export type Commit = Awaited<ReturnType<typeof get_commits>>[0];
+type CommitList = Awaited<ReturnType<typeof get_commits>>;
+
+export type Commit = CommitList[0];
 
 export async function get_commits(dot_range: string) {
   const log_result = await cli(`git log ${dot_range} --format=${FORMAT} --color=never`);
@@ -51,6 +54,15 @@ export async function get_commits(dot_range: string) {
   commit_list.reverse();
 
   return commit_list;
+}
+
+export async function get_diff(commit_list: CommitList) {
+  invariant(commit_list.length, "commit_list must exist");
+  const first_commit = commit_list[0];
+  const last_commit = commit_list[commit_list.length - 1];
+  const sha_range = `${first_commit.sha}~1..${last_commit.sha}`;
+  const diff_result = await cli(`git --no-pager diff --color=never ${sha_range}`);
+  return diff_result.stdout;
 }
 
 // Why these separators?
