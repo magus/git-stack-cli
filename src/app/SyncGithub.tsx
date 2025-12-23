@@ -183,7 +183,7 @@ async function run() {
       // Unable to sync.
       // ```
       //
-      if (`origin/${group.pr.baseRefName}` !== master_branch) {
+      if (!is_master_base(group)) {
         await github.pr_edit({
           branch: group.id,
           base: master_branch,
@@ -200,7 +200,7 @@ async function run() {
     const selected_url = get_group_url(group);
 
     if (group.pr) {
-      if (`origin/${group.pr.baseRefName}` !== master_branch) {
+      if (!is_master_base(group)) {
         // ensure base matches pr in github
         await github.pr_edit({
           branch: group.id,
@@ -262,10 +262,12 @@ async function run() {
       selected_url,
     });
 
+    const debug_meta = `${group.id} ${selected_url}`;
+
     if (update_body === body) {
-      actions.debug(`Skipping body update for ${selected_url}`);
+      actions.debug(`Skipping body update ${debug_meta}`);
     } else {
-      actions.debug(`Update body for ${selected_url}`);
+      actions.debug(`Update body ${debug_meta}`);
 
       await github.pr_edit({
         branch: group.id,
@@ -273,6 +275,14 @@ async function run() {
         body: update_body,
       });
     }
+  }
+
+  function is_master_base(group: CommitMetadataGroup) {
+    if (!group.pr) {
+      return false;
+    }
+
+    return group.master_base || `origin/${group.pr.baseRefName}` === master_branch;
   }
 }
 
