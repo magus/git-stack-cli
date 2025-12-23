@@ -84,12 +84,12 @@ function SelectCommitRangesInternal(props: Props) {
   Ink.useInput((input, key) => {
     const input_lower = input.toLowerCase();
 
-    if (input_lower === SYMBOL.s) {
-      // do not allow sync when inputting group title
-      if (group_input) {
-        return;
-      }
+    // do not allow input when inputting group title
+    if (group_input) {
+      return;
+    }
 
+    if (input_lower === SYMBOL.s) {
       if (sync_status === "disabled") {
         return;
       }
