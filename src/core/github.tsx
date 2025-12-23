@@ -167,6 +167,10 @@ type EditPullRequestArgs = {
 };
 
 export async function pr_edit(args: EditPullRequestArgs) {
+  // const state = Store.getState();
+  // const actions = state.actions;
+  // actions.debug(`github.pr_edit ${JSON.stringify(args)}`);
+
   const command_parts = [`gh pr edit ${args.branch}`];
 
   if (args.base) {
@@ -281,11 +285,10 @@ async function write_body_file(args: EditPullRequestArgs) {
   invariant(args.body, "args.body must exist");
 
   // ensure unique filename is safe for filesystem
-  // base (group id) might contain slashes, e.g. dev/magus/gs-3cmrMBSUj
+  // args.branch_id (group id) might contain slashes, e.g. dev/magus/gs-3cmrMBSUj
   // the flashes would mess up the filesystem path to this file
-  let base = args.base || "master";
-  base = base.replace(/^origin\//, "");
-  let tmp_filename = safe_filename(`git-stack-body-${base}`);
+  const branch = args.branch;
+  let tmp_filename = safe_filename(`git-stack-body-${branch}`);
 
   const temp_path = path.join(await get_tmp_dir(), tmp_filename);
 
