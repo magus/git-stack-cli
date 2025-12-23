@@ -18,10 +18,9 @@ process.chdir(REPO_ROOT);
 
 // require clean git status besides changes to package.json version
 const git_status = await spawn.sync("git status --porcelain");
-if (!/^M\s+package.json/.test(git_status.stdout)) {
-  console.error(
-    "please commit local changes and only update package.json version before running release",
-  );
+if (!/^M\s+package.json$/.test(git_status.stdout)) {
+  console.error("please commit local changes");
+  console.error("only update package.json version before running release");
   process.exit(4);
 }
 
