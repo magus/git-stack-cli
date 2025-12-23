@@ -224,6 +224,7 @@ function SelectCommitRangesInternal(props: Props) {
   // console.debug({ sync_status });
 
   const group = group_list[current_index];
+  const is_master_base = group_master_base.has(group.id);
 
   const multiselect_disabled = group_input;
   const multiselect_disableSelect = group.id === props.commit_range.UNASSIGNED;
@@ -309,6 +310,10 @@ function SelectCommitRangesInternal(props: Props) {
             <Ink.Text wrap="truncate-end" bold color={colors.white}>
               {group.title}
             </Ink.Text>
+            {!is_master_base ? null : (
+              // show base master
+              <Ink.Text color={colors.yellow}> (base: master)</Ink.Text>
+            )}
           </Ink.Box>
         </React.Fragment>
       )}
@@ -479,8 +484,8 @@ function SelectCommitRangesInternal(props: Props) {
           <FormatText
             wrapper={<Ink.Text color={colors.gray} />}
             message={
-              group_master_base.has(group.id)
-                ? "Press {m} to reset current PR base to stack position"
+              is_master_base
+                ? "Press {m} to {reset} current PR base to stack position"
                 : "Press {m} to set current PR base to master"
             }
             values={{
@@ -489,6 +494,7 @@ function SelectCommitRangesInternal(props: Props) {
                   {SYMBOL.m}
                 </Ink.Text>
               ),
+              reset: <Ink.Text color={colors.yellow}>reset</Ink.Text>,
             }}
           />
         </Ink.Box>
