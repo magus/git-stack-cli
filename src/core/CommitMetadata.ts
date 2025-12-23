@@ -168,7 +168,19 @@ export async function range(commit_group_map?: CommitGroupMap) {
       group.dirty = true;
     } else if (group.pr.baseRefName !== group.base) {
       group.dirty = true;
+    } else if (group.master_base) {
+      group.pr.number;
+      // master_base groups cannot be compared by commit sha
+      // instead compare the literal diff local against origin
+      // gh pr diff --color=never 110
+      // git --no-pager diff --color=never 00c8fe0~1..00c8fe0 | pbcopy
+      const diff_github = await github.pr_diff(group.pr.number);
+      const diff_local = await git.get_diff(group.commits);
+      if (diff_github !== diff_local) {
+        group.dirty = true;
+      }
     } else {
+      // comapre literal commit shas in group
       for (let i = 0; i < group.pr.commits.length; i++) {
         const pr_commit = group.pr.commits[i];
         const local_commit = group.commits[i];
