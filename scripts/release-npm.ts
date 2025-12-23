@@ -54,6 +54,9 @@ for (const filepath of package_json.files) {
   }
 }
 
+// ensure npm is authenticated
+await spawn(`npm whoami`);
+
 process.chdir(REPO_ROOT);
 
 await spawn.sync(`git commit -a -m ${version}`);
