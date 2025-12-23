@@ -75,12 +75,15 @@ async function run() {
 
     const git_push_target_list: Array<string> = [];
 
-    for (const group of push_group_list) {
+    for (let i = 0; i < push_group_list.length; i++) {
+      const group = push_group_list[i];
       const last_commit = last(group.commits);
       invariant(last_commit, "last_commit must exist");
 
       // push group in isolation if master_base is set
-      if (group.master_base) {
+      // for the first group (i > 0) we can skip this
+      // since it'll be based off master anyway
+      if (group.master_base && i > 0) {
         await push_master_group(group);
         continue;
       }
