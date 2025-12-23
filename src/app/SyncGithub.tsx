@@ -54,6 +54,17 @@ async function run() {
   // 2 create PR / edit PR
   // --------------------------------------
 
+  function create_git_push_command(base: string, target: string) {
+    const command = [`${base} push -f origin`];
+
+    if (argv.verify === false) {
+      command.push("--no-verify");
+    }
+
+    command.push(target);
+    return command;
+  }
+
   try {
     const before_push_tasks = [];
     for (const group of push_group_list) {
@@ -62,15 +73,17 @@ async function run() {
 
     await Promise.all(before_push_tasks);
 
-    const git_push_command = [`git push -f origin`];
-
-    if (argv.verify === false) {
-      git_push_command.push("--no-verify");
-    }
+    const git_push_target_list: Array<string> = [];
 
     for (const group of push_group_list) {
       const last_commit = last(group.commits);
       invariant(last_commit, "last_commit must exist");
+
+      // push group in isolation if master_base is set
+      if (group.master_base) {
+        await push_master_group(group);
+        continue;
+      }
 
       // explicit refs/heads head branch to avoid push failing
       //
@@ -90,10 +103,14 @@ async function run() {
       //   error: failed to push some refs to 'github.com:magus/git-multi-diff-playground.git'
       //
       const target = `${last_commit.sha}:refs/heads/${group.id}`;
-      git_push_command.push(target);
+      git_push_target_list.push(target);
     }
 
-    await cli(git_push_command);
+    if (git_push_target_list.length > 0) {
+      const push_target = git_push_target_list.join(" ");
+      const git_push_command = create_git_push_command("git", push_target);
+      await cli(git_push_command);
+    }
 
     const pr_url_list = push_group_list.map(get_group_url);
 
@@ -283,6 +300,29 @@ async function run() {
     }
 
     return group.master_base || `origin/${group.pr.baseRefName}` === master_branch;
+  }
+
+  async function push_master_group(group: CommitMetadataGroup) {
+    const worktree_path = `.git/git-stack-worktrees/${group.id}`;
+
+    // create temp worktree at master (or group.base if you prefer)
+    await cli(`git worktree add -f ${worktree_path} ${master_branch}`);
+
+    try {
+      // cherry-pick the group commits onto that base
+      const cp_commit_list = group.commits.map((c) => c.sha);
+      await cli(`git -C ${worktree_path} cherry-pick ${cp_commit_list}`);
+
+      `git -C ${worktree_path} push -f origin HEAD:refs/heads/${group.id}`;
+
+      const push_target = `HEAD:refs/heads/${group.id}`;
+      const git_push_command = create_git_push_command(`git -C ${worktree_path}`, push_target);
+
+      await cli(git_push_command);
+    } finally {
+      // clean up even if push fails
+      await cli(`git worktree remove --force ${worktree_path}`);
+    }
   }
 }
 
