@@ -303,7 +303,10 @@ async function run() {
   }
 
   async function push_master_group(group: CommitMetadataGroup) {
-    const worktree_path = `.git/git-stack-worktrees/${group.id}`;
+    const worktree_path = `.git/git-stack-worktrees/push_master_group`;
+
+    // ensure previous instance of worktree is removed
+    await cli(`git worktree remove --force ${worktree_path}`, { ignoreExitCode: true });
 
     // create temp worktree at master (or group.base if you prefer)
     await cli(`git worktree add -f ${worktree_path} ${master_branch}`);
