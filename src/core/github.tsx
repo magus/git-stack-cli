@@ -241,6 +241,8 @@ export async function pr_draft(args: DraftPullRequestArgs) {
   }
 }
 
+// pull request JSON fields
+// https://cli.github.com/manual/gh_pr_list
 // prettier-ignore
 const JSON_FIELDS = "--json id,number,state,baseRefName,headRefName,commits,title,body,url,isDraft";
 
