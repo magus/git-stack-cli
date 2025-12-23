@@ -15,6 +15,9 @@ import { short_id } from "~/core/short_id";
 import { wrap_index } from "~/core/wrap_index";
 
 import type { State } from "~/app/Store";
+import type * as CommitMetadata from "~/core/CommitMetadata";
+
+type CommitRangeGroup = NonNullable<Parameters<typeof CommitMetadata.range>[0]>[string];
 
 export function SelectCommitRanges() {
   const commit_range = Store.useState((state) => state.commit_range);
@@ -62,6 +65,23 @@ function SelectCommitRangesInternal(props: Props) {
     [],
   );
 
+  const [group_master_base, set_group_master_base] = React.useReducer(
+    (set: Set<string>, group_id: string) => {
+      set.has(group_id) ? set.delete(group_id) : set.add(group_id);
+      return new Set(set);
+    },
+    new Set<string>(),
+    (set) => {
+      for (const group of props.commit_range.group_list) {
+        if (group.master_base) {
+          set.add(group.id);
+        }
+      }
+
+      return new Set(set);
+    },
+  );
+
   const [commit_map, update_commit_map] = React.useReducer(
     (map: Map<string, null | string>, args: { key: string; value: null | string }) => {
       map.set(args.key, args.value);
@@ -95,7 +115,7 @@ function SelectCommitRangesInternal(props: Props) {
       }
 
       actions.set((state) => {
-        const state_commit_map: Record<string, SimpleGroup> = {};
+        const state_commit_map: Record<string, CommitRangeGroup> = {};
 
         for (let [sha, id] of commit_map.entries()) {
           // console.debug({ sha, id });
@@ -104,14 +124,15 @@ function SelectCommitRangesInternal(props: Props) {
           if (!id) {
             id = props.commit_range.UNASSIGNED;
             const title = "allow_unassigned";
-            state_commit_map[sha] = { id, title };
+            state_commit_map[sha] = { id, title, master_base: false };
             continue;
           }
 
           const group = group_list.find((g) => g.id === id);
           invariant(group, "group must exist");
           // console.debug({ group });
-          state_commit_map[sha] = group;
+          const master_base = group_master_base.has(id);
+          state_commit_map[sha] = { ...group, master_base };
         }
 
         state.commit_map = state_commit_map;
@@ -124,6 +145,13 @@ function SelectCommitRangesInternal(props: Props) {
     // only allow create when on unassigned group
     if (has_unassigned_commits && input_lower === SYMBOL.c) {
       set_group_input(true);
+      return;
+    }
+
+    // only allow setting base branch when on a created group
+    if (group.id !== props.commit_range.UNASSIGNED && input_lower === SYMBOL.m) {
+      const group = group_list[current_index];
+      set_group_master_base(group.id);
       return;
     }
 
@@ -445,6 +473,26 @@ function SelectCommitRangesInternal(props: Props) {
           }}
         />
       </Ink.Box>
+
+      {group.id === props.commit_range.UNASSIGNED ? null : (
+        <Ink.Box>
+          <FormatText
+            wrapper={<Ink.Text color={colors.gray} />}
+            message={
+              group_master_base.has(group.id)
+                ? "Press {m} to reset current PR base to stack position"
+                : "Press {m} to set current PR base to master"
+            }
+            values={{
+              m: (
+                <Ink.Text bold color={colors.green}>
+                  {SYMBOL.m}
+                </Ink.Text>
+              ),
+            }}
+          />
+        </Ink.Box>
+      )}
     </Ink.Box>
   );
 
@@ -518,6 +566,7 @@ const SYMBOL = {
   enter: "Enter",
   c: "c",
   s: "s",
+  m: "m",
 };
 
 const S_TO_SYNC_VALUES = {

@@ -14,10 +14,16 @@ type CommitGroup = {
   base: null | string;
   dirty: boolean;
   commits: Array<git.Commit>;
+  master_base: boolean;
 };
 
-export type SimpleGroup = { id: string; title: string };
-type CommitGroupMap = { [sha: string]: SimpleGroup };
+type CommitRangeGroup = {
+  id: string;
+  title: string;
+  master_base: boolean;
+};
+
+type CommitGroupMap = { [sha: string]: CommitRangeGroup };
 
 export async function range(commit_group_map?: CommitGroupMap) {
   // gather all open prs in repo first
@@ -25,6 +31,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
   await github.pr_list();
 
   const master_branch = Store.getState().master_branch;
+  const master_branch_name = master_branch.replace(/^origin\//, "");
   const commit_list = await git.get_commits(`${master_branch}..HEAD`);
 
   const pr_lookup: Record<string, void | PullRequest> = {};
@@ -37,6 +44,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
   for (const commit of commit_list) {
     let id = commit.branch_id;
     let title = commit.title || id;
+    let master_base = commit.master_base;
 
     // console.debug({ commit, id });
 
@@ -47,6 +55,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
       if (group) {
         id = group.id;
         title = group.title;
+        master_base = group.master_base;
       }
     }
 
@@ -75,6 +84,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
     const group = group_map.get(id) || {
       id,
       title,
+      master_base,
       pr: null,
       base: null,
       dirty: false,
@@ -130,17 +140,20 @@ export async function range(commit_group_map?: CommitGroupMap) {
     }
 
     if (i === 0) {
-      const master_branch_name = master_branch.replace(/^origin\//, "");
       group.base = master_branch_name;
     } else {
       const last_group = group_value_list[i - 1];
       // console.debug("  ", "last_group", last_group.pr?.title.substring(0, 40));
       // console.debug("  ", "last_group.id", last_group.id);
 
-      // null out base when unassigned and after unassigned
-      if (group.id === UNASSIGNED) {
+      if (group.master_base) {
+        // explicitly set base to master when master_base is true
+        group.base = master_branch_name;
+      } else if (group.id === UNASSIGNED) {
+        // null out base when unassigned and after unassigned
         group.base = null;
       } else if (last_group.base === null) {
+        // null out base when last group base is null
         group.base = null;
       } else {
         group.base = last_group.id;
