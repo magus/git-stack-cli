@@ -241,6 +241,18 @@ export async function pr_draft(args: DraftPullRequestArgs) {
   }
 }
 
+export async function pr_diff(number: number) {
+  // https://cli.github.com/manual/gh_pr_diff
+
+  const cli_result = await cli(`gh pr diff --color=never ${number}`);
+
+  if (cli_result.code !== 0) {
+    handle_error(cli_result.output);
+  }
+
+  return cli_result.stdout;
+}
+
 // pull request JSON fields
 // https://cli.github.com/manual/gh_pr_list
 // prettier-ignore
