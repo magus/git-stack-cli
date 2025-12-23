@@ -57,6 +57,7 @@ async function run() {
       const group_from_map = commit_map[commit.sha];
       commit.branch_id = group_from_map.id;
       commit.title = group_from_map.title;
+      commit.master_base = group_from_map.master_base;
     }
 
     // // capture commit_range for GitReviseTodo test

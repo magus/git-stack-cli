@@ -76,6 +76,8 @@ type CommitListArgs = {
   commit_list: CommitMetadata.CommitRange["commit_list"];
 };
 
+type MetadataWriteValues = Parameters<typeof Metadata.write>[1];
+
 GitReviseTodo.todo = function todo(args: CommitListArgs) {
   const entry_list = [];
 
@@ -95,7 +97,10 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
       const title = commit.title;
       invariant(title, "commit.title must exist");
 
-      const metadata = { id, title };
+      const metadata: MetadataWriteValues = { id, title };
+      if (commit.master_base) {
+        metadata.base = "master";
+      }
       const unsafe_message_with_id = Metadata.write(commit.full_message, metadata);
       const message_with_id = unsafe_message_with_id;
       entry_lines.push(message_with_id);

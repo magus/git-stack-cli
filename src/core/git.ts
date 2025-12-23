@@ -34,6 +34,7 @@ export async function get_commits(dot_range: string) {
     const branch_id = metadata.id;
     const subject_line = metadata.subject || "";
     const title = metadata.title;
+    const master_base = metadata.base === "master";
 
     const commit = {
       sha,
@@ -41,6 +42,7 @@ export async function get_commits(dot_range: string) {
       subject_line,
       branch_id,
       title,
+      master_base,
     };
 
     commit_list.push(commit);

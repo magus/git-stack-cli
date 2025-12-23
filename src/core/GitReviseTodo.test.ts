@@ -171,8 +171,10 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
           subject_line: "banana color",
           branch_id: "AAWsYx1UU",
           title: "banana",
+          master_base: false,
         },
       ],
+      master_base: false,
     },
     {
       id: "E63ytp5dj",
@@ -244,6 +246,7 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
           subject_line: "lemon color",
           branch_id: "E63ytp5dj",
           title: "lemon color",
+          master_base: false,
         },
         {
           sha: "d36d63499425bb46a1e62c2c9df1a4332b13004f",
@@ -251,6 +254,7 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
           subject_line: "cantaloupe color",
           branch_id: "E63ytp5dj",
           title: "lemon color",
+          master_base: false,
         },
         {
           sha: "4f98dd3e67d03b79d7a12480c7d1c2fcbd186ac5",
@@ -258,6 +262,7 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
           subject_line: "banana sweet",
           branch_id: "E63ytp5dj",
           title: "lemon color",
+          master_base: false,
         },
         {
           sha: "f143d03c723c9f5231a81c1e12098511611898cb",
@@ -265,8 +270,10 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
           subject_line: "apple sweet",
           branch_id: "E63ytp5dj",
           title: "lemon color",
+          master_base: false,
         },
       ],
+      master_base: false,
     },
   ],
   commit_list: [
@@ -276,6 +283,7 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
       subject_line: "banana color",
       branch_id: "AAWsYx1UU",
       title: "banana",
+      master_base: false,
     },
     {
       sha: "3cb22661ecff6c872e96ce9c40b31c824938cab7",
@@ -283,6 +291,7 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
       subject_line: "lemon color",
       branch_id: "E63ytp5dj",
       title: "lemon color",
+      master_base: false,
     },
     {
       sha: "d36d63499425bb46a1e62c2c9df1a4332b13004f",
@@ -290,6 +299,7 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
       subject_line: "cantaloupe color",
       branch_id: "E63ytp5dj",
       title: "lemon color",
+      master_base: false,
     },
     {
       sha: "4f98dd3e67d03b79d7a12480c7d1c2fcbd186ac5",
@@ -297,6 +307,7 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
       subject_line: "banana sweet",
       branch_id: "E63ytp5dj",
       title: "lemon color",
+      master_base: false,
     },
     {
       sha: "f143d03c723c9f5231a81c1e12098511611898cb",
@@ -304,6 +315,7 @@ const SINGLE_COMMIT_EXISTING_GROUP: CommitMetadata.CommitRange = {
       subject_line: "apple sweet",
       branch_id: "6Ak-qn+5Z",
       title: "new group",
+      master_base: false,
     },
   ],
   pr_lookup: {
@@ -440,8 +452,10 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
           subject_line: "banana color",
           branch_id: "AAWsYx1UU",
           title: "banana",
+          master_base: false,
         },
       ],
+      master_base: false,
     },
     {
       id: "E63ytp5dj",
@@ -513,6 +527,7 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
           subject_line: "lemon color",
           branch_id: "E63ytp5dj",
           title: "lemon color",
+          master_base: false,
         },
         {
           sha: "d36d63499425bb46a1e62c2c9df1a4332b13004f",
@@ -520,6 +535,7 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
           subject_line: "cantaloupe color",
           branch_id: "E63ytp5dj",
           title: "lemon color",
+          master_base: false,
         },
         {
           sha: "4f98dd3e67d03b79d7a12480c7d1c2fcbd186ac5",
@@ -527,8 +543,10 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
           subject_line: "banana sweet",
           branch_id: "E63ytp5dj",
           title: "lemon color",
+          master_base: false,
         },
       ],
+      master_base: false,
     },
     {
       id: "6Ak-qn+5Z",
@@ -543,8 +561,10 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
           subject_line: "apple sweet",
           branch_id: "6Ak-qn+5Z",
           title: "new group",
+          master_base: false,
         },
       ],
+      master_base: false,
     },
   ],
   commit_list: [
@@ -554,6 +574,7 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       subject_line: "banana color",
       branch_id: "AAWsYx1UU",
       title: "banana",
+      master_base: false,
     },
     {
       sha: "3cb22661ecff6c872e96ce9c40b31c824938cab7",
@@ -561,6 +582,7 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       subject_line: "lemon color",
       branch_id: "E63ytp5dj",
       title: "lemon color",
+      master_base: false,
     },
     {
       sha: "d36d63499425bb46a1e62c2c9df1a4332b13004f",
@@ -568,6 +590,7 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       subject_line: "cantaloupe color",
       branch_id: "E63ytp5dj",
       title: "lemon color",
+      master_base: false,
     },
     {
       sha: "4f98dd3e67d03b79d7a12480c7d1c2fcbd186ac5",
@@ -575,6 +598,7 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       subject_line: "banana sweet",
       branch_id: "E63ytp5dj",
       title: "lemon color",
+      master_base: false,
     },
     {
       sha: "f143d03c723c9f5231a81c1e12098511611898cb",
@@ -582,6 +606,7 @@ const SINGLE_COMMIT_NEW_GROUP: CommitMetadata.CommitRange = {
       subject_line: "apple sweet",
       branch_id: "6Ak-qn+5Z",
       title: "new group",
+      master_base: false,
     },
   ],
   pr_lookup: {
@@ -691,8 +716,10 @@ const COMMIT_MESSAGE_WITH_QUOTES: CommitMetadata.CommitRange = {
           subject_line: '[new] invalid "by me" quotes',
           branch_id: "6Ak-qn+5Z",
           title: '[new] invalid "by me" quotes',
+          master_base: false,
         },
       ],
+      master_base: false,
     },
   ],
   commit_list: [
@@ -702,6 +729,7 @@ const COMMIT_MESSAGE_WITH_QUOTES: CommitMetadata.CommitRange = {
       subject_line: '[new] invalid "by me" quotes',
       branch_id: "6Ak-qn+5Z",
       title: '[new] invalid "by me" quotes',
+      master_base: false,
     },
   ],
   pr_lookup: {},
@@ -726,6 +754,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
           subject_line: "head~7",
           branch_id: "gs---4gvxa-5v-2mx26",
           title: "pr-title",
+          master_base: false,
         },
         {
           sha: "391476bbfc6b77b60a3ef7fa97155496a9f8f27f",
@@ -733,6 +762,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
           subject_line: "head~6",
           branch_id: "gs---4gvxa-5v-2mx26",
           title: "pr-title",
+          master_base: false,
         },
         {
           sha: "5a98cf8f0406712405d41af07c3a012f72ad36fa",
@@ -740,6 +770,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
           subject_line: "head~5",
           branch_id: "gs---4gvxa-5v-2mx26",
           title: "pr-title",
+          master_base: false,
         },
         {
           sha: "e820018cb370bb6cda118dc649e841c75d797188",
@@ -747,6 +778,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
           subject_line: "head~4",
           branch_id: "gs---4gvxa-5v-2mx26",
           title: "pr-title",
+          master_base: false,
         },
         {
           sha: "e6d1dfc7ec007468712bfc015884cc22bfa79e1d",
@@ -754,6 +786,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
           subject_line: "head~3",
           branch_id: "gs---4gvxa-5v-2mx26",
           title: "pr-title",
+          master_base: false,
         },
         {
           sha: "a26f21025a558968554c439ab9b942d5fe84bccb",
@@ -761,8 +794,10 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
           subject_line: "head~2",
           branch_id: "gs---4gvxa-5v-2mx26",
           title: "pr-title",
+          master_base: false,
         },
       ],
+      master_base: false,
     },
     {
       id: "unassigned",
@@ -777,6 +812,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
           subject_line: "head~1",
           branch_id: "unassigned",
           title: "allow_unassigned",
+          master_base: false,
         },
         {
           sha: "b61c5b09a4b7c9dcff9a9071386b134997569a01",
@@ -784,8 +820,10 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
           subject_line: "head",
           branch_id: "unassigned",
           title: "allow_unassigned",
+          master_base: false,
         },
       ],
+      master_base: false,
     },
   ],
   commit_list: [
@@ -795,6 +833,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
       subject_line: "head~7",
       branch_id: "gs---4gvxa-5v-2mx26",
       title: "pr-title",
+      master_base: false,
     },
     {
       sha: "391476bbfc6b77b60a3ef7fa97155496a9f8f27f",
@@ -802,6 +841,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
       subject_line: "head~6",
       branch_id: "gs---4gvxa-5v-2mx26",
       title: "pr-title",
+      master_base: false,
     },
     {
       sha: "5a98cf8f0406712405d41af07c3a012f72ad36fa",
@@ -809,6 +849,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
       subject_line: "head~5",
       branch_id: "gs---4gvxa-5v-2mx26",
       title: "pr-title",
+      master_base: false,
     },
     {
       sha: "e820018cb370bb6cda118dc649e841c75d797188",
@@ -816,6 +857,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
       subject_line: "head~4",
       branch_id: "gs---4gvxa-5v-2mx26",
       title: "pr-title",
+      master_base: false,
     },
     {
       sha: "e6d1dfc7ec007468712bfc015884cc22bfa79e1d",
@@ -823,6 +865,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
       subject_line: "head~3",
       branch_id: "gs---4gvxa-5v-2mx26",
       title: "pr-title",
+      master_base: false,
     },
     {
       sha: "a26f21025a558968554c439ab9b942d5fe84bccb",
@@ -830,6 +873,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
       subject_line: "head~2",
       branch_id: "gs---4gvxa-5v-2mx26",
       title: "pr-title",
+      master_base: false,
     },
     {
       sha: "90667fe97e059e8285e070d6268f2b4035b2ebd4",
@@ -837,6 +881,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
       subject_line: "head~1",
       branch_id: "unassigned",
       title: "allow_unassigned",
+      master_base: false,
     },
     {
       sha: "b61c5b09a4b7c9dcff9a9071386b134997569a01",
@@ -844,6 +889,7 @@ const SYNC_WITH_UNASSIGNED: CommitMetadata.CommitRange = {
       subject_line: "head",
       branch_id: "unassigned",
       title: "allow_unassigned",
+      master_base: false,
     },
   ],
   pr_lookup: {},
