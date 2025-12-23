@@ -121,6 +121,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
   for (let i = 0; i < group_value_list.length; i++) {
     const group = group_value_list[i];
+    const previous_group: undefined | CommitGroup = group_value_list[i - 1];
 
     if (group.id !== UNASSIGNED) {
       let pr_result = pr_lookup[group.id];
@@ -164,29 +165,61 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
     if (!group.pr) {
       group.dirty = true;
-    } else if (group.pr.commits.length !== group.commits.length) {
-      group.dirty = true;
-    } else if (group.pr.baseRefName !== group.base) {
-      group.dirty = true;
-    } else if (group.master_base) {
-      group.pr.number;
-      // master_base groups cannot be compared by commit sha
-      // instead compare the literal diff local against origin
-      // gh pr diff --color=never 110
-      // git --no-pager diff --color=never 00c8fe0~1..00c8fe0 | pbcopy
-      const diff_github = await github.pr_diff(group.pr.number);
-      const diff_local = await git.get_diff(group.commits);
-      if (diff_github !== diff_local) {
-        group.dirty = true;
-      }
     } else {
-      // comapre literal commit shas in group
-      for (let i = 0; i < group.pr.commits.length; i++) {
-        const pr_commit = group.pr.commits[i];
-        const local_commit = group.commits[i];
-
-        if (pr_commit.oid !== local_commit.sha) {
+      if (group.pr.baseRefName !== group.base) {
+        group.dirty = true;
+      } else if (group.master_base && i > 0) {
+        // special case
+        // master_base groups cannot be compared by commit sha
+        // instead compare the literal diff local against origin
+        // gh pr diff --color=never 110
+        // git --no-pager diff --color=never 00c8fe0~1..00c8fe0
+        const diff_github = await github.pr_diff(group.pr.number);
+        const diff_local = await git.get_diff(group.commits);
+        if (diff_github !== diff_local) {
           group.dirty = true;
+        }
+      } else if (!group.master_base && previous_group && previous_group.master_base) {
+        // special case
+        // boundary between normal commits and master commits
+
+        // collect all previous groups for sha comparison
+        const all_commits: Array<git.Commit> = [];
+        const previous_groups = group_value_list.slice(0, i);
+        for (const g of previous_groups) {
+          for (const c of g.commits) {
+            all_commits.push(c);
+          }
+        }
+        for (const c of group.commits) {
+          all_commits.push(c);
+        }
+
+        // compare all commits against pr commits
+        if (group.pr.commits.length !== all_commits.length) {
+          group.dirty = true;
+        } else {
+          for (let i = 0; i < group.pr.commits.length; i++) {
+            const pr_commit = group.pr.commits[i];
+            const local_commit = all_commits[i];
+
+            if (pr_commit.oid !== local_commit.sha) {
+              group.dirty = true;
+            }
+          }
+        }
+      } else if (group.pr.commits.length !== group.commits.length) {
+        group.dirty = true;
+      } else {
+        // if we still haven't marked this dirty, check each commit
+        // comapre literal commit shas in group
+        for (let i = 0; i < group.pr.commits.length; i++) {
+          const pr_commit = group.pr.commits[i];
+          const local_commit = group.commits[i];
+
+          if (pr_commit.oid !== local_commit.sha) {
+            group.dirty = true;
+          }
         }
       }
     }
