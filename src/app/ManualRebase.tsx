@@ -79,21 +79,12 @@ async function run() {
     let rebase_merge_base = merge_base;
     let rebase_group_index = 0;
 
-    for (let i = 0; i < commit_range.group_list.length; i++) {
-      const group = commit_range.group_list[i];
+    inplace_order_commit_range_groups(commit_range);
 
-      if (!group.dirty) {
-        continue;
-      }
-
-      if (i > 0) {
-        const prev_group = commit_range.group_list[i - 1];
-        const prev_commit = prev_group.commits[prev_group.commits.length - 1];
-        rebase_merge_base = prev_commit.sha;
-        rebase_group_index = i;
-      }
-
-      break;
+    const dirty = find_first_dirty_group(commit_range);
+    if (dirty) {
+      rebase_merge_base = dirty.sha;
+      rebase_group_index = dirty.index;
     }
 
     actions.debug(`rebase_merge_base = ${rebase_merge_base}`);
@@ -186,3 +177,66 @@ async function run() {
     );
   }
 }
+
+function inplace_order_commit_range_groups(commit_range: CommitMetadata.CommitRange) {
+  const state = Store.getState();
+  const actions = state.actions;
+
+  // order groups with group.master_base first
+  const group_list_master: CommitGroupList = [];
+  const group_list_others: CommitGroupList = [];
+  for (const group of commit_range.group_list) {
+    if (group.master_base) {
+      group_list_master.push(group);
+    } else {
+      group_list_others.push(group);
+    }
+  }
+
+  const ordered_group_list = [...group_list_master, ...group_list_others];
+
+  // detect if group list order differs
+  let differs = false;
+  for (let i = 0; i < commit_range.group_list.length; i++) {
+    const original_group = commit_range.group_list[i];
+    const ordered_group = ordered_group_list[i];
+    if (original_group.id !== ordered_group.id) {
+      ordered_group.dirty = true;
+      const debug = JSON.stringify({ original_group, ordered_group });
+      actions.debug(`inplace_order_commit_range_groups ${debug}`);
+
+      differs = true;
+      break;
+    }
+  }
+
+  if (differs) {
+    commit_range.group_list = ordered_group_list;
+  }
+
+  return differs;
+}
+
+function find_first_dirty_group(commit_range: CommitMetadata.CommitRange) {
+  for (let i = 0; i < commit_range.group_list.length; i++) {
+    const group = commit_range.group_list[i];
+
+    if (!group.dirty) {
+      continue;
+    }
+
+    if (i > 0) {
+      const prev_group = commit_range.group_list[i - 1];
+      const prev_commit = prev_group.commits[prev_group.commits.length - 1];
+      const sha = prev_commit.sha;
+      const index = i;
+      return { sha, index };
+    }
+
+    break;
+  }
+
+  return null;
+}
+
+type CommitGroupList = CommitMetadata.CommitRange["group_list"];
