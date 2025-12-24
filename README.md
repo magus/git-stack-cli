@@ -67,6 +67,12 @@ Adding commits to a PR is as simple as running `git stack` and adding commits to
 1. Use `↑↓` and `space`/`enter` to navigate and assign commits to the PR
 1. Press `s` to sync created PRs and commits to Github
 
+### Base PRs on `master` branch
+
+By default PRs are stacked based on the order of commits in your branch.
+
+To separate a PR and base it on your `master` branch press `m`.
+
 ### Editing existing commits and pull requests
 
 Sometimes you want to add changes to an existing commit or pull request.
