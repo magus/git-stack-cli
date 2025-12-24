@@ -6,6 +6,9 @@ import { spawn } from "~/core/spawn";
 
 process.env.NODE_ENV = "production";
 
+// ensure npm is authenticated
+await spawn(`npm whoami`);
+
 // get paths relative to this script
 const REPO_ROOT = (await spawn.sync("git rev-parse --show-toplevel")).stdout;
 const DIST_DIR = path.join(REPO_ROOT, "dist");
@@ -53,9 +56,6 @@ for (const filepath of package_json.files) {
     }
   }
 }
-
-// ensure npm is authenticated
-await spawn(`npm whoami`);
 
 process.chdir(REPO_ROOT);
 
