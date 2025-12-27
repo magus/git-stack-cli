@@ -100,7 +100,8 @@ async function run() {
 const RE = {
   // git@github.com:magus/git-multi-diff-playground.git
   // https://github.com/magus/git-multi-diff-playground.git
-  repo_path: /(?<repo_path>[^:^/]+\/[^/]+)\.git/,
+  // the .git suffix is optional for remote urls, and may not always be provided
+  repo_path: /(?<repo_path>[^:^/]+\/[^/]+)(?:\.git)?$/,
 };
 
 const BRANCH = {
