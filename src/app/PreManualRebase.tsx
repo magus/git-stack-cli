@@ -95,4 +95,4 @@ const PR_TEMPLATE = Object.freeze({
 });
 
 // prettier-ignore
-const PR_TEMPLATE_KEY_LIST = Object.keys(PR_TEMPLATE) as Array<keyof typeof PR_TEMPLATE>;
+const PR_TEMPLATE_KEY_LIST = ["Github", "Root", "Docs"] as Array<Exclude<keyof typeof PR_TEMPLATE, "TemplateDir">>;
