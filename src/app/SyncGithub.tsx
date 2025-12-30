@@ -240,8 +240,6 @@ async function run() {
       if (!is_master_base(group)) {
         // ensure base matches pr in github
         await github.pr_edit({ branch: group.id, base: group.base });
-      } else {
-        await github.pr_edit({ branch: group.id });
       }
     } else {
       // create pr in github
