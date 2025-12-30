@@ -101,7 +101,8 @@ const RE = {
   // git@github.com:magus/git-multi-diff-playground.git
   // https://github.com/magus/git-multi-diff-playground.git
   // the .git suffix is optional for remote urls, and may not always be provided
-  repo_path: /(?<repo_path>[^:^/]+\/[^/]+)(?:\.git)?$/,
+  // https://regex101.com/r/pICG7G/1
+  repo_path: /(?<repo_path>[^:^/]+\/[^/]+?)(\.git)?$/,
 };
 
 const BRANCH = {
