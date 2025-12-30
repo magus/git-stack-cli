@@ -39,10 +39,11 @@ async function run() {
   // ./pull_request_template.md
   // ./docs/pull_request_template.md
   for (const key of PR_TEMPLATE_KEY_LIST) {
-    const pr_template_fn = PR_TEMPLATE[key as keyof typeof PR_TEMPLATE];
+    const pr_template_fn = PR_TEMPLATE[key];
+    const pr_template_file = pr_template_fn(repo_root);
 
-    if (await safe_exists(pr_template_fn(repo_root))) {
-      pr_template_body = await fs.readFile(pr_template_fn(repo_root), "utf-8");
+    if (await safe_exists(pr_template_file)) {
+      pr_template_body = await fs.readFile(pr_template_file, "utf-8");
 
       actions.output(
         <FormatText
@@ -58,10 +59,23 @@ async function run() {
     }
   }
 
-  // ./.github/PULL_REQUEST_TEMPLATE/*.md
   let pr_templates: Array<string> = [];
-  if (await safe_exists(PR_TEMPLATE.TemplateDir(repo_root))) {
-    pr_templates = await fs.readdir(PR_TEMPLATE.TemplateDir(repo_root));
+  let pr_dir: string = "";
+
+  // ./.github/PULL_REQUEST_TEMPLATE/*.md
+  pr_dir = PR_TEMPLATE.DirGithub(repo_root);
+  if (await safe_exists(pr_dir)) {
+    for (const filename of await fs.readdir(pr_dir)) {
+      pr_templates.push(path.join(pr_dir, filename));
+    }
+  }
+
+  // ./docs/PULL_REQUEST_TEMPLATE/*.md
+  pr_dir = PR_TEMPLATE.DirDocs(repo_root);
+  if (await safe_exists(pr_dir)) {
+    for (const filename of await fs.readdir(pr_dir)) {
+      pr_templates.push(path.join(pr_dir, filename));
+    }
   }
 
   // check if repo has multiple pr templates
@@ -71,14 +85,20 @@ async function run() {
 
     if (pr_templates.length > 0) {
       actions.output(
-        <FormatText
-          wrapper={<Ink.Text color={colors.yellow} />}
-          message="{count} queryable templates found under {dir}, but not supported."
-          values={{
-            count: <Ink.Text color={colors.blue}>{pr_templates.length}</Ink.Text>,
-            dir: <Brackets>{PR_TEMPLATE.TemplateDir("")}</Brackets>,
-          }}
-        />,
+        <Ink.Box flexDirection="column">
+          {pr_templates.map((filepath) => {
+            const relpath = path.relative(repo_root, filepath);
+            return <Ink.Text key={filepath}>- {relpath}</Ink.Text>;
+          })}
+
+          <FormatText
+            wrapper={<Ink.Text color={colors.yellow} />}
+            message="{count} queryable templates found, but not supported."
+            values={{
+              count: <Ink.Text color={colors.blue}>{pr_templates.length}</Ink.Text>,
+            }}
+          />
+        </Ink.Box>,
       );
     }
 
@@ -91,8 +111,11 @@ const PR_TEMPLATE = Object.freeze({
   Github: (root: string) => path.join(root, ".github", "pull_request_template.md"),
   Root: (root: string) => path.join(root, "pull_request_template.md"),
   Docs: (root: string) => path.join(root, "docs", "pull_request_template.md"),
-  TemplateDir: (root: string) => path.join(root, ".github", "PULL_REQUEST_TEMPLATE"),
+
+  DirDocs: (root: string) => path.join(root, "docs", "PULL_REQUEST_TEMPLATE/"),
+  DirGithub: (root: string) => path.join(root, ".github", "PULL_REQUEST_TEMPLATE/"),
 });
 
 // prettier-ignore
-const PR_TEMPLATE_KEY_LIST = ["Github", "Root", "Docs"] as Array<Exclude<keyof typeof PR_TEMPLATE, "TemplateDir">>;
+//
+const PR_TEMPLATE_KEY_LIST = ["Github", "Root", "Docs"] satisfies Array<keyof typeof PR_TEMPLATE>;
