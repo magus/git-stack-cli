@@ -97,6 +97,15 @@ async function run() {
   }
 }
 
+export function get_repo_path(origin_url: string): null | string {
+  try {
+    return match_group(origin_url, RE.repo_path, "repo_path");
+  } catch {
+    // pass
+  }
+  return null;
+}
+
 const RE = {
   // git@github.com:magus/git-multi-diff-playground.git
   // https://github.com/magus/git-multi-diff-playground.git
