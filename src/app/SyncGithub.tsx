@@ -24,7 +24,6 @@ async function run() {
   const branch_name = state.branch_name;
   const commit_map = state.commit_map;
   const master_branch = state.master_branch;
-  const master_branch_name = master_branch.replace(/^origin\//, "");
   const repo_root = state.repo_root;
   const sync_github = state.sync_github;
 
@@ -220,7 +219,7 @@ async function run() {
       // Unable to sync.
       // ```
       //
-      if (!is_master_base(group) && !pr_base_is_master(group)) {
+      if (!is_master_base(group)) {
         await github.pr_edit({
           branch: group.id,
           base: master_branch,
@@ -298,32 +297,7 @@ async function run() {
       return false;
     }
 
-    if (!group.base) {
-      return group.master_base;
-    }
-
-    const base = group.base;
-
-    return (
-      group.master_base ||
-      base === master_branch ||
-      base === master_branch_name ||
-      `origin/${base}` === master_branch
-    );
-  }
-
-  function pr_base_is_master(group: CommitMetadataGroup) {
-    if (!group.pr) {
-      return false;
-    }
-
-    const pr_base = group.pr.baseRefName;
-
-    return (
-      pr_base === master_branch ||
-      `origin/${pr_base}` === master_branch ||
-      pr_base === master_branch_name
-    );
+    return group.master_base || `origin/${group.pr.baseRefName}` === master_branch;
   }
 
   async function push_master_group(group: CommitMetadataGroup) {
