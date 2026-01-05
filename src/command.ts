@@ -167,13 +167,6 @@ const DefaultOptions = {
     default: false,
     description: "Write state to local json file for debugging",
   },
-
-  "mock-metadata": {
-    hidden: true,
-    type: "boolean",
-    default: false,
-    description: "Mock local store metadata for testing",
-  },
 } satisfies YargsOptions;
 
 const FixupOptions = {
