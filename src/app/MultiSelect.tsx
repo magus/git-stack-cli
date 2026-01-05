@@ -19,7 +19,7 @@ type Props<T> = {
 };
 
 type Item<T> = {
-  label: string;
+  label: React.ReactNode;
   value: T;
   selected?: ItemRowProps["selected"];
   disabled?: ItemRowProps["disabled"];
@@ -206,7 +206,7 @@ export function MultiSelect<T>(props: Props<T>) {
 }
 
 type ItemRowProps = {
-  label: string;
+  label: React.ReactNode;
   active: boolean;
   selected: boolean;
   disabled: boolean;
