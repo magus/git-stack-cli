@@ -14,28 +14,16 @@ import { invariant } from "~/core/invariant";
 import { short_id } from "~/core/short_id";
 import { wrap_index } from "~/core/wrap_index";
 
-import type { State } from "~/app/Store";
 import type * as CommitMetadata from "~/core/CommitMetadata";
 
 type CommitRangeGroup = NonNullable<Parameters<typeof CommitMetadata.range>[0]>[string];
-
-export function SelectCommitRanges() {
-  const commit_range = Store.useState((state) => state.commit_range);
-
-  invariant(commit_range, "commit_range must exist");
-
-  return <SelectCommitRangesInternal commit_range={commit_range} />;
-}
-
-type Props = {
-  commit_range: CommitRange;
-};
-
-type CommitRange = NonNullable<State["commit_range"]>;
 type SimpleGroup = { id: string; title: string };
 
-function SelectCommitRangesInternal(props: Props) {
+export function SelectCommitRanges() {
   const actions = Store.useActions();
+
+  const commit_range = Store.useState((state) => state.commit_range);
+  invariant(commit_range, "commit_range must exist");
 
   const argv = Store.useState((state) => state.argv);
   const branch_name = Store.useState((state) => state.branch_name);
@@ -44,15 +32,13 @@ function SelectCommitRangesInternal(props: Props) {
   const [focused, set_focused] = React.useState("");
 
   const [selected_group_id, set_selected_group_id] = React.useState(() => {
-    const first_group = props.commit_range.group_list.find(
-      (g) => g.id !== props.commit_range.UNASSIGNED,
-    );
+    const first_group = commit_range.group_list.find((g) => g.id !== commit_range.UNASSIGNED);
 
     if (first_group) {
       return first_group.id;
     }
 
-    return props.commit_range.UNASSIGNED;
+    return commit_range.UNASSIGNED;
   });
 
   const [group_input, set_group_input] = React.useState(false);
@@ -72,7 +58,7 @@ function SelectCommitRangesInternal(props: Props) {
     },
     new Set<string>(),
     (set) => {
-      for (const group of props.commit_range.group_list) {
+      for (const group of commit_range.group_list) {
         if (group.master_base) {
           set.add(group.id);
         }
@@ -91,7 +77,7 @@ function SelectCommitRangesInternal(props: Props) {
     },
     new Map(),
     (map) => {
-      for (const commit of props.commit_range.commit_list) {
+      for (const commit of commit_range.commit_list) {
         map.set(commit.sha, commit.branch_id);
       }
 
@@ -122,7 +108,7 @@ function SelectCommitRangesInternal(props: Props) {
 
           // handle allow_unassigned case
           if (!id) {
-            id = props.commit_range.UNASSIGNED;
+            id = commit_range.UNASSIGNED;
             const title = "allow_unassigned";
             state_commit_map[sha] = { id, title, master_base: false };
             continue;
@@ -149,7 +135,7 @@ function SelectCommitRangesInternal(props: Props) {
     }
 
     // only allow setting base branch when on a created group
-    if (group.id !== props.commit_range.UNASSIGNED && input_lower === SYMBOL.m) {
+    if (group.id !== commit_range.UNASSIGNED && input_lower === SYMBOL.m) {
       const group = group_list[current_index];
       set_group_master_base(group.id);
       return;
@@ -180,19 +166,19 @@ function SelectCommitRangesInternal(props: Props) {
     }
   }
 
-  if (!props.commit_range.group_list.length) {
+  if (!commit_range.group_list.length) {
     return null;
   }
 
-  const total_group_count = new_group_list.length + props.commit_range.group_list.length;
+  const total_group_count = new_group_list.length + commit_range.group_list.length;
 
-  for (let i = 0; i < props.commit_range.group_list.length; i++) {
-    const index = props.commit_range.group_list.length - i - 1;
-    const group = props.commit_range.group_list[index];
+  for (let i = 0; i < commit_range.group_list.length; i++) {
+    const index = commit_range.group_list.length - i - 1;
+    const group = commit_range.group_list[index];
 
     if (group.pr?.state === "MERGED") continue;
 
-    if (group.id === props.commit_range.UNASSIGNED) {
+    if (group.id === commit_range.UNASSIGNED) {
       // only include unassigned group when there are no other groups
       if (total_group_count === 1) {
         group_list.push({
@@ -227,12 +213,12 @@ function SelectCommitRangesInternal(props: Props) {
   const is_master_base = group_master_base.has(group.id);
 
   const multiselect_disabled = group_input;
-  const multiselect_disableSelect = group.id === props.commit_range.UNASSIGNED;
+  const multiselect_disableSelect = group.id === commit_range.UNASSIGNED;
 
   const max_width = 80;
-  const has_groups = group.id !== props.commit_range.UNASSIGNED;
+  const has_groups = group.id !== commit_range.UNASSIGNED;
 
-  const items = props.commit_range.commit_list.map((commit) => {
+  const items = commit_range.commit_list.map((commit) => {
     const commit_metadata_id = commit_map.get(commit.sha);
 
     const selected = commit_metadata_id !== null;
@@ -479,7 +465,7 @@ function SelectCommitRangesInternal(props: Props) {
         />
       </Ink.Box>
 
-      {group.id === props.commit_range.UNASSIGNED ? null : (
+      {group.id === commit_range.UNASSIGNED ? null : (
         <Ink.Box>
           <FormatText
             wrapper={<Ink.Text color={colors.gray} />}
@@ -527,6 +513,8 @@ function SelectCommitRangesInternal(props: Props) {
   }
 
   function detect_sync_status() {
+    invariant(commit_range, "commit_range must exist");
+
     if (!has_unassigned_commits) {
       return "allow";
     }
@@ -537,8 +525,8 @@ function SelectCommitRangesInternal(props: Props) {
 
     let allow_unassigned_sync = null;
 
-    for (let i = 0; i < props.commit_range.commit_list.length; i++) {
-      const commit = props.commit_range.commit_list[i];
+    for (let i = 0; i < commit_range.commit_list.length; i++) {
+      const commit = commit_range.commit_list[i];
       const group_id = commit_map.get(commit.sha);
       // console.debug(commit.sha, group_id);
 
