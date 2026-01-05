@@ -15,6 +15,7 @@ type Props<T> = {
   disableSelect?: boolean;
   maxWidth?: number;
   startIndex?: number;
+  withSelectPreview?: boolean;
 };
 
 type Item<T> = {
@@ -181,9 +182,13 @@ export function MultiSelect<T>(props: Props<T>) {
   return (
     <Ink.Box flexDirection="column">
       {props.items.map((item, i) => {
-        const active = i === index;
-        const selected = selected_set.has(i);
-        const disabled = item.disabled || false;
+        let active = i === index;
+        let selected = selected_set.has(i);
+        let disabled = item.disabled || false;
+
+        if (props.withSelectPreview) {
+          selected = active;
+        }
 
         return (
           <ItemRow
