@@ -30,6 +30,9 @@ export function SelectCommitRanges() {
   invariant(branch_name, "branch_name must exist");
 
   const [focused, set_focused] = React.useState("");
+  const [group_input, set_group_input] = React.useState(false);
+  const [pr_select, set_pr_select] = React.useState(false);
+  const is_input_mode = group_input || pr_select;
 
   const [selected_group_id, set_selected_group_id] = React.useState(() => {
     const first_group = commit_range.group_list.find((g) => g.id !== commit_range.UNASSIGNED);
@@ -41,8 +44,6 @@ export function SelectCommitRanges() {
     return commit_range.UNASSIGNED;
   });
 
-  const [group_input, set_group_input] = React.useState(false);
-
   const [new_group_list, create_group] = React.useReducer(
     (group_list: Array<SimpleGroup>, group: SimpleGroup) => {
       const next_group_list = group_list.concat(group);
@@ -50,6 +51,22 @@ export function SelectCommitRanges() {
     },
     [],
   );
+
+  const existing_pr_list = Store.useState((state) => {
+    // collect set of groups already represented as prs
+    const existing_group_set = new Set<string>();
+    for (const group of commit_range.group_list) {
+      if (group.pr) {
+        existing_group_set.add(group.pr.headRefName);
+      }
+    }
+    for (const group of new_group_list) {
+      existing_group_set.add(group.id);
+    }
+
+    // exclude existing_group_set from existing state.pr values
+    return Object.values(state.pr).filter((pr) => !existing_group_set.has(pr.headRefName));
+  });
 
   const [group_master_base, set_group_master_base] = React.useReducer(
     (set: Set<string>, group_id: string) => {
@@ -90,8 +107,19 @@ export function SelectCommitRanges() {
   Ink.useInput((input, key) => {
     const input_lower = input.toLowerCase();
 
-    // do not allow input when inputting group title
-    if (group_input) {
+    // only allow pr select when on unassigned group
+    if (has_unassigned_commits && input_lower === SYMBOL.p) {
+      set_pr_select((v) => !v);
+      return;
+    }
+    // allow cancelling pr select with esc
+    if (pr_select && key.escape) {
+      set_pr_select(false);
+      return;
+    }
+
+    // do not allow input when inputting
+    if (is_input_mode) {
       return;
     }
 
@@ -212,7 +240,7 @@ export function SelectCommitRanges() {
   const group = group_list[current_index];
   const is_master_base = group_master_base.has(group.id);
 
-  const multiselect_disabled = group_input;
+  const multiselect_disabled = is_input_mode;
   const multiselect_disableSelect = group.id === commit_range.UNASSIGNED;
 
   const max_width = 80;
@@ -225,7 +253,7 @@ export function SelectCommitRanges() {
 
     let disabled;
 
-    if (group_input) {
+    if (is_input_mode) {
       disabled = true;
     } else if (!has_groups) {
       disabled = true;
@@ -247,7 +275,7 @@ export function SelectCommitRanges() {
     <Ink.Box flexDirection="column">
       <Ink.Box height={1} />
 
-      {has_groups || group_input ? null : (
+      {has_groups || is_input_mode ? null : (
         <Ink.Box flexDirection="column">
           <Ink.Text bold color={colors.blue}>
             👋 Welcome to <Command>git stack</Command>!
@@ -269,10 +297,28 @@ export function SelectCommitRanges() {
               }}
             />
           </Ink.Text>
+
+          <Ink.Text color={colors.blue}>
+            <FormatText
+              message="Press {p} to {pick} an existing PR"
+              values={{
+                p: (
+                  <Ink.Text bold color={colors.green}>
+                    p
+                  </Ink.Text>
+                ),
+                pick: (
+                  <Ink.Text bold color={colors.green}>
+                    <Parens>p</Parens>pick
+                  </Ink.Text>
+                ),
+              }}
+            />
+          </Ink.Text>
         </Ink.Box>
       )}
 
-      {!has_groups || group_input ? null : (
+      {!has_groups || is_input_mode ? null : (
         <React.Fragment>
           <Ink.Box width={max_width} flexDirection="row">
             <Ink.Box flexDirection="row">
@@ -306,8 +352,6 @@ export function SelectCommitRanges() {
 
       {!group_input ? null : (
         <React.Fragment>
-          <Ink.Box height={1} />
-
           <FormatText
             wrapper={<Ink.Text color={colors.gray} />}
             message="Enter a title for the PR {note}"
@@ -315,11 +359,16 @@ export function SelectCommitRanges() {
               note: (
                 <Parens>
                   <FormatText
-                    message="press {enter} to submit"
+                    message="press {enter} to submit, {esc} to clear"
                     values={{
                       enter: (
                         <Ink.Text bold color={colors.green}>
                           {SYMBOL.enter}
+                        </Ink.Text>
+                      ),
+                      esc: (
+                        <Ink.Text bold color={colors.green}>
+                          {SYMBOL.esc}
                         </Ink.Text>
                       ),
                     }}
@@ -333,6 +382,80 @@ export function SelectCommitRanges() {
             defaultValue={focused}
             onSubmit={submit_group_input}
             onCancel={() => set_group_input(false)}
+          />
+        </React.Fragment>
+      )}
+
+      {!pr_select ? null : (
+        <React.Fragment>
+          <FormatText
+            wrapper={<Ink.Text color={colors.gray} />}
+            message="Pick an existing PR {note}"
+            values={{
+              note: (
+                <Parens>
+                  <FormatText
+                    message="press {enter} to select, {esc} to cancel"
+                    values={{
+                      enter: (
+                        <Ink.Text bold color={colors.green}>
+                          {SYMBOL.enter}
+                        </Ink.Text>
+                      ),
+                      esc: (
+                        <Ink.Text bold color={colors.green}>
+                          {SYMBOL.esc}
+                        </Ink.Text>
+                      ),
+                    }}
+                  />
+                </Parens>
+              ),
+            }}
+          />
+
+          <MultiSelect
+            withSelectPreview
+            maxWidth={max_width}
+            startIndex={existing_pr_list.length - 1}
+            onSelect={(args) => {
+              if (args.selected) {
+                const title = args.item.title;
+                const id = args.item.headRefName;
+
+                actions.output(
+                  <FormatText
+                    wrapper={<Ink.Text dimColor />}
+                    message="Selected existing PR {title} {id}"
+                    values={{
+                      title: <Brackets>{title}</Brackets>,
+                      id: <Parens>{id}</Parens>,
+                    }}
+                  />,
+                );
+
+                // console.debug("submit_group_input", { title, id });
+                create_group({ id, title });
+                set_selected_group_id(id);
+                set_pr_select(false);
+              }
+            }}
+            items={existing_pr_list.map((pr) => {
+              return {
+                value: pr,
+                selected: false,
+                disabled: false,
+                label: (
+                  <FormatText
+                    message="{title} {ref}"
+                    values={{
+                      title: <Ink.Text>{pr.title}</Ink.Text>,
+                      ref: <Ink.Text color={colors.gray}>{pr.headRefName}</Ink.Text>,
+                    }}
+                  />
+                ),
+              };
+            })}
           />
         </React.Fragment>
       )}
@@ -382,7 +505,7 @@ export function SelectCommitRanges() {
             }}
           />
 
-          {group_input ? null : (
+          {is_input_mode ? null : (
             <FormatText
               wrapper={<Ink.Text color={colors.gray} />}
               message="Press {c} to {create} a new PR"
@@ -395,6 +518,25 @@ export function SelectCommitRanges() {
                 create: (
                   <Ink.Text bold color={colors.green}>
                     <Parens>c</Parens>reate
+                  </Ink.Text>
+                ),
+              }}
+            />
+          )}
+
+          {is_input_mode ? null : (
+            <FormatText
+              wrapper={<Ink.Text color={colors.gray} />}
+              message="Press {p} to {pick} an existing PR"
+              values={{
+                p: (
+                  <Ink.Text bold color={colors.green}>
+                    p
+                  </Ink.Text>
+                ),
+                pick: (
+                  <Ink.Text bold color={colors.green}>
+                    <Parens>p</Parens>pick
                   </Ink.Text>
                 ),
               }}
@@ -558,9 +700,11 @@ const SYMBOL = {
   left: "←",
   right: "→",
   enter: "Enter",
+  esc: "Esc",
   c: "c",
   s: "s",
   m: "m",
+  p: "p",
 };
 
 const S_TO_SYNC_VALUES = {
