@@ -52,7 +52,7 @@ const BUILD_CONFIG = {
   entrypoints: ["./src/index.tsx"],
   outdir: "./dist/js",
   target: "node",
-  env: "inline",
+  env: "disable",
   format: "esm",
   sourcemap: "inline",
   define,
