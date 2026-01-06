@@ -160,13 +160,6 @@ const DefaultOptions = {
       "Disable with --no-template",
     ].join("\n"),
   },
-
-  "write-state-json": {
-    hidden: true,
-    type: "boolean",
-    default: false,
-    description: "Write state to local json file for debugging",
-  },
 } satisfies YargsOptions;
 
 const FixupOptions = {

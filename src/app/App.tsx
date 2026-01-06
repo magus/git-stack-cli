@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { AutoUpdate } from "~/app/AutoUpdate";
 import { CherryPickCheck } from "~/app/CherryPickCheck";
-import { Debug } from "~/app/Debug";
 import { DependencyCheck } from "~/app/DependencyCheck";
 import { DetectInitialPR } from "~/app/DetectInitialPR";
 import { DirtyCheck } from "~/app/DirtyCheck";
@@ -51,7 +50,6 @@ export function App() {
   return (
     <Providers>
       <ErrorBoundary>
-        <Debug />
         <Output />
 
         <ExitingGate>
