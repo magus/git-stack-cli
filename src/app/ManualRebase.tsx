@@ -129,10 +129,6 @@ async function run() {
     }
 
     actions.error("Unable to rebase.");
-    if (!argv.verbose) {
-      actions.error("Try again with `--verbose` to see more information.");
-    }
-
     actions.exit(16);
   }
 
