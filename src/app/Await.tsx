@@ -5,19 +5,12 @@ import { invariant } from "~/core/invariant";
 
 type Cache = ReturnType<typeof cache>;
 
-type BaseProps = {
+type Props = {
   function: Parameters<typeof cache>[0];
-};
-
-type WithChildrenProps = BaseProps & {
-  fallback: React.SuspenseProps["fallback"];
-  children: React.ReactNode;
+  fallback?: React.SuspenseProps["fallback"];
+  children?: React.ReactNode;
   delayFallbackMs?: number;
 };
-
-type WithoutChildrenProps = BaseProps;
-
-type Props = WithChildrenProps | WithoutChildrenProps;
 
 export function Await(props: Props) {
   const [display_fallback, set_display_fallback] = React.useState(false);
@@ -68,7 +61,7 @@ export function Await(props: Props) {
     );
   }
 
-  return <ReadCache cache={cacheRef.current} />;
+  return <ReadCache cache={cacheRef.current}>{props.children}</ReadCache>;
 }
 
 type ReadCacheProps = {
