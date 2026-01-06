@@ -142,7 +142,7 @@ async function run() {
     // always hard reset and clean to allow subsequent checkout
     // if there are files checkout will fail and cascade fail subsequent commands
     cli.sync(`git reset --hard`, spawn_options);
-    cli.sync(`git clean -df`, spawn_options);
+    cli.sync(`git clean -fd`, spawn_options);
 
     // always put self back in original branch
     cli.sync(`git checkout ${branch_name}`, spawn_options);
