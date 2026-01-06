@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import path from "node:path";
+
 import * as Ink from "ink-cjs";
 import last from "lodash/last";
 
@@ -10,6 +12,7 @@ import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import * as github from "~/core/github";
 import { invariant } from "~/core/invariant";
+import { safe_exists } from "~/core/safe_exists";
 
 import type * as CommitMetadata from "~/core/CommitMetadata";
 
@@ -81,9 +84,7 @@ async function run() {
       invariant(last_commit, "last_commit must exist");
 
       // push group in isolation if master_base is set
-      // for the first group (i > 0) we can skip this
-      // since it'll be based off master anyway
-      if (group.master_base && i > 0) {
+      if (group.master_base) {
         await push_master_group(group);
         continue;
       }
@@ -297,29 +298,43 @@ async function run() {
   }
 
   async function push_master_group(group: CommitMetadataGroup) {
+    invariant(repo_root, "repo_root must exist");
+
     const worktree_path = `.git/git-stack-worktrees/push_master_group`;
+    const worktree_path_absolute = path.join(repo_root, worktree_path);
 
-    // ensure previous instance of worktree is removed
-    await cli(`git worktree remove --force ${worktree_path}`, { ignoreExitCode: true });
-
-    // create temp worktree at master (or group.base if you prefer)
-    await cli(`git worktree add -f ${worktree_path} ${master_branch}`);
-
-    try {
-      // cherry-pick the group commits onto that base
-      const cp_commit_list = group.commits.map((c) => c.sha);
-      await cli(`git -C ${worktree_path} cherry-pick ${cp_commit_list}`);
-
-      `git -C ${worktree_path} push -f origin HEAD:refs/heads/${group.id}`;
-
-      const push_target = `HEAD:refs/heads/${group.id}`;
-      const git_push_command = create_git_push_command(`git -C ${worktree_path}`, push_target);
-
-      await cli(git_push_command);
-    } finally {
-      // clean up even if push fails
-      await cli(`git worktree remove --force ${worktree_path}`);
+    // ensure worktree for pushing master groups
+    if (!(await safe_exists(worktree_path_absolute))) {
+      actions.output(
+        <Ink.Text color={colors.white}>
+          Creating <Ink.Text color={colors.yellow}>{worktree_path}</Ink.Text>
+        </Ink.Text>,
+      );
+      actions.output(
+        <Ink.Text color={colors.gray}>(this may take a moment the first time…)</Ink.Text>,
+      );
+      await cli(`git worktree add -f ${worktree_path} ${master_branch}`);
     }
+
+    // ensure worktree is clean + on the right base before applying commits
+    // - abort any in-progress cherry-pick/rebase
+    // - drop local changes/untracked files (including ignored) for a truly fresh state
+    // - reset to the desired base
+    await cli(`git -C ${worktree_path} cherry-pick --abort`, { ignoreExitCode: true });
+    await cli(`git -C ${worktree_path} rebase --abort`, { ignoreExitCode: true });
+    await cli(`git -C ${worktree_path} merge --abort`, { ignoreExitCode: true });
+    await cli(`git -C ${worktree_path} checkout -f ${master_branch}`);
+    await cli(`git -C ${worktree_path} reset --hard ${master_branch}`);
+    await cli(`git -C ${worktree_path} clean -fd`);
+
+    // cherry-pick the group commits onto that base
+    const cp_commit_list = group.commits.map((c) => c.sha).join(" ");
+    await cli(`git -C ${worktree_path} cherry-pick ${cp_commit_list}`);
+
+    const push_target = `HEAD:refs/heads/${group.id}`;
+    const git_push_command = create_git_push_command(`git -C ${worktree_path}`, push_target);
+
+    await cli(git_push_command);
   }
 }
 
