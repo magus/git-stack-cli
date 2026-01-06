@@ -163,21 +163,57 @@ export async function range(commit_group_map?: CommitGroupMap) {
       // console.debug("  ", "group.base", group.base);
     }
 
+    // console.debug({ group });
+
     if (!group.pr) {
       group.dirty = true;
     } else {
       if (group.pr.baseRefName !== group.base) {
+        // console.debug("PR_BASEREF_MISMATCH");
         group.dirty = true;
-      } else if (group.master_base && i > 0) {
+      } else if (group.master_base) {
+        // console.debug("MASTER_BASE_DIFF_COMPARE");
+
         // special case
         // master_base groups cannot be compared by commit sha
         // instead compare the literal diff local against origin
         // gh pr diff --color=never 110
         // git --no-pager diff --color=never 00c8fe0~1..00c8fe0
-        const diff_github = await github.pr_diff(group.pr.number);
-        const diff_local = await git.get_diff(group.commits);
-        if (diff_github !== diff_local) {
+        let diff_github = await github.pr_diff(group.pr.number);
+        diff_github = diff_strip_index_lines(diff_github);
+
+        let diff_local = await git.get_diff(group.commits);
+        diff_local = diff_strip_index_lines(diff_local);
+
+        // find the first differing character index
+        let compare_length = Math.min(diff_github.length, diff_local.length);
+        let diff_index = -1;
+        for (let c_i = 0; c_i < compare_length; c_i++) {
+          if (diff_github[c_i] !== diff_local[c_i]) {
+            diff_index = c_i;
+            break;
+          }
+        }
+        if (diff_index > -1) {
           group.dirty = true;
+
+          // // print preview at diff_index for both strings
+          // const preview_radius = 30;
+          // const start_index = Math.max(0, diff_index - preview_radius);
+          // const end_index = Math.min(compare_length, diff_index + preview_radius);
+
+          // diff_github = diff_github.substring(start_index, end_index);
+          // diff_github = JSON.stringify(diff_github).slice(1, -1);
+
+          // diff_local = diff_local.substring(start_index, end_index);
+          // diff_local = JSON.stringify(diff_local).slice(1, -1);
+
+          // let pointer_indent = " ".repeat(diff_index - start_index + 1);
+          // console.warn(`⚠️ git diff mismatch`);
+          // console.warn(`              ${pointer_indent}⌄`);
+          // console.warn(`diff_github  …${diff_github}…`);
+          // console.warn(`diff_local   …${diff_local}…`);
+          // console.warn(`              ${pointer_indent}⌃`);
         }
       } else if (!group.master_base && previous_group && previous_group.master_base) {
         // special case
@@ -197,8 +233,10 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
         // compare all commits against pr commits
         if (group.pr.commits.length !== all_commits.length) {
+          // console.debug("BOUNDARY_COMMIT_LENGTH_MISMATCH");
           group.dirty = true;
         } else {
+          // console.debug("BOUNDARY_COMMIT_SHA_COMPARISON");
           for (let i = 0; i < group.pr.commits.length; i++) {
             const pr_commit = group.pr.commits[i];
             const local_commit = all_commits[i];
@@ -209,8 +247,10 @@ export async function range(commit_group_map?: CommitGroupMap) {
           }
         }
       } else if (group.pr.commits.length !== group.commits.length) {
+        // console.debug("COMMIT_LENGTH_MISMATCH");
         group.dirty = true;
       } else {
+        // console.debug("COMMIT_SHA_COMPARISON");
         // if we still haven't marked this dirty, check each commit
         // comapre literal commit shas in group
         for (let i = 0; i < group.pr.commits.length; i++) {
@@ -239,3 +279,11 @@ export async function range(commit_group_map?: CommitGroupMap) {
 }
 
 export const UNASSIGNED = "unassigned";
+
+function diff_strip_index_lines(diff_text: string) {
+  return diff_text.replace(RE.diff_index_line, "");
+}
+
+const RE = {
+  diff_index_line: /^index [0-9a-f]+\.\.[0-9a-f]+.*?\n/gm,
+};
