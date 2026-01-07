@@ -20,9 +20,6 @@ export function PostRebaseStatus() {
 async function run() {
   const actions = Store.getState().actions;
 
-  // reset github pr cache before refreshing via commit range below
-  actions.reset_pr();
-
   const commit_range = await CommitMetadata.range();
 
   actions.set((state) => {

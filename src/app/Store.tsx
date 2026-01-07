@@ -92,7 +92,6 @@ export type State = {
 
     isDebug(): boolean;
 
-    reset_pr(): void;
     register_abort_handler(abort_handler: AbortHandler): void;
     unregister_abort_handler(): void;
 
@@ -229,13 +228,6 @@ const BaseStore = createStore<State>()(
       isDebug() {
         const state = get();
         return state.select.debug(state);
-      },
-
-      reset_pr() {
-        set((state) => {
-          state.pr = {};
-          state.cache_pr_diff = {};
-        });
       },
 
       register_abort_handler(abort_handler) {

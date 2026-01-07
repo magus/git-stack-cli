@@ -160,6 +160,15 @@ async function run() {
     actions.unregister_abort_handler();
 
     actions.set((state) => {
+      // invalidate cache for PRs we pushed
+      for (const group of push_group_list) {
+        if (group.pr) {
+          delete state.pr[group.pr.headRefName];
+          delete state.cache_pr_diff[group.pr.number];
+        }
+      }
+
+      // move to next step
       state.step = "post-rebase-status";
     });
   } catch (err) {
