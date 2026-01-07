@@ -60,7 +60,11 @@ export async function command(argv: string[], options: CommandOptions = {}) {
     .command(
       "config",
       "Generate a one-time configuration json based on the passed arguments",
-      (yargs) => yargs,
+      (yargs) => {
+        // match options for default command (since we are generating a config for its options)
+        let builder = yargs.options(DefaultOptions);
+        return builder;
+      },
     )
 
     .command(
