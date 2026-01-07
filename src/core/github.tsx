@@ -7,6 +7,7 @@ import path from "node:path";
 import * as Ink from "ink-cjs";
 
 import { Brackets } from "~/app/Brackets";
+import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import { Timer } from "~/core/Timer";
 import { cli } from "~/core/cli";
@@ -38,16 +39,19 @@ export async function pr_list(): Promise<Array<PullRequest>> {
 
   if (actions.isDebug()) {
     actions.output(
-      <Ink.Text dimColor>
-        <Ink.Text>{"Github cache "}</Ink.Text>
-        <Ink.Text bold color={colors.yellow}>
-          {result_pr_list.length}
-        </Ink.Text>
-        <Ink.Text>{" open PRs from "}</Ink.Text>
-        <Brackets>{repo_path}</Brackets>
-        <Ink.Text>{" authored by "}</Ink.Text>
-        <Brackets>{username}</Brackets>
-      </Ink.Text>,
+      <FormatText
+        wrapper={<Ink.Text dimColor />}
+        message="Github cache {count} open PRs from {repo_path} authored by {username}"
+        values={{
+          count: (
+            <Ink.Text bold color={colors.yellow}>
+              {result_pr_list.length}
+            </Ink.Text>
+          ),
+          repo_path: <Brackets>{repo_path}</Brackets>,
+          username: <Brackets>{username}</Brackets>,
+        }}
+      />,
     );
   }
 
@@ -76,15 +80,11 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
   if (cache) {
     if (actions.isDebug()) {
       actions.debug(
-        <Ink.Text>
-          <Ink.Text dimColor>Github pr_status cache</Ink.Text>
-          <Ink.Text> </Ink.Text>
-          <Ink.Text bold color={colors.green}>
-            {"HIT "}
-          </Ink.Text>
-          <Ink.Text> </Ink.Text>
-          <Ink.Text dimColor>{branch}</Ink.Text>
-        </Ink.Text>,
+        cache_message({
+          hit: true,
+          message: "Github pr_status cache",
+          extra: branch,
+        }),
       );
     }
 
@@ -93,15 +93,11 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
 
   if (actions.isDebug()) {
     actions.debug(
-      <Ink.Text>
-        <Ink.Text dimColor>Github pr_status cache</Ink.Text>
-        <Ink.Text> </Ink.Text>
-        <Ink.Text bold color={colors.red}>
-          MISS
-        </Ink.Text>
-        <Ink.Text> </Ink.Text>
-        <Ink.Text dimColor>{branch}</Ink.Text>
-      </Ink.Text>,
+      cache_message({
+        hit: false,
+        message: "Github pr_status cache",
+        extra: branch,
+      }),
     );
   }
 
@@ -319,6 +315,36 @@ async function write_body_file(args: EditPullRequestArgs) {
 
 function safe_filename(value: string): string {
   return value.replace(RE.non_alphanumeric_dash, "-");
+}
+
+type CacheMessageArgs = {
+  hit: boolean;
+  message: React.ReactNode;
+  extra: React.ReactNode;
+};
+
+function cache_message(args: CacheMessageArgs) {
+  const status = args.hit ? (
+    <Ink.Text bold color={colors.green}>
+      HIT
+    </Ink.Text>
+  ) : (
+    <Ink.Text bold color={colors.red}>
+      MISS
+    </Ink.Text>
+  );
+
+  return (
+    <FormatText
+      wrapper={<Ink.Text dimColor />}
+      message="{message} {status} {extra}"
+      values={{
+        message: args.message,
+        status,
+        extra: args.extra,
+      }}
+    />
+  );
 }
 
 type Commit = {
