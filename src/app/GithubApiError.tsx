@@ -15,7 +15,12 @@ type Props = {
 };
 
 export function GithubApiError(props: Props) {
-  return <Await fallback={null} function={() => run(props)} />;
+  return (
+    <Await
+      fallback={<Ink.Text color={colors.yellow}>Fetching Github API usage…</Ink.Text>}
+      function={() => run(props)}
+    />
+  );
 }
 
 async function run(props: Props) {

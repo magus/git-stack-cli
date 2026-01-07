@@ -9,7 +9,12 @@ import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 
 export function Status() {
-  return <Await fallback={null} function={run} />;
+  return (
+    <Await
+      fallback={<Ink.Text color={colors.yellow}>Fetching latest status…</Ink.Text>}
+      function={run}
+    />
+  );
 }
 
 async function run() {

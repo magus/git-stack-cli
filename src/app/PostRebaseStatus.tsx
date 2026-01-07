@@ -6,9 +6,15 @@ import { Await } from "~/app/Await";
 import { StatusTable } from "~/app/StatusTable";
 import { Store } from "~/app/Store";
 import * as CommitMetadata from "~/core/CommitMetadata";
+import { colors } from "~/core/colors";
 
 export function PostRebaseStatus() {
-  return <Await fallback={null} function={run} />;
+  return (
+    <Await
+      fallback={<Ink.Text color={colors.yellow}>Fetching latest status…</Ink.Text>}
+      function={run}
+    />
+  );
 }
 
 async function run() {

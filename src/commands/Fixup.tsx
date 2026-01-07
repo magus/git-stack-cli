@@ -10,7 +10,12 @@ import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 
 export function Fixup() {
-  return <Await fallback={null} function={run} />;
+  return (
+    <Await
+      fallback={<Ink.Text color={colors.yellow}>Fixing up commits…</Ink.Text>}
+      function={run}
+    />
+  );
 }
 
 async function run() {

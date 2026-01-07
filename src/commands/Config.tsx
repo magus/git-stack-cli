@@ -10,7 +10,12 @@ import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 
 export function Config() {
-  return <Await fallback={null} function={run} />;
+  return (
+    <Await
+      fallback={<Ink.Text color={colors.yellow}>Generating config…</Ink.Text>}
+      function={run}
+    />
+  );
 
   async function run() {
     const state = Store.getState();

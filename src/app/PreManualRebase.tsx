@@ -14,7 +14,12 @@ import { invariant } from "~/core/invariant";
 import { safe_exists } from "~/core/safe_exists";
 
 export function PreManualRebase() {
-  return <Await fallback={null} function={run} />;
+  return (
+    <Await
+      fallback={<Ink.Text color={colors.yellow}>Check PR templates…</Ink.Text>}
+      function={run}
+    />
+  );
 }
 
 async function run() {

@@ -5,13 +5,19 @@ import * as Ink from "ink-cjs";
 import { Await } from "~/app/Await";
 import { Store } from "~/app/Store";
 import { cli } from "~/core/cli";
+import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
 
 export function Log() {
   const { stdout } = Ink.useStdout();
   const available_width = stdout.columns || 80;
 
-  return <Await fallback={null} function={() => run({ available_width })} />;
+  return (
+    <Await
+      fallback={<Ink.Text color={colors.yellow}>Generating log…</Ink.Text>}
+      function={() => run({ available_width })}
+    />
+  );
 }
 
 type Args = {
