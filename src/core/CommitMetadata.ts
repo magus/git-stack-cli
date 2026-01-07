@@ -196,7 +196,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
         }
 
         // find the first differing character index
-        let compare_length = Math.min(diff_github.length, diff_local.length);
+        let compare_length = Math.max(diff_github.length, diff_local.length);
         let diff_index = -1;
         for (let c_i = 0; c_i < compare_length; c_i++) {
           if (diff_github[c_i] !== diff_local[c_i]) {
