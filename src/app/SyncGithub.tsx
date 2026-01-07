@@ -300,14 +300,14 @@ async function run() {
   async function push_master_group(group: CommitMetadataGroup) {
     invariant(repo_root, "repo_root must exist");
 
-    const worktree_path = `.git/git-stack-worktrees/push_master_group`;
-    const worktree_path_absolute = path.join(repo_root, worktree_path);
+    const repo_rel_worktree_path = `.git/git-stack-worktrees/push_master_group`;
+    const worktree_path = path.join(repo_root, repo_rel_worktree_path);
 
     // ensure worktree for pushing master groups
-    if (!(await safe_exists(worktree_path_absolute))) {
+    if (!(await safe_exists(worktree_path))) {
       actions.output(
         <Ink.Text color={colors.white}>
-          Creating <Ink.Text color={colors.yellow}>{worktree_path}</Ink.Text>
+          Creating <Ink.Text color={colors.yellow}>{repo_rel_worktree_path}</Ink.Text>
         </Ink.Text>,
       );
       actions.output(
