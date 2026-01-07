@@ -180,10 +180,10 @@ export async function range(commit_group_map?: CommitGroupMap) {
         // gh pr diff --color=never 110
         // git --no-pager diff --color=never 00c8fe0~1..00c8fe0
         let diff_github = await github.pr_diff(group.pr.number);
-        diff_github = diff_strip_index_lines(diff_github);
+        diff_github = normalize_diff(diff_github);
 
         let diff_local = await git.get_diff(group.commits);
-        diff_local = diff_strip_index_lines(diff_local);
+        diff_local = normalize_diff(diff_local);
 
         // find the first differing character index
         let compare_length = Math.min(diff_github.length, diff_local.length);
@@ -280,10 +280,17 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
 export const UNASSIGNED = "unassigned";
 
-function diff_strip_index_lines(diff_text: string) {
-  return diff_text.replace(RE.diff_index_line, "");
+function normalize_diff(diff_text: string) {
+  diff_text = diff_text.replace(RE.diff_index_line, "");
+  diff_text = diff_text.replace(RE.diff_section_header, "");
+  return diff_text;
 }
 
 const RE = {
+  // index 8b7c5f7b37688..84124e0a677ca 100644
+  // https://regex101.com/r/YBwF6P/1
   diff_index_line: /^index [0-9a-f]+\.\.[0-9a-f]+.*?\n/gm,
+  // @@ -29,6 +29,7 @@ from caas_cli import cli as caas_cli  # type: ignore
+  // https://regex101.com/r/ohMeDC/1
+  diff_section_header: /^@@ .*? @@(?: .*)?\n/gm,
 };
