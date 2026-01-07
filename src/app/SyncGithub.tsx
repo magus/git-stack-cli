@@ -185,9 +185,13 @@ async function run() {
 
       const group = commit_range.group_list[index];
 
-      if (group.id !== commit_range.UNASSIGNED) {
-        push_group_list.unshift(group);
-      }
+      // skip the unassigned commits group
+      if (group.id === commit_range.UNASSIGNED) continue;
+
+      // if not --force, skip non-dirty master_base groups
+      if (group.master_base && !group.dirty && !argv.force) continue;
+
+      push_group_list.unshift(group);
     }
 
     return push_group_list;
