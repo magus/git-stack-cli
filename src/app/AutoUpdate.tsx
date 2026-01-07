@@ -152,6 +152,12 @@ export function AutoUpdate(props: Props) {
     init_state().catch(abort);
 
     async function init_state() {
+      if (process.env.DEV === "true") {
+        info(<Ink.Text color={colors.yellow}>Skip AutoUpdate</Ink.Text>);
+        patch({ status: "done" });
+        return;
+      }
+
       if (state.latest_version !== null) return;
 
       const local_version = process.env.CLI_VERSION;
