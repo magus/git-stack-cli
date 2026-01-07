@@ -76,7 +76,9 @@ export type State = {
   output: Array<React.ReactNode>;
   pending_output: Record<string, Array<React.ReactNode>>;
 
+  // cache
   pr: { [branch: string]: PullRequest };
+  cache_pr_diff: { [id: number]: string };
 
   actions: {
     exit(code: number, args?: ExitArgs): void;
@@ -138,6 +140,7 @@ const BaseStore = createStore<State>()(
     pending_output: {},
 
     pr: {},
+    cache_pr_diff: {},
 
     actions: {
       exit(code, args) {
@@ -231,6 +234,7 @@ const BaseStore = createStore<State>()(
       reset_pr() {
         set((state) => {
           state.pr = {};
+          state.cache_pr_diff = {};
         });
       },
 

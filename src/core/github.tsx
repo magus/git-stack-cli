@@ -242,13 +242,45 @@ export async function pr_draft(args: DraftPullRequestArgs) {
 }
 
 export async function pr_diff(number: number) {
-  // https://cli.github.com/manual/gh_pr_diff
+  const state = Store.getState();
+  const actions = state.actions;
 
+  const maybe_diff = state.cache_pr_diff[number];
+
+  if (maybe_diff) {
+    if (actions.isDebug()) {
+      actions.debug(
+        cache_message({
+          hit: true,
+          message: "Github pr_diff cache",
+          extra: number,
+        }),
+      );
+    }
+
+    return maybe_diff;
+  }
+
+  if (actions.isDebug()) {
+    actions.debug(
+      cache_message({
+        hit: false,
+        message: "Github pr_diff cache",
+        extra: number,
+      }),
+    );
+  }
+
+  // https://cli.github.com/manual/gh_pr_diff
   const cli_result = await cli(`gh pr diff --color=never ${number}`);
 
   if (cli_result.code !== 0) {
     handle_error(cli_result.output);
   }
+
+  actions.set((state) => {
+    state.cache_pr_diff[number] = cli_result.output;
+  });
 
   return cli_result.stdout;
 }
