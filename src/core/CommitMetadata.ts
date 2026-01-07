@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { Store } from "~/app/Store";
 import * as git from "~/core/git";
 import * as github from "~/core/github";
@@ -26,6 +28,8 @@ type CommitRangeGroup = {
 type CommitGroupMap = { [sha: string]: CommitRangeGroup };
 
 export async function range(commit_group_map?: CommitGroupMap) {
+  const DEBUG = process.env.DEV && false;
+
   // gather all open prs in repo first
   // cheaper query to populate cache
   await github.pr_list();
@@ -163,7 +167,9 @@ export async function range(commit_group_map?: CommitGroupMap) {
       // console.debug("  ", "group.base", group.base);
     }
 
-    // console.debug({ group });
+    if (DEBUG) {
+      console.debug({ group });
+    }
 
     if (!group.pr) {
       group.dirty = true;
@@ -185,6 +191,10 @@ export async function range(commit_group_map?: CommitGroupMap) {
         let diff_local = await git.get_diff(group.commits);
         diff_local = normalize_diff(diff_local);
 
+        if (DEBUG) {
+          console.debug({ diff_local, diff_github });
+        }
+
         // find the first differing character index
         let compare_length = Math.min(diff_github.length, diff_local.length);
         let diff_index = -1;
@@ -197,23 +207,25 @@ export async function range(commit_group_map?: CommitGroupMap) {
         if (diff_index > -1) {
           group.dirty = true;
 
-          // // print preview at diff_index for both strings
-          // const preview_radius = 30;
-          // const start_index = Math.max(0, diff_index - preview_radius);
-          // const end_index = Math.min(compare_length, diff_index + preview_radius);
+          if (DEBUG) {
+            // print preview at diff_index for both strings
+            const preview_radius = 30;
+            const start_index = Math.max(0, diff_index - preview_radius);
+            const end_index = Math.min(compare_length, diff_index + preview_radius);
 
-          // diff_github = diff_github.substring(start_index, end_index);
-          // diff_github = JSON.stringify(diff_github).slice(1, -1);
+            diff_github = diff_github.substring(start_index, end_index);
+            diff_github = JSON.stringify(diff_github).slice(1, -1);
 
-          // diff_local = diff_local.substring(start_index, end_index);
-          // diff_local = JSON.stringify(diff_local).slice(1, -1);
+            diff_local = diff_local.substring(start_index, end_index);
+            diff_local = JSON.stringify(diff_local).slice(1, -1);
 
-          // let pointer_indent = " ".repeat(diff_index - start_index + 1);
-          // console.warn(`⚠️ git diff mismatch`);
-          // console.warn(`              ${pointer_indent}⌄`);
-          // console.warn(`diff_github  …${diff_github}…`);
-          // console.warn(`diff_local   …${diff_local}…`);
-          // console.warn(`              ${pointer_indent}⌃`);
+            let pointer_indent = " ".repeat(diff_index - start_index + 1);
+            console.warn(`⚠️ git diff mismatch`);
+            console.warn(`              ${pointer_indent}⌄`);
+            console.warn(`diff_github  …${diff_github}…`);
+            console.warn(`diff_local   …${diff_local}…`);
+            console.warn(`              ${pointer_indent}⌃`);
+          }
         }
       } else if (!group.master_base && previous_group && previous_group.master_base) {
         // special case
