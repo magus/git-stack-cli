@@ -48,6 +48,10 @@ const REPO_ROOT = (await spawn.sync("git rev-parse --show-toplevel")).stdout;
 
 const define = await get_define();
 
+if (DEV) {
+  define["process.env.DEV"] = JSON.stringify("true");
+}
+
 const BUILD_CONFIG = {
   entrypoints: ["./src/index.tsx"],
   outdir: "./dist/js",
