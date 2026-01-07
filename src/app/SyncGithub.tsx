@@ -229,7 +229,7 @@ async function run() {
       // Unable to sync.
       // ```
       //
-      if (!is_master_base(group)) {
+      if (!is_master_base({ group, master_branch })) {
         await github.pr_edit({
           branch: group.id,
           base: master_branch,
@@ -247,7 +247,7 @@ async function run() {
     invariant(group.base, "group.base must exist");
 
     if (group.pr) {
-      if (!is_master_base(group)) {
+      if (!is_master_base({ group, master_branch })) {
         // ensure base matches pr in github
         await github.pr_edit({ branch: group.id, base: group.base });
       }
@@ -303,11 +303,7 @@ async function run() {
   }
 
   function is_master_base(group: CommitMetadataGroup) {
-    if (!group.pr) {
-      return false;
-    }
-
-    return group.master_base || `origin/${group.pr.baseRefName}` === master_branch;
+    return _is_master_base({ group, master_branch });
   }
 
   async function push_master_group(group: CommitMetadataGroup) {
@@ -351,4 +347,23 @@ async function run() {
   }
 }
 
-type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
+export function _is_master_base(args: {
+  group: CommitMetadataGroup;
+  master_branch: string;
+}) {
+  const { group } = args;
+  const master_branch = args.master_branch;
+
+  if (!group.pr) {
+    return false;
+  }
+
+  // Treat as master-based only if we expect this group to live on master.
+  // Do not rely on the current PR base (it might be wrong and we want to fix it).
+  const master_branch_name = master_branch.replace(/^origin\//, "");
+  const group_base = group.base?.replace(/^origin\//, "");
+
+  return group.master_base || group_base === master_branch_name;
+}
+
+export type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
