@@ -30,10 +30,6 @@ type CommitGroupMap = { [sha: string]: CommitRangeGroup };
 export async function range(commit_group_map?: CommitGroupMap) {
   const DEBUG = process.env.DEV && false;
 
-  // gather all open prs in repo first
-  // cheaper query to populate cache
-  await github.pr_list();
-
   const master_branch = Store.getState().master_branch;
   const master_branch_name = master_branch.replace(/^origin\//, "");
   const commit_list = await git.get_commits(`${master_branch}..HEAD`);

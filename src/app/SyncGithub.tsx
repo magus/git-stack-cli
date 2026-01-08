@@ -171,6 +171,10 @@ async function run() {
       // move to next step
       state.step = "post-rebase-status";
     });
+
+    // gather all open prs in repo at once
+    // cheaper query to populate cache
+    await github.pr_list();
   } catch (err) {
     if (err instanceof Error) {
       actions.error(err.message);

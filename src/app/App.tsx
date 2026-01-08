@@ -5,6 +5,7 @@ import { CherryPickCheck } from "~/app/CherryPickCheck";
 import { DependencyCheck } from "~/app/DependencyCheck";
 import { DetectInitialPR } from "~/app/DetectInitialPR";
 import { DirtyCheck } from "~/app/DirtyCheck";
+import { FetchPullRequests } from "~/app/FetchPullRequests";
 import { GatherMetadata } from "~/app/GatherMetadata";
 import { GithubApiError } from "~/app/GithubApiError";
 import { HandleCtrlCSigint } from "~/app/HandleCtrlCSigint";
@@ -100,9 +101,11 @@ function MaybeMain() {
       <DependencyCheck>
         <DirtyCheck>
           <GatherMetadata>
-            <LocalCommitStatus>
-              <Rebase />
-            </LocalCommitStatus>
+            <FetchPullRequests>
+              <LocalCommitStatus>
+                <Rebase />
+              </LocalCommitStatus>
+            </FetchPullRequests>
           </GatherMetadata>
         </DirtyCheck>
       </DependencyCheck>
@@ -117,11 +120,13 @@ function MaybeMain() {
         <DirtyCheck>
           <GatherMetadata>
             <RequireBranch>
-              <LocalCommitStatus>
-                <DetectInitialPR>
-                  <Main />
-                </DetectInitialPR>
-              </LocalCommitStatus>
+              <FetchPullRequests>
+                <LocalCommitStatus>
+                  <DetectInitialPR>
+                    <Main />
+                  </DetectInitialPR>
+                </LocalCommitStatus>
+              </FetchPullRequests>
             </RequireBranch>
           </GatherMetadata>
         </DirtyCheck>
