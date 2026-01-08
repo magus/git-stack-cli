@@ -30,7 +30,9 @@ type CommitGroupMap = { [sha: string]: CommitRangeGroup };
 export async function range(commit_group_map?: CommitGroupMap) {
   const DEBUG = process.env.DEV && false;
 
-  const master_branch = Store.getState().master_branch;
+  const state = Store.getState();
+  const actions = state.actions;
+  const master_branch = state.master_branch;
   const master_branch_name = master_branch.replace(/^origin\//, "");
   const commit_list = await git.get_commits(`${master_branch}..HEAD`);
 
@@ -163,18 +165,16 @@ export async function range(commit_group_map?: CommitGroupMap) {
       // console.debug("  ", "group.base", group.base);
     }
 
-    if (DEBUG) {
-      console.debug({ group });
-    }
+    actions.json({ group });
 
     if (!group.pr) {
       group.dirty = true;
     } else {
       if (group.pr.baseRefName !== group.base) {
-        // console.debug("PR_BASEREF_MISMATCH");
+        actions.debug("PR_BASEREF_MISMATCH");
         group.dirty = true;
       } else if (group.master_base) {
-        // console.debug("MASTER_BASE_DIFF_COMPARE");
+        actions.debug("MASTER_BASE_DIFF_COMPARE");
 
         // special case
         // master_base groups cannot be compared by commit sha
@@ -187,9 +187,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
         let diff_local = await git.get_diff(group.commits);
         diff_local = normalize_diff(diff_local);
 
-        if (DEBUG) {
-          console.debug({ diff_local, diff_github });
-        }
+        actions.json({ diff_local, diff_github });
 
         // find the first differing character index
         let compare_length = Math.max(diff_github.length, diff_local.length);
@@ -216,11 +214,11 @@ export async function range(commit_group_map?: CommitGroupMap) {
             diff_local = JSON.stringify(diff_local).slice(1, -1);
 
             let pointer_indent = " ".repeat(diff_index - start_index + 1);
-            console.warn(`⚠️ git diff mismatch`);
-            console.warn(`              ${pointer_indent}⌄`);
-            console.warn(`diff_github  …${diff_github}…`);
-            console.warn(`diff_local   …${diff_local}…`);
-            console.warn(`              ${pointer_indent}⌃`);
+            actions.debug(`⚠️ git diff mismatch`);
+            actions.debug(`              ${pointer_indent}⌄`);
+            actions.debug(`diff_github  …${diff_github}…`);
+            actions.debug(`diff_local   …${diff_local}…`);
+            actions.debug(`              ${pointer_indent}⌃`);
           }
         }
       } else if (!group.master_base && previous_group && previous_group.master_base) {
@@ -241,10 +239,10 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
         // compare all commits against pr commits
         if (group.pr.commits.length !== all_commits.length) {
-          // console.debug("BOUNDARY_COMMIT_LENGTH_MISMATCH");
+          actions.debug("BOUNDARY_COMMIT_LENGTH_MISMATCH");
           group.dirty = true;
         } else {
-          // console.debug("BOUNDARY_COMMIT_SHA_COMPARISON");
+          actions.debug("BOUNDARY_COMMIT_SHA_COMPARISON");
           for (let i = 0; i < group.pr.commits.length; i++) {
             const pr_commit = group.pr.commits[i];
             const local_commit = all_commits[i];
@@ -255,10 +253,10 @@ export async function range(commit_group_map?: CommitGroupMap) {
           }
         }
       } else if (group.pr.commits.length !== group.commits.length) {
-        // console.debug("COMMIT_LENGTH_MISMATCH");
+        actions.debug("COMMIT_LENGTH_MISMATCH");
         group.dirty = true;
       } else {
-        // console.debug("COMMIT_SHA_COMPARISON");
+        actions.debug("COMMIT_SHA_COMPARISON");
         // if we still haven't marked this dirty, check each commit
         // comapre literal commit shas in group
         for (let i = 0; i < group.pr.commits.length; i++) {
@@ -266,6 +264,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
           const local_commit = group.commits[i];
 
           if (pr_commit.oid !== local_commit.sha) {
+            actions.json({ pr_commit, local_commit });
             group.dirty = true;
           }
         }
