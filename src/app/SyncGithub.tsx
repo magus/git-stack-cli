@@ -13,6 +13,7 @@ import { colors } from "~/core/colors";
 import * as github from "~/core/github";
 import { invariant } from "~/core/invariant";
 import { safe_exists } from "~/core/safe_exists";
+import { sleep } from "~/core/sleep";
 
 import type * as CommitMetadata from "~/core/CommitMetadata";
 
@@ -159,22 +160,28 @@ async function run() {
 
     actions.unregister_abort_handler();
 
+    // invalidate cache for PRs we pushed
     actions.set((state) => {
-      // invalidate cache for PRs we pushed
       for (const group of push_group_list) {
         if (group.pr) {
           delete state.pr[group.pr.headRefName];
           delete state.cache_pr_diff[group.pr.number];
         }
       }
-
-      // move to next step
-      state.step = "post-rebase-status";
     });
+
+    // wait a bit for github to settle after push / edits above
+    // we github.pr_list returns outdated information if called too quickly
+    await sleep(400);
 
     // gather all open prs in repo at once
     // cheaper query to populate cache
     await github.pr_list();
+
+    // move to next step
+    actions.set((state) => {
+      state.step = "post-rebase-status";
+    });
   } catch (err) {
     if (err instanceof Error) {
       actions.error(err.message);
