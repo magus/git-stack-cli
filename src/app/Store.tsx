@@ -179,7 +179,7 @@ const BaseStore = createStore<State>()(
       json(value) {
         set((state) => {
           const node = pretty_json(value);
-          state.mutate.output(state, { node });
+          state.actions.debug(node);
         });
       },
 
