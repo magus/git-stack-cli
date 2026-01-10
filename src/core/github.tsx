@@ -253,6 +253,28 @@ export async function pr_diff(branch: string) {
   return result;
 }
 
+export async function pr_compare(branch: string) {
+  const state = Store.getState();
+  const master_branch = state.master_branch;
+  const repo_path = state.repo_path;
+  invariant(master_branch, "master_branch must exist");
+  invariant(repo_path, "repo_path must exist");
+
+  const master_branch_name = master_branch.replace(/^origin\//, "");
+
+  // gh api repos/openai/openai/compare/master...chrome/publish/vine-1211---4h2xmw0o3ndvnt
+  const result = await gh_json<BranchCompare>(
+    `api repos/${repo_path}/compare/${master_branch_name}...${branch}`,
+    { branch },
+  );
+
+  if (result instanceof Error) {
+    handle_error(result.message);
+  }
+
+  return result;
+}
+
 // pull request JSON fields
 // https://cli.github.com/manual/gh_pr_list
 // prettier-ignore
@@ -444,6 +466,36 @@ export type PullRequest = {
   body: string;
   url: string;
   isDraft: boolean;
+};
+
+type MergeBaseCommit = {
+  author: unknown;
+  comments_url: string;
+  commit: unknown;
+  committer: unknown;
+  html_url: string;
+  node_id: string;
+  parents: unknown;
+  sha: string;
+  url: string;
+};
+
+export type BranchCompare = {
+  ahead_by: number;
+  base_commit: unknown;
+  behind_by: number;
+  commits: unknown;
+  diff_url: string;
+
+  files: unknown;
+  html_url: string;
+
+  merge_base_commit: MergeBaseCommit;
+  patch_url: string;
+  permalink_url: string;
+  status: unknown;
+  total_commits: number;
+  url: string;
 };
 
 const RE = {
