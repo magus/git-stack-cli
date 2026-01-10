@@ -61,7 +61,7 @@ export async function get_diff(commit_list: CommitList) {
   const first_commit = commit_list[0];
   const last_commit = commit_list[commit_list.length - 1];
   const sha_range = `${first_commit.sha}~1..${last_commit.sha}`;
-  const diff_result = await cli(`git --no-pager diff --color=never ${sha_range}`);
+  const diff_result = await cli(`git --no-pager diff --color=never ${sha_range}`, { quiet: true });
   return diff_result.stdout;
 }
 

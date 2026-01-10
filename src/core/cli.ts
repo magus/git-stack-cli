@@ -8,6 +8,7 @@ type SpawnOptions = Parameters<typeof child.spawn>[2];
 type Options = SpawnOptions & {
   ignoreExitCode?: boolean;
   onOutput?: (data: string) => void;
+  quiet?: boolean;
 };
 
 type Return = {
@@ -51,7 +52,9 @@ export async function cli(
 
     function write_output(value: string) {
       output += value;
-      state.actions.debug(value, id);
+      if (!options.quiet) {
+        state.actions.debug(value, id);
+      }
       options.onOutput?.(value);
     }
 
@@ -81,7 +84,9 @@ export async function cli(
 
       state.actions.set((state) => state.mutate.end_pending_output(state, id));
       state.actions.debug(log.end(result));
-      state.actions.debug(log.output(result));
+      if (!options.quiet) {
+        state.actions.debug(log.output(result));
+      }
 
       if (!options.ignoreExitCode && result.code !== 0) {
         state.actions.debug(log.non_zero_exit(result));
@@ -133,7 +138,9 @@ cli.sync = function cli_sync(
   };
 
   state.actions.debug(log.end(result));
-  state.actions.debug(log.output(result));
+  if (!options.quiet) {
+    state.actions.debug(log.output(result));
+  }
 
   if (!options.ignoreExitCode && result.code !== 0) {
     state.actions.debug(log.non_zero_exit(result));
