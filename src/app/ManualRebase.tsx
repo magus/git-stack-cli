@@ -47,6 +47,11 @@ async function run() {
     // get latest merge_base relative to local master
     const merge_base = (await cli(`git merge-base HEAD ${master_branch}`)).stdout;
 
+    // ensure merge_base is updated
+    actions.set((state) => {
+      state.merge_base = merge_base;
+    });
+
     // immediately paint all commit to preserve selected commit ranges
     let commit_range = await CommitMetadata.range(commit_map);
 

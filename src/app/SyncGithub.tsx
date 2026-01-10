@@ -26,6 +26,7 @@ async function run() {
   const actions = state.actions;
   const argv = state.argv;
   const branch_name = state.branch_name;
+  const merge_base = state.merge_base;
   const commit_map = state.commit_map;
   const master_branch = state.master_branch;
   const repo_root = state.repo_root;
@@ -348,7 +349,7 @@ async function run() {
     await cli(`git -C ${worktree_path} rebase --abort`, { ignoreExitCode: true });
     await cli(`git -C ${worktree_path} merge --abort`, { ignoreExitCode: true });
     await cli(`git -C ${worktree_path} checkout -f ${master_branch}`);
-    await cli(`git -C ${worktree_path} reset --hard ${master_branch}`);
+    await cli(`git -C ${worktree_path} reset --hard ${merge_base}`);
     await cli(`git -C ${worktree_path} clean -fd`);
 
     // cherry-pick the group commits onto that base
