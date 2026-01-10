@@ -123,7 +123,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
   for (let i = 0; i < group_value_list.length; i++) {
     const group = group_value_list[i];
-    const last_group: undefined | CommitGroup = group_value_list[i - 1];
+    const previous_group: undefined | CommitGroup = group_value_list[i - 1];
 
     // actions.json({ group });
     actions.debug(`title=${group.title}`);
@@ -132,7 +132,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
     // special case
     // boundary between normal commits and master commits
-    const MASTER_BASE_BOUNDARY = !group.master_base && last_group && last_group.master_base;
+    const MASTER_BASE_BOUNDARY = !group.master_base && previous_group && previous_group.master_base;
 
     if (group.id !== UNASSIGNED) {
       let pr_result = pr_lookup[group.id];
@@ -154,8 +154,8 @@ export async function range(commit_group_map?: CommitGroupMap) {
     if (i === 0) {
       group.base = master_branch_name;
     } else {
-      // console.debug("  ", "last_group", last_group.pr?.title.substring(0, 40));
-      // console.debug("  ", "last_group.id", last_group.id);
+      // console.debug("  ", "previous_group", previous_group.pr?.title.substring(0, 40));
+      // console.debug("  ", "previous_group.id", previous_group.id);
 
       if (group.master_base) {
         // explicitly set base to master when master_base is true
@@ -167,11 +167,11 @@ export async function range(commit_group_map?: CommitGroupMap) {
         // ensure we set its base to `master`
         actions.debug(`  MASTER_BASE_BOUNDARY set group.base = ${master_branch_name}`);
         group.base = master_branch_name;
-      } else if (last_group.base === null) {
+      } else if (previous_group.base === null) {
         // null out base when last group base is null
         group.base = null;
       } else {
-        group.base = last_group.id;
+        group.base = previous_group.id;
       }
     }
 
