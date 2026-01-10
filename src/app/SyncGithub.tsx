@@ -227,7 +227,7 @@ async function run() {
       // Unable to sync.
       // ```
       //
-      if (!is_master_base(group)) {
+      if (!is_pr_master_base(group)) {
         await github.pr_edit({
           branch: group.id,
           base: master_branch,
@@ -245,7 +245,15 @@ async function run() {
     invariant(group.base, "group.base must exist");
 
     if (group.pr) {
-      if (!is_master_base(group)) {
+      // there are two scenarios where we should restore the base after push
+      // 1. if we aren't master base and pr is master base we should fix it
+      const base_mismatch = !group.master_base && is_pr_master_base(group);
+      // 2. if group pr was not master before the push we set it to master before pushing
+      //    now we need to restore it back to how it was before the before_push
+      const was_modified_before_push = !is_pr_master_base(group);
+
+      const needs_base_fix = base_mismatch || was_modified_before_push;
+      if (needs_base_fix) {
         // ensure base matches pr in github
         await github.pr_edit({ branch: group.id, base: group.base });
       }
@@ -300,12 +308,12 @@ async function run() {
     }
   }
 
-  function is_master_base(group: CommitMetadataGroup) {
+  function is_pr_master_base(group: CommitMetadataGroup) {
     if (!group.pr) {
       return false;
     }
 
-    return group.master_base || `origin/${group.pr.baseRefName}` === master_branch;
+    return `origin/${group.pr.baseRefName}` === master_branch;
   }
 
   async function push_master_group(group: CommitMetadataGroup) {
