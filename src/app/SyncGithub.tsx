@@ -162,7 +162,7 @@ async function run() {
       for (const group of push_group_list) {
         if (group.pr) {
           delete state.pr[group.pr.headRefName];
-          delete state.cache_pr_diff[group.pr.number];
+          delete state.cache_gh_cli_by_branch[group.pr.headRefName];
         }
       }
     });

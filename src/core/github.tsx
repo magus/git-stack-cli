@@ -101,7 +101,8 @@ export async function pr_status(branch: string): Promise<null | PullRequest> {
     );
   }
 
-  const pr = await gh_json<PullRequest>(`pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`);
+  const commmand = `pr view ${branch} --repo ${repo_path} ${JSON_FIELDS}`;
+  const pr = await gh_json<PullRequest>(commmand, { branch });
 
   if (pr instanceof Error) {
     return null;
@@ -241,48 +242,15 @@ export async function pr_draft(args: DraftPullRequestArgs) {
   }
 }
 
-export async function pr_diff(number: number) {
-  const state = Store.getState();
-  const actions = state.actions;
-
-  const maybe_diff = state.cache_pr_diff[number];
-
-  if (maybe_diff) {
-    if (actions.isDebug()) {
-      actions.debug(
-        cache_message({
-          hit: true,
-          message: "Github pr_diff cache",
-          extra: number,
-        }),
-      );
-    }
-
-    return maybe_diff;
-  }
-
-  if (actions.isDebug()) {
-    actions.debug(
-      cache_message({
-        hit: false,
-        message: "Github pr_diff cache",
-        extra: number,
-      }),
-    );
-  }
-
+export async function pr_diff(branch: string) {
   // https://cli.github.com/manual/gh_pr_diff
-  const cli_result = await cli(`gh pr diff --color=never ${number}`);
+  const result = await gh(`pr diff --color=never ${branch}`, { branch });
 
-  if (cli_result.code !== 0) {
-    handle_error(cli_result.output);
+  if (result instanceof Error) {
+    handle_error(result.message);
   }
 
-  actions.set((state) => {
-    state.cache_pr_diff[number] = cli_result.output;
-  });
-
-  return cli_result.stdout;
+  return result;
 }
 
 // pull request JSON fields
@@ -290,29 +258,99 @@ export async function pr_diff(number: number) {
 // prettier-ignore
 const JSON_FIELDS = "--json id,number,state,baseRefName,headRefName,commits,title,body,url,isDraft";
 
+type GhCmdOptions = {
+  branch?: string;
+};
+
 // consistent handle gh cli commands returning json
 // redirect to tmp file to avoid scrollback overflow causing scrollback to be cleared
-async function gh_json<T>(command: string): Promise<T | Error> {
+async function gh_json<T>(command: string, gh_options?: GhCmdOptions): Promise<T | Error> {
+  const gh_result = await gh(command, gh_options);
+
+  if (gh_result instanceof Error) {
+    return gh_result;
+  }
+
+  try {
+    const json = JSON.parse(gh_result);
+    return json as T;
+  } catch (error) {
+    return new Error(`gh_json JSON.parse: ${error}`);
+  }
+}
+
+// consistent handle gh cli commands
+// redirect to tmp file to avoid scrollback overflow causing scrollback to be cleared
+async function gh(command: string, gh_options?: GhCmdOptions): Promise<string | Error> {
+  const state = Store.getState();
+  const actions = state.actions;
+
+  if (gh_options?.branch) {
+    const branch = gh_options.branch;
+
+    type CacheEntryByHeadRefName = (typeof state.cache_gh_cli_by_branch)[string][string];
+
+    let cache: undefined | CacheEntryByHeadRefName = undefined;
+
+    if (branch) {
+      if (state.cache_gh_cli_by_branch[branch]) {
+        cache = state.cache_gh_cli_by_branch[branch][command];
+      }
+    }
+
+    if (cache) {
+      if (actions.isDebug()) {
+        actions.debug(
+          cache_message({
+            hit: true,
+            message: "gh cache",
+            extra: command,
+          }),
+        );
+      }
+
+      return cache;
+    }
+
+    if (actions.isDebug()) {
+      actions.debug(
+        cache_message({
+          hit: false,
+          message: "gh cache",
+          extra: command,
+        }),
+      );
+    }
+  }
+
   // hash command for unique short string
   let hash = crypto.createHash("md5").update(command).digest("hex");
-  let tmp_filename = safe_filename(`gh_json-${hash}`);
-  const tmp_pr_json = path.join(await get_tmp_dir(), `${tmp_filename}.json`);
+  let tmp_filename = safe_filename(`gh-${hash}`);
+  const tmp_filepath = path.join(await get_tmp_dir(), `${tmp_filename}`);
 
   const options = { ignoreExitCode: true };
-  const cli_result = await cli(`gh ${command} > ${tmp_pr_json}`, options);
+  const cli_result = await cli(`gh ${command} > ${tmp_filepath}`, options);
 
   if (cli_result.code !== 0) {
     return new Error(cli_result.output);
   }
 
   // read from file
-  const json_str = String(await fs.readFile(tmp_pr_json));
-  try {
-    const json = JSON.parse(json_str);
-    return json;
-  } catch (error) {
-    return new Error(`gh_json JSON.parse: ${error}`);
+  let content = String(await fs.readFile(tmp_filepath));
+  content = content.trim();
+
+  if (gh_options?.branch) {
+    const branch = gh_options.branch;
+
+    actions.set((state) => {
+      if (!state.cache_gh_cli_by_branch[branch]) {
+        state.cache_gh_cli_by_branch[branch] = {};
+      }
+      state.cache_gh_cli_by_branch[branch][command] = content;
+    });
   }
+
+  return content;
 }
 
 function handle_error(output: string): never {
