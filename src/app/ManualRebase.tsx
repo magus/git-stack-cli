@@ -121,7 +121,7 @@ async function run() {
     if (argv.sync) {
       actions.set((state) => {
         state.step = "sync-github";
-        state.sync_github = { commit_range, rebase_group_index };
+        state.sync_github = { commit_range };
       });
     } else {
       actions.set((state) => {

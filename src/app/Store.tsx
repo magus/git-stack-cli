@@ -27,7 +27,6 @@ type MutateOutputArgs = {
 
 type SyncGithubState = {
   commit_range: CommitMetadata.CommitRange;
-  rebase_group_index: number;
 };
 
 // async function that returns exit code

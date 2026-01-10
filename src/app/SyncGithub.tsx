@@ -38,7 +38,6 @@ async function run() {
   invariant(sync_github, "sync_github must exist");
 
   const commit_range = sync_github.commit_range;
-  const rebase_group_index = sync_github.rebase_group_index;
 
   let DEFAULT_PR_BODY = "";
   if (state.pr_template_body) {
@@ -46,9 +45,6 @@ async function run() {
   }
 
   const push_group_list = get_push_group_list();
-
-  // console.debug({ push_group_list });
-  // throw new Error("STOP");
 
   // for all push targets in push_group_list
   // things that can be done in parallel are grouped by numbers
@@ -193,24 +189,14 @@ async function run() {
   }
 
   function get_push_group_list() {
-    // start from HEAD and work backward to rebase_group_index
     const push_group_list = [];
 
-    for (let i = 0; i < commit_range.group_list.length; i++) {
-      const index = commit_range.group_list.length - 1 - i;
-
-      // do not go past rebase_group_index
-      if (index < rebase_group_index) {
-        break;
-      }
-
-      const group = commit_range.group_list[index];
-
+    for (let group of commit_range.group_list) {
       // skip the unassigned commits group
       if (group.id === commit_range.UNASSIGNED) continue;
 
-      // if not --force, skip non-dirty master_base groups
-      if (group.master_base && !group.dirty && !argv.force) continue;
+      // if not --force, skip non-dirty groups
+      if (!group.dirty && !argv.force) continue;
 
       push_group_list.unshift(group);
     }
