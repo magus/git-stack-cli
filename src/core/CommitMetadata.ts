@@ -28,10 +28,9 @@ type CommitRangeGroup = {
 type CommitGroupMap = { [sha: string]: CommitRangeGroup };
 
 export async function range(commit_group_map?: CommitGroupMap) {
-  const DEBUG = process.env.DEV && false;
-
   const state = Store.getState();
   const actions = state.actions;
+  const argv = state.argv;
   const master_branch = state.master_branch;
   const master_branch_name = master_branch.replace(/^origin\//, "");
   const commit_list = await git.get_commits(`${master_branch}..HEAD`);
@@ -177,22 +176,23 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
     actions.debug(`  base=${group.base}`);
 
-
     if (!group.pr) {
+      actions.debug(`  group.pr=${group.pr}`);
       group.dirty = true;
     } else {
+      actions.debug(`  group.pr.baseRefName=${group.pr.baseRefName}`);
       if (group.pr.baseRefName !== group.base) {
-        actions.debug("PR_BASEREF_MISMATCH");
+        actions.debug("  PR_BASEREF_MISMATCH");
         group.dirty = true;
       } else if (group.master_base) {
-        actions.debug("MASTER_BASE_DIFF_COMPARE");
+        actions.debug("  MASTER_BASE_DIFF_COMPARE");
 
         // special case
         // master_base groups cannot be compared by commit sha
         // instead compare the literal diff local against origin
         // gh pr diff --color=never 110
         // git --no-pager diff --color=never 00c8fe0~1..00c8fe0
-        let diff_github = await github.pr_diff(group.pr.number);
+        let diff_github = await github.pr_diff(group.pr.headRefName);
         diff_github = normalize_diff(diff_github);
 
         let diff_local = await git.get_diff(group.commits);
@@ -208,9 +208,10 @@ export async function range(commit_group_map?: CommitGroupMap) {
           }
         }
         if (diff_index > -1) {
+          actions.debug("  MASTER_BASE_DIFF_MISMATCH");
           group.dirty = true;
 
-          if (DEBUG) {
+          if (argv.verbose) {
             // print preview at diff_index for both strings
             const preview_radius = 30;
             const start_index = Math.max(0, diff_index - preview_radius);
@@ -223,11 +224,11 @@ export async function range(commit_group_map?: CommitGroupMap) {
             diff_local = JSON.stringify(diff_local).slice(1, -1);
 
             let pointer_indent = " ".repeat(diff_index - start_index + 1);
-            actions.debug(`⚠️ git diff mismatch`);
-            actions.debug(`              ${pointer_indent}⌄`);
-            actions.debug(`diff_github  …${diff_github}…`);
-            actions.debug(`diff_local   …${diff_local}…`);
-            actions.debug(`              ${pointer_indent}⌃`);
+            actions.debug(`  ⚠️ git diff mismatch`);
+            actions.debug(`                ${pointer_indent}⌄`);
+            actions.debug(`  diff_github  …${diff_github}…`);
+            actions.debug(`  diff_local   …${diff_local}…`);
+            actions.debug(`                ${pointer_indent}⌃`);
           }
         }
       } else if (MASTER_BASE_BOUNDARY) {
@@ -248,24 +249,23 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
         // compare all commits against pr commits
         if (group.pr.commits.length !== all_commits.length) {
-          actions.debug("BOUNDARY_COMMIT_LENGTH_MISMATCH");
+          actions.debug("  BOUNDARY_COMMIT_LENGTH_MISMATCH");
           group.dirty = true;
         } else {
-          actions.debug("BOUNDARY_COMMIT_SHA_COMPARISON");
           for (let i = 0; i < group.pr.commits.length; i++) {
             const pr_commit = group.pr.commits[i];
             const local_commit = all_commits[i];
 
             if (pr_commit.oid !== local_commit.sha) {
+              actions.debug("  BOUNDARY_COMMIT_SHA_MISMATCH");
               group.dirty = true;
             }
           }
         }
       } else if (group.pr.commits.length !== group.commits.length) {
-        actions.debug("COMMIT_LENGTH_MISMATCH");
+        actions.debug("  COMMIT_LENGTH_MISMATCH");
         group.dirty = true;
       } else {
-        actions.debug("COMMIT_SHA_COMPARISON");
         // if we still haven't marked this dirty, check each commit
         // comapre literal commit shas in group
         for (let i = 0; i < group.pr.commits.length; i++) {
@@ -273,14 +273,14 @@ export async function range(commit_group_map?: CommitGroupMap) {
           const local_commit = group.commits[i];
 
           if (pr_commit.oid !== local_commit.sha) {
-            actions.json({ pr_commit, local_commit });
+            actions.debug("  COMMIT_SHA_MISMATCH");
             group.dirty = true;
           }
         }
       }
     }
 
-    // console.debug("  ", "group.dirty", group.dirty);
+    actions.debug(`  group.dirty=${group.dirty}`);
   }
 
   // reverse group_list to match git log
