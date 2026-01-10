@@ -3,6 +3,7 @@
 import { Store } from "~/app/Store";
 import * as git from "~/core/git";
 import * as github from "~/core/github";
+import { invariant } from "~/core/invariant";
 
 export type CommitRange = Awaited<ReturnType<typeof range>>;
 
@@ -31,9 +32,12 @@ export async function range(commit_group_map?: CommitGroupMap) {
   const state = Store.getState();
   const actions = state.actions;
   const argv = state.argv;
+  const merge_base = state.merge_base;
   const master_branch = state.master_branch;
   const master_branch_name = master_branch.replace(/^origin\//, "");
   const commit_list = await git.get_commits(`${master_branch}..HEAD`);
+
+  invariant(merge_base, "merge_base must exist");
 
   const pr_lookup: Record<string, void | PullRequest> = {};
 
@@ -185,50 +189,62 @@ export async function range(commit_group_map?: CommitGroupMap) {
         actions.debug("  PR_BASEREF_MISMATCH");
         group.dirty = true;
       } else if (group.master_base) {
-        actions.debug("  MASTER_BASE_DIFF_COMPARE");
-
-        // special case
-        // master_base groups cannot be compared by commit sha
-        // instead compare the literal diff local against origin
-        // gh pr diff --color=never 110
-        // git --no-pager diff --color=never 00c8fe0~1..00c8fe0
-        let diff_github = await github.pr_diff(group.pr.headRefName);
-        diff_github = normalize_diff(diff_github);
-
-        let diff_local = await git.get_diff(group.commits);
-        diff_local = normalize_diff(diff_local);
-
-        // find the first differing character index
-        let compare_length = Math.max(diff_github.length, diff_local.length);
-        let diff_index = -1;
-        for (let c_i = 0; c_i < compare_length; c_i++) {
-          if (diff_github[c_i] !== diff_local[c_i]) {
-            diff_index = c_i;
-            break;
+        // first check if merge base has changed
+        let branch_compare = await github.pr_compare(group.pr.headRefName);
+        if (!(branch_compare instanceof Error)) {
+          if (branch_compare.merge_base_commit.sha !== merge_base) {
+            actions.debug("  MASTER_BASE_MERGE_BASE_MISMATCH");
+            group.dirty = true;
           }
         }
-        if (diff_index > -1) {
-          actions.debug("  MASTER_BASE_DIFF_MISMATCH");
-          group.dirty = true;
 
-          if (argv.verbose) {
-            // print preview at diff_index for both strings
-            const preview_radius = 30;
-            const start_index = Math.max(0, diff_index - preview_radius);
-            const end_index = Math.min(compare_length, diff_index + preview_radius);
+        // if still not dirty, check diffs
+        if (!group.dirty) {
+          actions.debug("  MASTER_BASE_DIFF_COMPARE");
 
-            diff_github = diff_github.substring(start_index, end_index);
-            diff_github = JSON.stringify(diff_github).slice(1, -1);
+          // special case
+          // master_base groups cannot be compared by commit sha
+          // instead compare the literal diff local against origin
+          // gh pr diff --color=never 110
+          // git --no-pager diff --color=never 00c8fe0~1..00c8fe0
+          let diff_github = await github.pr_diff(group.pr.headRefName);
+          diff_github = normalize_diff(diff_github);
 
-            diff_local = diff_local.substring(start_index, end_index);
-            diff_local = JSON.stringify(diff_local).slice(1, -1);
+          let diff_local = await git.get_diff(group.commits);
+          diff_local = normalize_diff(diff_local);
 
-            let pointer_indent = " ".repeat(diff_index - start_index + 1);
-            actions.debug(`  ⚠️ git diff mismatch`);
-            actions.debug(`                ${pointer_indent}⌄`);
-            actions.debug(`  diff_github  …${diff_github}…`);
-            actions.debug(`  diff_local   …${diff_local}…`);
-            actions.debug(`                ${pointer_indent}⌃`);
+          // find the first differing character index
+          let compare_length = Math.max(diff_github.length, diff_local.length);
+          let diff_index = -1;
+          for (let c_i = 0; c_i < compare_length; c_i++) {
+            if (diff_github[c_i] !== diff_local[c_i]) {
+              diff_index = c_i;
+              break;
+            }
+          }
+          if (diff_index > -1) {
+            actions.debug("  MASTER_BASE_DIFF_MISMATCH");
+            group.dirty = true;
+
+            if (argv.verbose) {
+              // print preview at diff_index for both strings
+              const preview_radius = 30;
+              const start_index = Math.max(0, diff_index - preview_radius);
+              const end_index = Math.min(compare_length, diff_index + preview_radius);
+
+              diff_github = diff_github.substring(start_index, end_index);
+              diff_github = JSON.stringify(diff_github).slice(1, -1);
+
+              diff_local = diff_local.substring(start_index, end_index);
+              diff_local = JSON.stringify(diff_local).slice(1, -1);
+
+              let pointer_indent = " ".repeat(diff_index - start_index + 1);
+              actions.debug(`  ⚠️ git diff mismatch`);
+              actions.debug(`                ${pointer_indent}⌄`);
+              actions.debug(`  diff_github  …${diff_github}…`);
+              actions.debug(`  diff_local   …${diff_local}…`);
+              actions.debug(`                ${pointer_indent}⌃`);
+            }
           }
         }
       } else if (MASTER_BASE_BOUNDARY) {
