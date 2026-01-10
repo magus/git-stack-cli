@@ -123,7 +123,16 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
   for (let i = 0; i < group_value_list.length; i++) {
     const group = group_value_list[i];
-    const previous_group: undefined | CommitGroup = group_value_list[i - 1];
+    const last_group: undefined | CommitGroup = group_value_list[i - 1];
+
+    // actions.json({ group });
+    actions.debug(`title=${group.title}`);
+    actions.debug(`  id=${group.id}`);
+    actions.debug(`  master_base=${group.master_base}`);
+
+    // special case
+    // boundary between normal commits and master commits
+    const MASTER_BASE_BOUNDARY = !group.master_base && last_group && last_group.master_base;
 
     if (group.id !== UNASSIGNED) {
       let pr_result = pr_lookup[group.id];
@@ -145,7 +154,6 @@ export async function range(commit_group_map?: CommitGroupMap) {
     if (i === 0) {
       group.base = master_branch_name;
     } else {
-      const last_group = group_value_list[i - 1];
       // console.debug("  ", "last_group", last_group.pr?.title.substring(0, 40));
       // console.debug("  ", "last_group.id", last_group.id);
 
@@ -155,17 +163,20 @@ export async function range(commit_group_map?: CommitGroupMap) {
       } else if (group.id === UNASSIGNED) {
         // null out base when unassigned and after unassigned
         group.base = null;
+      } else if (MASTER_BASE_BOUNDARY) {
+        // ensure we set its base to `master`
+        actions.debug(`  MASTER_BASE_BOUNDARY set group.base = ${master_branch_name}`);
+        group.base = master_branch_name;
       } else if (last_group.base === null) {
         // null out base when last group base is null
         group.base = null;
       } else {
         group.base = last_group.id;
       }
-
-      // console.debug("  ", "group.base", group.base);
     }
 
-    actions.json({ group });
+    actions.debug(`  base=${group.base}`);
+
 
     if (!group.pr) {
       group.dirty = true;
@@ -186,8 +197,6 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
         let diff_local = await git.get_diff(group.commits);
         diff_local = normalize_diff(diff_local);
-
-        actions.json({ diff_local, diff_github });
 
         // find the first differing character index
         let compare_length = Math.max(diff_github.length, diff_local.length);
@@ -221,7 +230,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
             actions.debug(`              ${pointer_indent}⌃`);
           }
         }
-      } else if (!group.master_base && previous_group && previous_group.master_base) {
+      } else if (MASTER_BASE_BOUNDARY) {
         // special case
         // boundary between normal commits and master commits
 
