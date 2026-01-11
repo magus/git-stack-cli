@@ -40,7 +40,6 @@ export async function pr_list(): Promise<Array<PullRequest>> {
   if (actions.isDebug()) {
     actions.output(
       <FormatText
-        wrapper={<Ink.Text dimColor />}
         message="Github cache {count} open PRs from {repo_path} authored by {username}"
         values={{
           count: (
