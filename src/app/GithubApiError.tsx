@@ -4,6 +4,7 @@ import * as Ink from "ink-cjs";
 
 import { Await } from "~/app/Await";
 import { Brackets } from "~/app/Brackets";
+import { FormatText } from "~/app/FormatText";
 import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import { cli } from "~/core/cli";
@@ -51,34 +52,36 @@ async function run(props: Props) {
   }
 
   actions.output(
-    <Ink.Text>
-      <Ink.Text>{"Github "}</Ink.Text>
-
-      <Brackets>graphql</Brackets>
-
-      <Ink.Text>{" API rate limit "}</Ink.Text>
-
-      <Brackets>
-        <Ink.Text>{used}</Ink.Text>
-        <Ink.Text>/</Ink.Text>
-        <Ink.Text>{limit}</Ink.Text>
-      </Brackets>
-
-      <Ink.Text>{" will reset at "}</Ink.Text>
-
-      <Ink.Text bold color={colors.yellow}>
-        {reset_time}
-      </Ink.Text>
-
-      <Ink.Text> </Ink.Text>
-
-      <Parens>
-        <Ink.Text>{"in "}</Ink.Text>
-        <Ink.Text bold color={colors.yellow}>
-          {time_until}
-        </Ink.Text>
-      </Parens>
-    </Ink.Text>,
+    <FormatText
+      message="Github {graphql} API rate limit {ratio} will reset at {reset_time} {time_until}"
+      values={{
+        graphql: <Brackets>graphql</Brackets>,
+        ratio: (
+          <Brackets>
+            <FormatText message="{used}/{limit}" values={{ used, limit }} />
+          </Brackets>
+        ),
+        reset_time: (
+          <Ink.Text bold color={colors.yellow}>
+            {reset_time}
+          </Ink.Text>
+        ),
+        time_until: (
+          <Parens>
+            <FormatText
+              message="in {time_until}"
+              values={{
+                time_until: (
+                  <Ink.Text bold color={colors.yellow}>
+                    {time_until}
+                  </Ink.Text>
+                ),
+              }}
+            />
+          </Parens>
+        ),
+      }}
+    />,
   );
 
   if (props.exit) {
