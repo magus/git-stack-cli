@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import crypto from "node:crypto";
+
 import * as Ink from "ink-cjs";
 import { createStore, useStore } from "zustand";
 import { immer } from "zustand/middleware/immer";
@@ -70,7 +72,7 @@ export type State = {
     | "sync-github"
     | "post-rebase-status";
 
-  output: Array<React.ReactNode>;
+  output: Array<[string, React.ReactNode]>;
   pending_output: Record<string, Array<React.ReactNode>>;
 
   // cache
@@ -214,7 +216,7 @@ const BaseStore = createStore<State>()(
             if (id) {
               state.mutate.pending_output(state, { id, node });
             } else {
-              state.output.push(<DebugOutput node={node} />);
+              state.mutate.output(state, { node: <DebugOutput node={node} /> });
             }
           });
         }
@@ -246,7 +248,8 @@ const BaseStore = createStore<State>()(
 
     mutate: {
       output(state, args) {
-        state.output.push(args.node);
+        const id = crypto.randomUUID();
+        state.output.push([id, args.node]);
       },
 
       pending_output(state, args) {

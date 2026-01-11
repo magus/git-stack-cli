@@ -11,8 +11,9 @@ export function Output() {
   return (
     <React.Fragment>
       <Ink.Static items={output}>
-        {(node, i) => {
-          return <Ink.Box key={i}>{node}</Ink.Box>;
+        {(entry) => {
+          const [id, node] = entry;
+          return <Ink.Box key={id}>{node}</Ink.Box>;
         }}
       </Ink.Static>
 
