@@ -2,6 +2,7 @@ import * as React from "react";
 
 import * as Ink from "ink-cjs";
 
+import { DebugOutput } from "~/app/DebugOutput";
 import { Store } from "~/app/Store";
 
 export function Output() {
@@ -18,12 +19,9 @@ export function Output() {
       </Ink.Static>
 
       {Object.entries(pending_output).map((entry) => {
-        const [id, node_list] = entry;
-        return (
-          <Ink.Box key={id} flexDirection="column">
-            {node_list}
-          </Ink.Box>
-        );
+        const [id, content_list] = entry;
+        const content = content_list.join("");
+        return <DebugOutput key={id} node={content} />;
       })}
     </React.Fragment>
   );

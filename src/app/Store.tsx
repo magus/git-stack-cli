@@ -73,7 +73,7 @@ export type State = {
     | "post-rebase-status";
 
   output: Array<[string, React.ReactNode]>;
-  pending_output: Record<string, Array<React.ReactNode>>;
+  pending_output: Record<string, Array<string>>;
 
   // cache
   pr: { [branch: string]: PullRequest };
@@ -87,7 +87,9 @@ export type State = {
     json(value: pretty_json.JSONValue): void;
     error(error: unknown): void;
     output(node: React.ReactNode): void;
-    debug(node: React.ReactNode, id?: string): void;
+    debug(node: React.ReactNode): void;
+    debug_pending(id: string, content: string): void;
+    debug_pending_end(id: string): void;
 
     isDebug(): boolean;
 
@@ -99,8 +101,6 @@ export type State = {
 
   mutate: {
     output(state: State, args: MutateOutputArgs): void;
-    pending_output(state: State, args: MutateOutputArgs): void;
-    end_pending_output(state: State, id: string): void;
   };
 
   select: {
@@ -210,16 +210,30 @@ const BaseStore = createStore<State>()(
         });
       },
 
-      debug(node, id) {
+      debug(node) {
         if (get().actions.isDebug()) {
           set((state) => {
-            if (id) {
-              state.mutate.pending_output(state, { id, node });
-            } else {
-              state.mutate.output(state, { node: <DebugOutput node={node} /> });
-            }
+            state.mutate.output(state, { node: <DebugOutput node={node} /> });
           });
         }
+      },
+
+      debug_pending(id, content) {
+        if (get().actions.isDebug()) {
+          set((state) => {
+            if (!state.pending_output[id]) {
+              state.pending_output[id] = [];
+            }
+
+            state.pending_output[id].push(content);
+          });
+        }
+      },
+
+      debug_pending_end(id) {
+        set((state) => {
+          delete state.pending_output[id];
+        });
       },
 
       isDebug() {
@@ -250,37 +264,6 @@ const BaseStore = createStore<State>()(
       output(state, args) {
         const id = crypto.randomUUID();
         state.output.push([id, args.node]);
-      },
-
-      pending_output(state, args) {
-        const { id } = args;
-
-        if (!id) {
-          return;
-        }
-
-        // set `withoutTimestamp` to skip timestamp for all subsequent pending outputs
-        // we only want to timestamp for the first part (when we initialize the [])
-        // if we have many incremental outputs on the same line we do not want multiple timestamps
-        //
-        // await Promise.all([
-        //   cli(`for i in $(seq 1 5); do echo $i; sleep 1; done`),
-        //   cli(`for i in $(seq 5 1); do printf "$i "; sleep 1; done; echo`),
-        // ]);
-        //
-        let withoutTimestamp = true;
-        if (!state.pending_output[id]) {
-          withoutTimestamp = false;
-          state.pending_output[id] = [];
-        }
-
-        state.pending_output[id].push(
-          <DebugOutput node={args.node} withoutTimestamp={withoutTimestamp} />,
-        );
-      },
-
-      end_pending_output(state, id) {
-        delete state.pending_output[id];
       },
     },
 

@@ -46,14 +46,14 @@ export async function cli(
 
     const id = `${++i}-${command}`;
     state.actions.debug(log.start(command));
-    state.actions.debug(log.pending(command), id);
+    state.actions.debug_pending(id, log.pending(command));
 
     const timer = Timer();
 
     function write_output(value: string) {
       output += value;
       if (!options.quiet) {
-        state.actions.debug(value, id);
+        state.actions.debug_pending(id, value);
       }
       options.onOutput?.(value);
     }
@@ -82,7 +82,7 @@ export async function cli(
         duration,
       };
 
-      state.actions.set((state) => state.mutate.end_pending_output(state, id));
+      state.actions.debug_pending_end(id);
       state.actions.debug(log.end(result));
       if (!options.quiet) {
         state.actions.debug(log.output(result));
