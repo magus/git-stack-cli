@@ -4,8 +4,8 @@ import * as Ink from "ink-cjs";
 import { createStore, useStore } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
+import { DebugOutput } from "~/app/DebugOutput";
 import { Exit } from "~/app/Exit";
-import { LogTimestamp } from "~/app/LogTimestamp";
 import { colors } from "~/core/colors";
 import { pretty_json } from "~/core/pretty_json";
 
@@ -21,8 +21,6 @@ type CommitMap = Parameters<typeof CommitMetadata.range>[0];
 type MutateOutputArgs = {
   node: React.ReactNode;
   id?: string;
-  debug?: boolean;
-  withoutTimestamp?: boolean;
 };
 
 type SyncGithubState = {
@@ -212,13 +210,11 @@ const BaseStore = createStore<State>()(
 
       debug(node, id) {
         if (get().actions.isDebug()) {
-          const debug = true;
-
           set((state) => {
             if (id) {
-              state.mutate.pending_output(state, { id, node, debug });
+              state.mutate.pending_output(state, { id, node });
             } else {
-              state.mutate.output(state, { node, debug });
+              state.output.push(<DebugOutput node={node} />);
             }
           });
         }
@@ -250,8 +246,7 @@ const BaseStore = createStore<State>()(
 
     mutate: {
       output(state, args) {
-        const renderOutput = renderOutputArgs(args);
-        state.output.push(renderOutput);
+        state.output.push(args.node);
       },
 
       pending_output(state, args) {
@@ -261,7 +256,7 @@ const BaseStore = createStore<State>()(
           return;
         }
 
-        // set `withoutTimestamp` to skip <LogTimestamp> for all subsequent pending outputs
+        // set `withoutTimestamp` to skip timestamp for all subsequent pending outputs
         // we only want to timestamp for the first part (when we initialize the [])
         // if we have many incremental outputs on the same line we do not want multiple timestamps
         //
@@ -276,8 +271,9 @@ const BaseStore = createStore<State>()(
           state.pending_output[id] = [];
         }
 
-        const renderOutput = renderOutputArgs({ ...args, withoutTimestamp });
-        state.pending_output[id].push(renderOutput);
+        state.pending_output[id].push(
+          <DebugOutput node={args.node} withoutTimestamp={withoutTimestamp} />,
+        );
       },
 
       end_pending_output(state, id) {
@@ -292,28 +288,6 @@ const BaseStore = createStore<State>()(
     },
   })),
 );
-
-function renderOutputArgs(args: MutateOutputArgs) {
-  let output = args.node;
-
-  switch (typeof args.node) {
-    case "boolean":
-    case "number":
-    case "string":
-      output = <Ink.Text dimColor={args.debug}>{String(args.node)}</Ink.Text>;
-  }
-
-  if (args.debug) {
-    return (
-      <React.Fragment>
-        {args.withoutTimestamp ? null : <LogTimestamp />}
-        {output}
-      </React.Fragment>
-    );
-  }
-
-  return output;
-}
 
 function useState<R>(selector: (state: State) => R): R {
   return useStore(BaseStore, selector);
