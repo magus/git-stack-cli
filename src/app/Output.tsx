@@ -7,7 +7,6 @@ import { Store } from "~/app/Store";
 export function Output() {
   const output = Store.useState((state) => state.output);
   const pending_output = Store.useState((state) => state.pending_output);
-  const pending_output_items = Object.values(pending_output);
 
   return (
     <React.Fragment>
@@ -17,18 +16,11 @@ export function Output() {
         }}
       </Ink.Static>
 
-      {pending_output_items.map((node_list, i) => {
+      {Object.entries(pending_output).map((entry) => {
+        const [id, node_list] = entry;
         return (
-          <Ink.Box key={i}>
-            <Ink.Text>
-              {node_list.map((text, j) => {
-                return (
-                  <React.Fragment key={j}>
-                    <Ink.Text>{text}</Ink.Text>
-                  </React.Fragment>
-                );
-              })}
-            </Ink.Text>
+          <Ink.Box key={id} flexDirection="column">
+            {node_list}
           </Ink.Box>
         );
       })}
