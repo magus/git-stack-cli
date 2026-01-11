@@ -29,12 +29,12 @@ async function run() {
   const merge_base = state.merge_base;
   const commit_map = state.commit_map;
   const master_branch = state.master_branch;
-  const repo_root = state.repo_root;
+  const repo_path = state.repo_path;
   const sync_github = state.sync_github;
 
   invariant(branch_name, "branch_name must exist");
   invariant(commit_map, "commit_map must exist");
-  invariant(repo_root, "repo_root must exist");
+  invariant(repo_path, "repo_path must exist");
   invariant(sync_github, "sync_github must exist");
 
   const commit_range = sync_github.commit_range;
@@ -317,16 +317,22 @@ async function run() {
   }
 
   async function push_master_group(group: CommitMetadataGroup) {
-    invariant(repo_root, "repo_root must exist");
+    invariant(repo_path, "repo_path must exist");
 
-    const repo_rel_worktree_path = `.git/git-stack-worktrees/push_master_group`;
-    const worktree_path = path.join(repo_root, repo_rel_worktree_path);
+    const worktree_path = path.join(
+      process.env.HOME,
+      ".cache",
+      "git-stack",
+      "worktrees",
+      repo_path,
+      "push_master_group",
+    );
 
     // ensure worktree for pushing master groups
     if (!(await safe_exists(worktree_path))) {
       actions.output(
         <Ink.Text color={colors.white}>
-          Creating <Ink.Text color={colors.yellow}>{repo_rel_worktree_path}</Ink.Text>
+          Creating <Ink.Text color={colors.yellow}>{worktree_path}</Ink.Text>
         </Ink.Text>,
       );
       actions.output(
@@ -337,7 +343,7 @@ async function run() {
 
     // ensure worktree is clean + on the right base before applying commits
     // - abort any in-progress cherry-pick/rebase
-    // - drop local changes/untracked files (including ignored) for a truly fresh state
+    // - drop local changes/untracked files to fresh state
     // - reset to the desired base
     await cli(`git -C ${worktree_path} cherry-pick --abort`, { ignoreExitCode: true });
     await cli(`git -C ${worktree_path} rebase --abort`, { ignoreExitCode: true });
