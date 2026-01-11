@@ -5,7 +5,6 @@
 import * as React from "react";
 
 import fs from "node:fs/promises";
-import path from "node:path";
 
 import * as Ink from "ink-cjs";
 
@@ -60,10 +59,6 @@ import { pretty_json } from "~/core/pretty_json";
     const actions = Store.getState().actions;
 
     actions.debug(pretty_json(argv as any));
-
-    const PATH = process.env["PATH"];
-    const PATH_LIST = pretty_json(PATH.split(path.delimiter));
-    actions.debug(`process.env.PATH ${PATH_LIST}`);
 
     await ink.waitUntilExit();
 
