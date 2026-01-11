@@ -5,21 +5,14 @@ import { DateTime } from "luxon";
 
 type Props = {
   node: React.ReactNode;
-  withoutTimestamp?: boolean;
 };
 
 export function DebugOutput(props: Props) {
   const { stdout } = Ink.useStdout();
   const available_width = stdout.columns;
 
-  const timestamp_format = "yyyy-MM-dd HH:mm:ss.SSS";
-
-  const maybe_timestamp = props.withoutTimestamp
-    ? " ".repeat(timestamp_format.length)
-    : DateTime.now().toFormat(timestamp_format);
-
-  const timestamp_width = timestamp_format.length;
-  const content_width = available_width - timestamp_width - 2;
+  const timestamp = DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss.SSS");
+  const content_width = available_width - timestamp.length - 2;
 
   const content = (function () {
     switch (typeof props.node) {
@@ -36,8 +29,8 @@ export function DebugOutput(props: Props) {
   return (
     <Ink.Box flexDirection="column">
       <Ink.Box flexDirection="row" gap={1} width={available_width}>
-        <Ink.Box width={timestamp_format.length} flexDirection="column">
-          <Ink.Text dimColor>{maybe_timestamp}</Ink.Text>
+        <Ink.Box width={timestamp.length} flexDirection="column">
+          <Ink.Text dimColor>{timestamp}</Ink.Text>
         </Ink.Box>
 
         <Ink.Box width={content_width}>{content}</Ink.Box>
