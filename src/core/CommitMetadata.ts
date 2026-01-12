@@ -184,8 +184,13 @@ export async function range(commit_group_map?: CommitGroupMap) {
       actions.debug(`  group.pr=${group.pr}`);
       group.dirty = true;
     } else {
+      // actions.json(group.pr);
+      actions.debug(`  group.pr.state=${group.pr.state}`);
       actions.debug(`  group.pr.baseRefName=${group.pr.baseRefName}`);
-      if (group.pr.baseRefName !== group.base) {
+
+      if (group.pr.state === "MERGED" || group.pr.state === "CLOSED") {
+        group.dirty = true;
+      } else if (group.pr.baseRefName !== group.base) {
         actions.debug("  PR_BASEREF_MISMATCH");
         group.dirty = true;
       } else if (group.master_base) {
