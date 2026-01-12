@@ -1,5 +1,16 @@
 # TODO
 
+- Fullscreen UI
+  - problem with active UI is it doesn't persist (only things written to Ink.Static persist
+    - but could we write current visible state to stderr on Exit?
+    - maybe just `actions.output(<StatusTable />)` is sufficient too since that's the critical info
+  - Always show StatusTable and update it as script runs (locked to bottom)
+  - Write high level actions like fetch, rebase, sync to easily track progress
+  - Show debug logs only when verbose as a static N-line box
+    - create Array<string> buffer of all output
+    - ensure each is exactly one line, wrap to terminal width, etc. 
+    - this is critical so we can 'tail' the buffer to last N lines and render an Ink.Box with that exact height
+
 - graphite does breakpoints, consider a hotkey for inserting "breakpoint group", e.g. "b"
 
 - select all commits first, then press "c" to create the group
