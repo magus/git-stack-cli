@@ -206,6 +206,9 @@ const BaseStore = createStore<State>()(
 
       output(node) {
         set((state) => {
+          if (typeof node === "string") {
+            node = <Ink.Text>{node}</Ink.Text>;
+          }
           state.mutate.output(state, { node });
         });
       },
