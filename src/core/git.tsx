@@ -1,10 +1,12 @@
 import * as React from "react";
 
 import path from "node:path";
+
 import * as Ink from "ink-cjs";
 
 import { Store } from "~/app/Store";
 import * as Metadata from "~/core/Metadata";
+import { cache_message } from "~/core/cache_message";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { invariant } from "~/core/invariant";
@@ -121,12 +123,56 @@ export async function worktree_add(args: WorktreeAddArgs): Promise<WorktreeAddRe
 }
 
 export async function diff_commits(commit_list: CommitList) {
-  const { worktree_path, merge_base } = await worktree_add({ commit_list });
-  const diff_result = await cli(
+  const state = Store.getState();
+  const actions = state.actions;
+  const merge_base = state.merge_base;
+  invariant(merge_base, "merge_base must exist");
+
+  const cache_key = `${merge_base}:${commit_list.map((c) => c.sha).join(",")}`;
+
+  const cache = state.cache_diff[cache_key];
+
+  if (cache) {
+    if (actions.isDebug()) {
+      actions.debug(
+        cache_message({
+          hit: true,
+          message: "git diff_commits cache",
+          extra: cache_key,
+        }),
+      );
+    }
+
+    return cache;
+  }
+
+  if (actions.isDebug()) {
+    actions.debug(
+      cache_message({
+        hit: false,
+        message: "git diff_commits cache",
+        extra: cache_key,
+      }),
+    );
+  }
+
+  const { worktree_path } = await worktree_add({ commit_list });
+  const cli_result = await cli(
     `git -C ${worktree_path} --no-pager diff --color=never ${merge_base}`,
     { quiet: true },
   );
-  return diff_result.stdout;
+
+  if (cli_result.code !== 0) {
+    throw new Error(cli_result.output);
+  }
+
+  const diff = cli_result.stdout;
+
+  actions.set((state) => {
+    state.cache_diff[cache_key] = diff;
+  });
+
+  return diff;
 }
 
 // Why these separators?

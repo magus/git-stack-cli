@@ -78,6 +78,7 @@ export type State = {
   // cache
   pr: { [branch: string]: PullRequest };
   cache_gh_cli_by_branch: { [branch: string]: { [command: string]: string } };
+  cache_diff: { [key: string]: string };
 
   actions: {
     exit(code: number, args?: ExitArgs): void;
@@ -139,6 +140,7 @@ const BaseStore = createStore<State>()(
 
     pr: {},
     cache_gh_cli_by_branch: {},
+    cache_diff: {},
 
     actions: {
       exit(code, args) {
