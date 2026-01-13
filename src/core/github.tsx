@@ -10,6 +10,7 @@ import { Brackets } from "~/app/Brackets";
 import { FormatText } from "~/app/FormatText";
 import { Store } from "~/app/Store";
 import { Timer } from "~/core/Timer";
+import { cache_message } from "~/core/cache_message";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { get_tmp_dir } from "~/core/get_tmp_dir";
@@ -406,36 +407,6 @@ async function write_body_file(args: EditPullRequestArgs) {
 
 function safe_filename(value: string): string {
   return value.replace(RE.non_alphanumeric_dash, "-");
-}
-
-type CacheMessageArgs = {
-  hit: boolean;
-  message: React.ReactNode;
-  extra: React.ReactNode;
-};
-
-function cache_message(args: CacheMessageArgs) {
-  const status = args.hit ? (
-    <Ink.Text bold color={colors.green}>
-      HIT
-    </Ink.Text>
-  ) : (
-    <Ink.Text bold color={colors.red}>
-      MISS
-    </Ink.Text>
-  );
-
-  return (
-    <FormatText
-      wrapper={<Ink.Text dimColor />}
-      message="{message} {status} {extra}"
-      values={{
-        message: args.message,
-        status,
-        extra: args.extra,
-      }}
-    />
-  );
 }
 
 type Commit = {
