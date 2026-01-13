@@ -338,18 +338,16 @@ async function run() {
       actions.output(
         <Ink.Text color={colors.gray}>(this may take a moment the first time…)</Ink.Text>,
       );
-      await cli(`git worktree add -f ${worktree_path} ${master_branch}`);
+      await cli(`git worktree add -f --detach ${worktree_path} ${merge_base}`);
     }
 
     // ensure worktree is clean + on the right base before applying commits
     // - abort any in-progress cherry-pick/rebase
     // - drop local changes/untracked files to fresh state
-    // - reset to the desired base
     await cli(`git -C ${worktree_path} cherry-pick --abort`, { ignoreExitCode: true });
     await cli(`git -C ${worktree_path} rebase --abort`, { ignoreExitCode: true });
     await cli(`git -C ${worktree_path} merge --abort`, { ignoreExitCode: true });
-    await cli(`git -C ${worktree_path} checkout -f ${master_branch}`);
-    await cli(`git -C ${worktree_path} reset --hard ${merge_base}`);
+    await cli(`git -C ${worktree_path} checkout -f --detach ${merge_base}`);
     await cli(`git -C ${worktree_path} clean -fd`);
 
     // cherry-pick the group commits onto that base
