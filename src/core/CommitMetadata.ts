@@ -215,7 +215,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
           let diff_github = await github.pr_diff(group.pr.headRefName);
           diff_github = normalize_diff(diff_github);
 
-          let diff_local = await git.get_diff(group.commits);
+          let diff_local = await git.diff_commits(group.commits);
           diff_local = normalize_diff(diff_local);
 
           // find the first differing character index

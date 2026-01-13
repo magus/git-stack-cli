@@ -1,7 +1,5 @@
 import * as React from "react";
 
-import path from "node:path";
-
 import * as Ink from "ink-cjs";
 import last from "lodash/last";
 
@@ -10,9 +8,9 @@ import { Store } from "~/app/Store";
 import * as StackSummaryTable from "~/core/StackSummaryTable";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
+import * as git from "~/core/git";
 import * as github from "~/core/github";
 import { invariant } from "~/core/invariant";
-import { safe_exists } from "~/core/safe_exists";
 import { sleep } from "~/core/sleep";
 
 import type * as CommitMetadata from "~/core/CommitMetadata";
@@ -26,7 +24,6 @@ async function run() {
   const actions = state.actions;
   const argv = state.argv;
   const branch_name = state.branch_name;
-  const merge_base = state.merge_base;
   const commit_map = state.commit_map;
   const master_branch = state.master_branch;
   const repo_path = state.repo_path;
@@ -319,40 +316,8 @@ async function run() {
   async function push_master_group(group: CommitMetadataGroup) {
     invariant(repo_path, "repo_path must exist");
 
-    const worktree_path = path.join(
-      process.env.HOME,
-      ".cache",
-      "git-stack",
-      "worktrees",
-      repo_path,
-      "push_master_group",
-    );
-
-    // ensure worktree for pushing master groups
-    if (!(await safe_exists(worktree_path))) {
-      actions.output(
-        <Ink.Text color={colors.white}>
-          Creating <Ink.Text color={colors.yellow}>{worktree_path}</Ink.Text>
-        </Ink.Text>,
-      );
-      actions.output(
-        <Ink.Text color={colors.gray}>(this may take a moment the first time…)</Ink.Text>,
-      );
-      await cli(`git worktree add -f --detach ${worktree_path} ${merge_base}`);
-    }
-
-    // ensure worktree is clean + on the right base before applying commits
-    // - abort any in-progress cherry-pick/rebase
-    // - drop local changes/untracked files to fresh state
-    await cli(`git -C ${worktree_path} cherry-pick --abort`, { ignoreExitCode: true });
-    await cli(`git -C ${worktree_path} rebase --abort`, { ignoreExitCode: true });
-    await cli(`git -C ${worktree_path} merge --abort`, { ignoreExitCode: true });
-    await cli(`git -C ${worktree_path} checkout -f --detach ${merge_base}`);
-    await cli(`git -C ${worktree_path} clean -fd`);
-
-    // cherry-pick the group commits onto that base
-    const cp_commit_list = group.commits.map((c) => c.sha).join(" ");
-    await cli(`git -C ${worktree_path} cherry-pick ${cp_commit_list}`);
+    const commit_list = group.commits;
+    const { worktree_path } = await git.worktree_add({ commit_list });
 
     const push_target = `HEAD:refs/heads/${group.id}`;
     const git_push_command = create_git_push_command(`git -C ${worktree_path}`, push_target);
