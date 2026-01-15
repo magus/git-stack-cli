@@ -260,13 +260,20 @@ export async function range(commit_group_map?: CommitGroupMap) {
         const all_commits: Array<git.Commit> = [];
         const previous_groups = group_value_list.slice(0, i);
         for (const g of previous_groups) {
+          actions.debug(`  BOUNDARY_COMMIT group=${g.title}`);
+
           for (const c of g.commits) {
+            actions.debug(`  BOUNDARY_COMMIT   commit=${c.subject_line}`);
             all_commits.push(c);
           }
         }
         for (const c of group.commits) {
+          actions.debug(`  BOUNDARY_COMMIT commit=${c.subject_line}`);
           all_commits.push(c);
         }
+
+        actions.debug(`  BOUNDARY_COMMIT group.pr.commits.length=${group.pr.commits.length}`);
+        actions.debug(`  BOUNDARY_COMMIT all_commits=${all_commits.length}`);
 
         // compare all commits against pr commits
         if (group.pr.commits.length !== all_commits.length) {
