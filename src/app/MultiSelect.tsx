@@ -92,6 +92,7 @@ export function MultiSelect<T>(props: Props<T>) {
   React.useEffect(ensure_selectable_focus, [props.items]);
   function ensure_selectable_focus() {
     const current = props.items[index];
+
     if (current && !current.disabled) {
       return;
     }
@@ -115,6 +116,11 @@ export function MultiSelect<T>(props: Props<T>) {
       return;
     }
 
+    // prevent accessing `.value` of undefined item
+    if (!props.items[index]) {
+      return;
+    }
+
     const item = props.items[index].value;
     const selected_list = Array.from(selected_set);
     const selected = selected_set.has(index);
@@ -125,6 +131,11 @@ export function MultiSelect<T>(props: Props<T>) {
   }, [selected_set]);
 
   React.useEffect(() => {
+    // prevent accessing `.value` of undefined item
+    if (!props.items[index]) {
+      return;
+    }
+
     const item = props.items[index].value;
     const selected_list = Array.from(selected_set);
     const selected = selected_set.has(index);
