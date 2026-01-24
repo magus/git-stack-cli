@@ -107,18 +107,21 @@ export function SelectCommitRanges() {
   Ink.useInput((input, key) => {
     const input_lower = input.toLowerCase();
 
-    // only allow pr select when on unassigned group
-    if (has_unassigned_commits && input_lower === SYMBOL.p) {
-      set_pr_select((v) => !v);
-      return;
-    }
     // allow cancelling pr select with esc
     if (pr_select && key.escape) {
       set_pr_select(false);
       return;
     }
 
-    // do not allow input when inputting
+    // only allow pr select when on unassigned group and not inputting group
+    if (!group_input) {
+      if (has_unassigned_commits && input_lower === SYMBOL.p) {
+        set_pr_select((v) => !v);
+        return;
+      }
+    }
+
+    // disable key handlers below when inputting
     if (is_input_mode) {
       return;
     }
