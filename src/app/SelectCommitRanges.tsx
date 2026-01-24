@@ -113,9 +113,12 @@ export function SelectCommitRanges() {
       return;
     }
 
-    // only allow pr select when on unassigned group and not inputting group
-    if (!group_input) {
-      if (has_unassigned_commits && input_lower === SYMBOL.p) {
+    // only allow pr select when…
+    // 1. we have unassigned commits
+    // 2. not inputting group
+    // 3. at least one existing prs exists
+    if (has_unassigned_commits && !group_input && existing_pr_list.length > 0) {
+      if (input_lower === SYMBOL.p) {
         set_pr_select((v) => !v);
         return;
       }
@@ -301,23 +304,25 @@ export function SelectCommitRanges() {
             />
           </Ink.Text>
 
-          <Ink.Text color={colors.blue}>
-            <FormatText
-              message="Press {p} to {pick} an existing PR"
-              values={{
-                p: (
-                  <Ink.Text bold color={colors.green}>
-                    p
-                  </Ink.Text>
-                ),
-                pick: (
-                  <Ink.Text bold color={colors.green}>
-                    <Parens>p</Parens>pick
-                  </Ink.Text>
-                ),
-              }}
-            />
-          </Ink.Text>
+          {existing_pr_list.length === 0 ? null : (
+            <Ink.Text color={colors.blue}>
+              <FormatText
+                message="Press {p} to {pick} an existing PR"
+                values={{
+                  p: (
+                    <Ink.Text bold color={colors.green}>
+                      p
+                    </Ink.Text>
+                  ),
+                  pick: (
+                    <Ink.Text bold color={colors.green}>
+                      <Parens>p</Parens>pick
+                    </Ink.Text>
+                  ),
+                }}
+              />
+            </Ink.Text>
+          )}
         </Ink.Box>
       )}
 
@@ -389,7 +394,7 @@ export function SelectCommitRanges() {
         </React.Fragment>
       )}
 
-      {!pr_select ? null : (
+      {!pr_select || !existing_pr_list.length ? null : (
         <React.Fragment>
           <FormatText
             wrapper={<Ink.Text color={colors.gray} />}
@@ -463,6 +468,8 @@ export function SelectCommitRanges() {
         </React.Fragment>
       )}
 
+      {is_input_mode ? null : <React.Fragment></React.Fragment>}
+
       <Ink.Box height={1} />
 
       <MultiSelect
@@ -492,143 +499,139 @@ export function SelectCommitRanges() {
         }}
       />
 
-      <Ink.Box height={1} />
-
-      {has_unassigned_commits ? (
+      {is_input_mode ? null : (
         <React.Fragment>
+          <Ink.Box height={1} />
+
+          {has_unassigned_commits ? (
+            <React.Fragment>
+              <FormatText
+                wrapper={<Ink.Text color={colors.gray} />}
+                message="{count} unassigned commits"
+                values={{
+                  count: (
+                    <Ink.Text color={colors.yellow} bold>
+                      {unassigned_count}
+                    </Ink.Text>
+                  ),
+                }}
+              />
+
+              <FormatText
+                wrapper={<Ink.Text color={colors.gray} />}
+                message="Press {c} to {create} a new PR"
+                values={{
+                  c: (
+                    <Ink.Text bold color={colors.green}>
+                      c
+                    </Ink.Text>
+                  ),
+                  create: (
+                    <Ink.Text bold color={colors.green}>
+                      <Parens>c</Parens>reate
+                    </Ink.Text>
+                  ),
+                }}
+              />
+
+              {existing_pr_list.length === 0 ? null : (
+                <FormatText
+                  wrapper={<Ink.Text color={colors.gray} />}
+                  message="Press {p} to {pick} an existing PR"
+                  values={{
+                    p: (
+                      <Ink.Text bold color={colors.green}>
+                        p
+                      </Ink.Text>
+                    ),
+                    pick: (
+                      <Ink.Text bold color={colors.green}>
+                        <Parens>p</Parens>pick
+                      </Ink.Text>
+                    ),
+                  }}
+                />
+              )}
+
+              {sync_status !== "allow_unassigned" ? null : (
+                <FormatText
+                  wrapper={<Ink.Text color={colors.gray} />}
+                  message={
+                    argv.sync
+                      ? "Press {s} to {sync} the {count} assigned commits to Github"
+                      : "Press {s} to {sync} the {count} assigned commits locally"
+                  }
+                  values={{
+                    ...S_TO_SYNC_VALUES,
+                    count: (
+                      <Ink.Text color={colors.yellow} bold>
+                        {assigned_count}
+                      </Ink.Text>
+                    ),
+                  }}
+                />
+              )}
+            </React.Fragment>
+          ) : (
+            <FormatText
+              wrapper={<Ink.Text color={colors.blue} />}
+              message={
+                argv.sync
+                  ? "🎉 Done! Press {s} to {sync} the PRs to Github"
+                  : "🎉 Done! Press {s} to {sync} the PRs locally"
+              }
+              values={S_TO_SYNC_VALUES}
+            />
+          )}
+
           <FormatText
             wrapper={<Ink.Text color={colors.gray} />}
-            message="{count} unassigned commits"
+            message="Press {left} and {right} to view PRs"
             values={{
-              count: (
-                <Ink.Text color={colors.yellow} bold>
-                  {unassigned_count}
+              left: (
+                <Ink.Text bold color={colors.green}>
+                  {SYMBOL.left}
+                </Ink.Text>
+              ),
+              right: (
+                <Ink.Text bold color={colors.green}>
+                  {SYMBOL.right}
                 </Ink.Text>
               ),
             }}
           />
 
-          {is_input_mode ? null : (
-            <FormatText
-              wrapper={<Ink.Text color={colors.gray} />}
-              message="Press {c} to {create} a new PR"
-              values={{
-                c: (
-                  <Ink.Text bold color={colors.green}>
-                    c
-                  </Ink.Text>
-                ),
-                create: (
-                  <Ink.Text bold color={colors.green}>
-                    <Parens>c</Parens>reate
-                  </Ink.Text>
-                ),
-              }}
-            />
-          )}
+          <FormatText
+            wrapper={<Ink.Text color={colors.gray} />}
+            message="Press {enter} to toggle commit selection"
+            values={{
+              enter: (
+                <Ink.Text bold color={colors.green}>
+                  {SYMBOL.enter}
+                </Ink.Text>
+              ),
+            }}
+          />
 
-          {is_input_mode ? null : (
-            <FormatText
-              wrapper={<Ink.Text color={colors.gray} />}
-              message="Press {p} to {pick} an existing PR"
-              values={{
-                p: (
-                  <Ink.Text bold color={colors.green}>
-                    p
-                  </Ink.Text>
-                ),
-                pick: (
-                  <Ink.Text bold color={colors.green}>
-                    <Parens>p</Parens>pick
-                  </Ink.Text>
-                ),
-              }}
-            />
-          )}
-
-          {sync_status !== "allow_unassigned" ? null : (
+          {group.id === commit_range.UNASSIGNED ? null : (
             <FormatText
               wrapper={<Ink.Text color={colors.gray} />}
               message={
-                argv.sync
-                  ? "Press {s} to {sync} the {count} assigned commits to Github"
-                  : "Press {s} to {sync} the {count} assigned commits locally"
+                is_master_base
+                  ? "Press {m} to {reset} current PR base to stack position"
+                  : "Press {m} to set current PR base to master"
               }
               values={{
-                ...S_TO_SYNC_VALUES,
-                count: (
-                  <Ink.Text color={colors.yellow} bold>
-                    {assigned_count}
+                m: (
+                  <Ink.Text bold color={colors.green}>
+                    {SYMBOL.m}
                   </Ink.Text>
                 ),
+                reset: <Ink.Text color={colors.yellow}>reset</Ink.Text>,
               }}
             />
           )}
         </React.Fragment>
-      ) : (
-        <FormatText
-          wrapper={<Ink.Text />}
-          message={
-            argv.sync
-              ? "🎉 Done! Press {s} to {sync} the PRs to Github"
-              : "🎉 Done! Press {s} to {sync} the PRs locally"
-          }
-          values={S_TO_SYNC_VALUES}
-        />
-      )}
-
-      <Ink.Box>
-        <FormatText
-          wrapper={<Ink.Text color={colors.gray} />}
-          message="Press {left} and {right} to view PRs"
-          values={{
-            left: (
-              <Ink.Text bold color={colors.green}>
-                {SYMBOL.left}
-              </Ink.Text>
-            ),
-            right: (
-              <Ink.Text bold color={colors.green}>
-                {SYMBOL.right}
-              </Ink.Text>
-            ),
-          }}
-        />
-      </Ink.Box>
-
-      <Ink.Box>
-        <FormatText
-          wrapper={<Ink.Text color={colors.gray} />}
-          message="Press {enter} to toggle commit selection"
-          values={{
-            enter: (
-              <Ink.Text bold color={colors.green}>
-                {SYMBOL.enter}
-              </Ink.Text>
-            ),
-          }}
-        />
-      </Ink.Box>
-
-      {group.id === commit_range.UNASSIGNED ? null : (
-        <Ink.Box>
-          <FormatText
-            wrapper={<Ink.Text color={colors.gray} />}
-            message={
-              is_master_base
-                ? "Press {m} to {reset} current PR base to stack position"
-                : "Press {m} to set current PR base to master"
-            }
-            values={{
-              m: (
-                <Ink.Text bold color={colors.green}>
-                  {SYMBOL.m}
-                </Ink.Text>
-              ),
-              reset: <Ink.Text color={colors.yellow}>reset</Ink.Text>,
-            }}
-          />
-        </Ink.Box>
       )}
     </Ink.Box>
   );
