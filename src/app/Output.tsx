@@ -4,6 +4,7 @@ import * as Ink from "ink-cjs";
 
 import { DebugOutput } from "~/app/DebugOutput";
 import { Store } from "~/app/Store";
+import { render_node } from "~/core/render_node";
 
 export function Output() {
   const output = Store.useState((state) => state.output);
@@ -14,7 +15,7 @@ export function Output() {
       <Ink.Static items={output}>
         {(entry) => {
           const [id, node] = entry;
-          return <Ink.Box key={id}>{node}</Ink.Box>;
+          return <Ink.Box key={id}>{render_node(node)}</Ink.Box>;
         }}
       </Ink.Static>
 

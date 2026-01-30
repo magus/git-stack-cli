@@ -3,6 +3,8 @@ import * as React from "react";
 import * as Ink from "ink-cjs";
 import { DateTime } from "luxon";
 
+import { render_node } from "~/core/render_node";
+
 type Props = {
   node: React.ReactNode;
 };
@@ -14,17 +16,7 @@ export function DebugOutput(props: Props) {
   const timestamp = DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss.SSS");
   const content_width = available_width - timestamp.length - 2;
 
-  const content = (function () {
-    switch (typeof props.node) {
-      case "boolean":
-      case "number":
-      case "string": {
-        return <Ink.Text dimColor>{String(props.node)}</Ink.Text>;
-      }
-      default:
-        return props.node;
-    }
-  })();
+  const content = render_node(props.node);
 
   return (
     <Ink.Box flexDirection="column">
