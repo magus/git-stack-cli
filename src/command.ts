@@ -122,6 +122,24 @@ const DefaultOptions = {
     description: "Sync commit ranges to Github, disable with --no-sync",
   },
 
+  "label": {
+    type: "array",
+    alias: ["labels"],
+    coerce: (label_input: Array<string | number>) => label_input.map((v) => String(v)),
+    description: [
+      // force line break
+      "Apply labels to all PRs in the stack (repeatable)",
+      "Example: --label backend --label needs-review",
+    ].join("\n"),
+  },
+
+  "draft": {
+    type: "boolean",
+    alias: ["d"],
+    default: false,
+    description: "Open all PRs as drafts",
+  },
+
   "verify": {
     type: "boolean",
     default: true,
@@ -142,19 +160,6 @@ const DefaultOptions = {
     ].join("\n"),
   },
 
-  "draft": {
-    type: "boolean",
-    alias: ["d"],
-    default: false,
-    description: "Open all PRs as drafts",
-  },
-
-  "revise-sign": {
-    type: "boolean",
-    default: true,
-    description: "Disable GPG signing for git revise with --no-revise-sign",
-  },
-
   "template": {
     type: "boolean",
     default: true,
@@ -163,6 +168,12 @@ const DefaultOptions = {
       "Use automatic Github PR template, e.g. .github/pull_request_template.md",
       "Disable with --no-template",
     ].join("\n"),
+  },
+
+  "revise-sign": {
+    type: "boolean",
+    default: true,
+    description: "Disable GPG signing for git revise with --no-revise-sign",
   },
 } satisfies YargsOptions;
 

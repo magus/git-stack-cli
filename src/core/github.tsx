@@ -121,6 +121,7 @@ type CreatePullRequestArgs = {
   title: string;
   body: string;
   draft: boolean;
+  labels?: Array<string>;
 };
 
 export async function pr_create(args: CreatePullRequestArgs) {
@@ -147,6 +148,13 @@ export async function pr_create(args: CreatePullRequestArgs) {
     command_parts.push("--draft");
   }
 
+  if (args.labels && args.labels.length > 0) {
+    for (const label of args.labels) {
+      if (!label) continue;
+      command_parts.push(`--label="${safe_quote(label)}"`);
+    }
+  }
+
   const cli_result = await cli(command_parts);
 
   if (cli_result.code !== 0) {
@@ -161,14 +169,17 @@ type EditPullRequestArgs = {
   branch: string;
   base?: string;
   body?: string;
+  add_labels?: Array<string>;
 };
 
 export async function pr_edit(args: EditPullRequestArgs) {
+  // https://cli.github.com/manual/gh_pr_edit
+
   // const state = Store.getState();
   // const actions = state.actions;
   // actions.debug(`github.pr_edit ${JSON.stringify(args)}`);
 
-  if (!args.base && !args.body) {
+  if (!args.base && !args.body && !(args.add_labels && args.add_labels.length > 0)) {
     return;
   }
 
@@ -184,6 +195,13 @@ export async function pr_edit(args: EditPullRequestArgs) {
   if (args.body) {
     body_file = await write_body_file(args);
     command_parts.push(`--body-file="${body_file}"`);
+  }
+
+  if (args.add_labels && args.add_labels.length > 0) {
+    for (const label of args.add_labels) {
+      if (!label) continue;
+      command_parts.push(`--add-label="${safe_quote(label)}"`);
+    }
   }
 
   const cli_result = await cli(command_parts);

@@ -28,6 +28,7 @@ async function run() {
   const master_branch = state.master_branch;
   const repo_path = state.repo_path;
   const sync_github = state.sync_github;
+  const labels = argv.label ?? [];
 
   invariant(branch_name, "branch_name must exist");
   invariant(commit_map, "commit_map must exist");
@@ -140,17 +141,17 @@ async function run() {
     const pr_url_list = all_pr_groups.map((g) => pr_url_by_group_id[g.id]);
 
     // update PR body for all pr groups (not just push_group_list)
-    const update_pr_body_tasks = [];
+    const update_pr_tasks = [];
     for (let i = 0; i < all_pr_groups.length; i++) {
       const group = all_pr_groups[i];
 
       const selected_url = pr_url_by_group_id[group.id];
 
-      const task = update_pr_body({ group, selected_url, pr_url_list });
-      update_pr_body_tasks.push(task);
+      const task = update_pr({ group, selected_url, pr_url_list, labels });
+      update_pr_tasks.push(task);
     }
 
-    await Promise.all(update_pr_body_tasks);
+    await Promise.all(update_pr_tasks);
 
     actions.unregister_abort_handler();
 
@@ -262,6 +263,7 @@ async function run() {
         title: group.title,
         body: DEFAULT_PR_BODY,
         draft: argv.draft,
+        labels,
       });
 
       if (!pr_url) {
@@ -273,10 +275,11 @@ async function run() {
     }
   }
 
-  async function update_pr_body(args: {
+  async function update_pr(args: {
     group: CommitMetadataGroup;
     selected_url: string;
     pr_url_list: Array<string>;
+    labels: Array<string>;
   }) {
     const { group, selected_url, pr_url_list } = args;
 
@@ -292,17 +295,30 @@ async function run() {
 
     const debug_meta = `${group.id} ${selected_url}`;
 
-    if (update_body === body) {
-      actions.debug(`Skipping body update ${debug_meta}`);
-    } else {
-      actions.debug(`Update body ${debug_meta}`);
+    const body_changed = update_body !== body;
+    const needs_labels = args.labels.length > 0;
 
-      await github.pr_edit({
-        branch: group.id,
-        base: group.base,
-        body: update_body,
-      });
+    if (!body_changed && !needs_labels) {
+      actions.debug(`Skipping update ${debug_meta}`);
+      return;
     }
+
+    actions.debug(`Update PR ${debug_meta}`);
+
+    const edit_args: Parameters<typeof github.pr_edit>[0] = {
+      branch: group.id,
+      base: group.base,
+    };
+
+    if (body_changed) {
+      edit_args.body = update_body;
+    }
+
+    if (needs_labels) {
+      edit_args.add_labels = args.labels;
+    }
+
+    await github.pr_edit(edit_args);
   }
 
   function is_pr_master_base(group: CommitMetadataGroup) {
