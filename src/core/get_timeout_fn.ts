@@ -1,5 +1,5 @@
 export function get_timeout_fn(ms: number, message: string) {
-  return function timeout<T>(promise: Promise<T>) {
+  return async function timeout<T>(promise: Promise<T>) {
     let id: ReturnType<typeof setTimeout>;
 
     const timeout = new Promise<never>((_resolve, reject) => {

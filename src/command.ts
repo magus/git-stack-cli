@@ -18,7 +18,7 @@ export async function command(argv: string[], options: CommandOptions = {}) {
     builder = builder.parserConfiguration(options.parserConfiguration);
   }
 
-  const parsed = await builder
+  const parsed = builder
     .scriptName("git stack")
     .usage("Usage: git stack [command] [options]")
 
