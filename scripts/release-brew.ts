@@ -92,6 +92,10 @@ core = core.replace(re_token("tarball_sha256"), tarball_asset.sha256);
 
 await file.write_text(path.join("Formula", "git-stack.core.rb"), core);
 
+// write latest.json containing latest version
+const latest_json = JSON.stringify({ version });
+await file.write_text(path.join("latest.json"), latest_json);
+
 // commit homebrew repo changes
 process.chdir(HOMEBREW_DIR);
 await spawn.sync(`git add .`);
