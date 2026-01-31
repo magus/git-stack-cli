@@ -161,20 +161,32 @@ export function AutoUpdate(props: Props) {
       if (state.latest_version !== null) return;
 
       const local_version = process.env.CLI_VERSION;
-      const latest_version = await get_latest_version();
       const is_brew_bun_standalone = get_is_brew_bun_standalone();
+
+      const timeout_ms = is_finite_value(props.timeoutMs) ? props.timeoutMs : 2 * 1000;
+      const timeout = get_timeout_fn(timeout_ms, "AutoUpdate timeout");
+      const latest_version = await timeout(get_latest_version(is_brew_bun_standalone));
+
       patch({ local_version, latest_version, is_brew_bun_standalone });
     }
 
-    async function get_latest_version() {
-      const timeout_ms = is_finite_value(props.timeoutMs) ? props.timeoutMs : 2 * 1000;
-      const timeout = get_timeout_fn(timeout_ms, "AutoUpdate timeout");
-      const npm_json = await timeout(fetch_json(`https://registry.npmjs.org/${props.name}`));
-      const maybe_version = npm_json?.["dist-tags"]?.latest;
-      if (typeof maybe_version === "string") {
-        return maybe_version;
+    async function get_latest_version(is_brew_bun_standalone: boolean) {
+      if (is_brew_bun_standalone) {
+        // prettier-ignore
+        const brew_json = await fetch_json("https://raw.githubusercontent.com/magus/homebrew-git-stack/refs/heads/master/latest.json");
+        const maybe_version = brew_json.version;
+        if (typeof maybe_version === "string") {
+          return maybe_version;
+        }
+        throw new Error("Unable to retrieve latest version from brew");
+      } else {
+        const npm_json = await fetch_json(`https://registry.npmjs.org/${props.name}`);
+        const maybe_version = npm_json?.["dist-tags"]?.latest;
+        if (typeof maybe_version === "string") {
+          return maybe_version;
+        }
+        throw new Error("Unable to retrieve latest version from npm");
       }
-      throw new Error("Unable to retrieve latest version from npm");
     }
 
     function get_is_brew_bun_standalone() {
