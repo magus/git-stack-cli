@@ -3,11 +3,13 @@ import * as React from "react";
 import * as Ink from "ink-cjs";
 
 import { Await } from "~/app/Await";
+import { Command } from "~/app/Command";
 import { FormatText } from "~/app/FormatText";
 import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
+import { is_finite_value } from "~/core/is_finite_value";
 
 export function Fixup() {
   return (
@@ -25,27 +27,48 @@ async function run() {
 
   const relative_number = argv.commit;
 
-  if (!relative_number) {
+  if (!is_finite_value(relative_number)) {
     actions.output(
-      <Ink.Text color={colors.red}>❗️ Usage: git fixup {"<relative-commit-number>"}</Ink.Text>,
+      <Ink.Box flexDirection="column">
+        <Ink.Text color={colors.red}>❗️ Usage: git fixup {"<relative-commit-number>"}</Ink.Text>
+        <Ink.Text color={colors.gray}>
+          Automates the process of adding staged changes to a previous commit.
+        </Ink.Text>
+        <FormatText
+          wrapper={<Ink.Text color={colors.gray} />}
+          message="You can use {git_stack_log} to get the relative commit number."
+          values={{ git_stack_log: <Command>git stack log</Command> }}
+        />
+        <Ink.Box height={1} />
+        <FormatText
+          message="    {prompt} git stack log"
+          values={{ prompt: <Ink.Text color={colors.green}>❯</Ink.Text> }}
+        />
+        <FormatText
+          message="    0 * {sha}  18 hours ago    noah      homebrew-git-stack 2.9.9"
+          values={{ sha: <Ink.Text color={colors.green}>e329794</Ink.Text> }}
+        />
+        <FormatText
+          message="    1 * {sha}  18 hours ago    noah      2.9.9"
+          values={{ sha: <Ink.Text color={colors.green}>c7e4065</Ink.Text> }}
+        />
+        <FormatText
+          message="    2 * {sha}  18 hours ago    noah      command: --label + github add labels"
+          values={{ sha: <Ink.Text color={colors.green}>f82ac73</Ink.Text> }}
+        />
+        <Ink.Box height={1} />
+        <FormatText
+          wrapper={<Ink.Text color={colors.gray} />}
+          message="To target {sha} above, use {command}"
+          values={{
+            sha: <Ink.Text color={colors.green}>838e878</Ink.Text>,
+            command: <Command>git stack fixup 2</Command>,
+          }}
+        />
+      </Ink.Box>,
     );
+
     actions.output("");
-    actions.output("This script automates the process of adding staged changes as a fixup commit");
-    actions.output(
-      "and the subsequent git rebase to flatten the commits based on relative commit number",
-    );
-    actions.output("You can use a `git log` like below to get the relative commit number");
-    actions.output("");
-    actions.output("    ❯ git stack log");
-    actions.output(
-      "    1\te329794d5f881cbf0fc3f26d2108cf6f3fdebabe enable drop_error_subtask test param",
-    );
-    actions.output(
-      "    2\t57f43b596e5c6b97bc47e2a591f82ccc81651156 test drop_error_subtask baseline",
-    );
-    actions.output("    3\t838e878d483c6a2d5393063fc59baf2407225c6d ErrorSubtask test baseline");
-    actions.output("");
-    actions.output("To target `838e87` above, you would call `fixup 3`");
 
     actions.exit(0);
   }
@@ -64,11 +87,8 @@ async function run() {
     // );
   }
 
-  // Calculate commit SHA based on the relative commit number
-  const adjusted_number = Number(relative_number) - 1;
-
   // get the commit SHA of the target commit
-  const commit_sha = (await cli(`git rev-parse HEAD~${adjusted_number}`)).stdout;
+  const commit_sha = (await cli(`git rev-parse HEAD~${relative_number}`)).stdout;
 
   actions.output(
     <FormatText
@@ -104,7 +124,7 @@ async function run() {
 
   try {
     // rebase target needs to account for new commit created above
-    const rebase_target = Number(relative_number) + 1;
+    const rebase_target = Number(relative_number) + 2;
 
     await cli(`git rebase -i --autosquash HEAD~${rebase_target}`, {
       env: {

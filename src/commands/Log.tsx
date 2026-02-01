@@ -65,7 +65,7 @@ async function run(args: Args) {
   const command = [
     `git log --pretty=format:"${format}" -n20 --graph --color ${rest_args}`,
     `cut -c 1-"${truncation_width}"`,
-    `nl -w3 -s' '`,
+    `nl -v0 -w3 -s' '`,
   ].join(" | ");
 
   const result = await cli(command);

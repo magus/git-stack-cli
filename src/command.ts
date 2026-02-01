@@ -180,7 +180,7 @@ const DefaultOptions = {
 const FixupOptions = {
   commit: {
     type: "number",
-    default: 1,
+    default: 0,
     description: [
       "Relative number of commit to amend staged changes.",
       "Most recent is 1, next is 2, etc.",
