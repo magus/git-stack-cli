@@ -38,7 +38,15 @@ export async function cli(
   }
 
   return new Promise((resolve, reject) => {
-    const childProcess = child.spawn("sh", ["-c", command], options);
+    let childProcess: child.ChildProcess;
+    try {
+      childProcess = child.spawn("sh", ["-c", command], options);
+    } catch (err) {
+      reject(err);
+      return;
+    }
+
+    let settled = false;
 
     let stdout = "";
     let stderr = "";
@@ -71,7 +79,11 @@ export async function cli(
     });
 
     childProcess.on("close", (unsafe_code) => {
-      const duration = timer.duration();
+      if (settled) {
+        return;
+      }
+
+      settled = true;
 
       const result = {
         command,
@@ -79,11 +91,12 @@ export async function cli(
         stdout: stdout.trimEnd(),
         stderr: stderr.trimEnd(),
         output: output.trimEnd(),
-        duration,
+        duration: timer.duration(),
       };
 
       state.actions.debug_pending_end(id);
       state.actions.debug(log.end(result));
+
       if (!options.quiet) {
         state.actions.debug(log.output(result));
       }
@@ -97,6 +110,24 @@ export async function cli(
     });
 
     childProcess.on("error", (err) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+
+      const result = {
+        command,
+        code: -1,
+        stdout: stdout.trimEnd(),
+        stderr: stderr.trimEnd(),
+        output: output.trimEnd(),
+        duration: timer.duration(),
+      };
+
+      state.actions.debug_pending_end(id);
+      state.actions.debug(log.abort({ result, err }));
+
       reject(err);
     });
   });
@@ -171,6 +202,12 @@ const log = {
   non_zero_exit(result: Return) {
     const { command, code, duration } = result;
     return `${command} (exit_code=${code} duration=${duration})`;
+  },
+
+  abort({ result, err }: { result: Return; err?: unknown }) {
+    const { command, duration } = result;
+    const err_message = err instanceof Error ? err.message : String(err);
+    return `[error] ${command} err=${err_message} (duration=${duration})`;
   },
 
   error(result: Return) {
