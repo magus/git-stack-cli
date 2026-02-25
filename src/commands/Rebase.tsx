@@ -6,6 +6,7 @@ import * as Ink from "ink-cjs";
 
 import { Await } from "~/app/Await";
 import { Brackets } from "~/app/Brackets";
+import { Command } from "~/app/Command";
 import { FormatText } from "~/app/FormatText";
 import { Status } from "~/app/Status";
 import { Store } from "~/app/Store";
@@ -69,11 +70,40 @@ Rebase.run = async function run(props: Props) {
 
     actions.unregister_abort_handler();
   } catch (err) {
+    actions.unregister_abort_handler();
     actions.error("Unable to rebase.");
 
     if (err instanceof Error) {
       actions.error(err.message);
     }
+
+    actions.output(
+      <Ink.Box flexDirection="column">
+        <Ink.Box height={1} />
+        <Ink.Text>⚠️ WARNING</Ink.Text>
+        <FormatText
+          message="You are in a temporary branch {branch_name} based on {original_branch}"
+          values={{
+            branch_name: <Brackets>{temp_branch_name}</Brackets>,
+            original_branch: <Brackets>{branch_name}</Brackets>,
+          }}
+        />
+        <FormatText
+          message="Fix merge conflicts then run {cp_continue} to proceed"
+          values={{
+            cp_continue: <Command>git cherry-pick --continue</Command>,
+          }}
+        />
+        <FormatText
+          message="To go back to the original branch run {checkout_original}"
+          values={{
+            checkout_original: (
+              <Command>git cherry-pick --abort && git checkout -f {branch_name}</Command>
+            ),
+          }}
+        />
+      </Ink.Box>,
+    );
 
     actions.exit(8);
   }
