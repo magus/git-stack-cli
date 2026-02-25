@@ -42,8 +42,12 @@ Rebase.run = async function run(props: Props) {
   invariant(commit_range, "commit_range must exist");
   invariant(repo_root, "repo_root must exist");
 
+  const abort_controller = new AbortController();
+  const signal = abort_controller.signal;
+
   // immediately register abort_handler in case of ctrl+c exit
   actions.register_abort_handler(async function abort_rebase() {
+    abort_controller.abort();
     actions.output(<Ink.Text color={colors.red}>🚨 Abort</Ink.Text>);
     handle_exit();
     return 19;
@@ -60,7 +64,7 @@ Rebase.run = async function run(props: Props) {
     await cli(`pwd`);
 
     // fetch origin master branch for latest sha
-    await cli(`git fetch --no-tags -v origin ${master_branch_name}`);
+    await cli(`git fetch --no-tags -v origin ${master_branch_name}`, { signal });
 
     if (branch_name === master_branch_name) {
       await rebase_master();
@@ -135,7 +139,7 @@ Rebase.run = async function run(props: Props) {
   }
 
   async function rebase_master() {
-    await cli(`git switch -C "${master_branch_name}" "${master_branch}"`);
+    await cli(`git switch -C "${master_branch_name}" "${master_branch}"`, { signal });
   }
 
   async function rebase_branch() {
@@ -145,7 +149,7 @@ Rebase.run = async function run(props: Props) {
     const rebase_merge_base = master_sha;
 
     // create temporary branch based on merge base
-    await cli(`git checkout -b ${temp_branch_name} ${rebase_merge_base}`);
+    await cli(`git checkout -b ${temp_branch_name} ${rebase_merge_base}`, { signal });
 
     const picked_commit_list = [];
 
@@ -187,17 +191,17 @@ Rebase.run = async function run(props: Props) {
 
     if (picked_commit_list.length > 0) {
       // ensure clean base to avoid conflicts when applying patch
-      await cli(`git clean -fd`);
+      await cli(`git clean -fd`, { signal });
 
       // create list of sha for cherry-pick
       const sha_list = picked_commit_list.map((commit) => commit.sha).join(" ");
 
-      await cli(`git cherry-pick --keep-redundant-commits ${sha_list}`);
+      await cli(`git cherry-pick --keep-redundant-commits ${sha_list}`, { signal });
     }
 
     // after all commits have been cherry-picked move the pointer
     // of original branch to the newly created temporary branch
-    await cli(`git branch -f ${branch_name} ${temp_branch_name}`);
+    await cli(`git branch -f ${branch_name} ${temp_branch_name}`, { signal });
 
     actions.debug("start restore_git()");
     restore_git();
