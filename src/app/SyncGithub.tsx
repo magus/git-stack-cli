@@ -5,6 +5,7 @@ import last from "lodash/last";
 
 import { Await } from "~/app/Await";
 import { Store } from "~/app/Store";
+import { maybe_fixup_pre_push_changes } from "~/app/maybe_fixup_pre_push_changes";
 import * as StackSummaryTable from "~/core/StackSummaryTable";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
@@ -35,14 +36,14 @@ async function run() {
   invariant(repo_path, "repo_path must exist");
   invariant(sync_github, "sync_github must exist");
 
-  const commit_range = sync_github.commit_range;
+  let commit_range = sync_github.commit_range;
 
   let DEFAULT_PR_BODY = "";
   if (state.pr_template_body) {
     DEFAULT_PR_BODY = state.pr_template_body;
   }
 
-  const push_group_list = get_push_group_list();
+  let push_group_list = get_push_group_list();
 
   // for all push targets in push_group_list
   // things that can be done in parallel are grouped by numbers
@@ -65,6 +66,18 @@ async function run() {
   }
 
   try {
+    if (argv.verify !== false && argv["pre-push-fixup"]) {
+      const maybe_commit_range = await maybe_fixup_pre_push_changes({
+        commit_map,
+        commit_range,
+      });
+
+      if (maybe_commit_range) {
+        commit_range = maybe_commit_range;
+        push_group_list = get_push_group_list();
+      }
+    }
+
     const before_push_tasks = [];
     for (const group of push_group_list) {
       before_push_tasks.push(before_push({ group }));

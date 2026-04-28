@@ -150,6 +150,12 @@ const DefaultOptions = {
     ].join("\n"),
   },
 
+  "pre-push-fixup": {
+    type: "boolean",
+    default: false,
+    description: "Offer to fixup worktree changes created by pre-push hooks",
+  },
+
   "branch": {
     type: "string",
     alias: ["b"],
