@@ -10,6 +10,7 @@ import { Parens } from "~/app/Parens";
 import { Store } from "~/app/Store";
 import { YesNoPrompt } from "~/app/YesNoPrompt";
 import * as CommitMetadata from "~/core/CommitMetadata";
+import * as StackGroupOrder from "~/core/StackGroupOrder";
 import * as StackSummaryTable from "~/core/StackSummaryTable";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
@@ -128,7 +129,11 @@ async function run(run_args: { ask_fold: AskFold }) {
     }
 
     // get pr url list for all pr groups
-    const pr_url_list = all_pr_groups.map((g) => pr_url_by_group_id[g.id]);
+    // Order from the base links rather than assuming commit_range.group_list's
+    // display order is stable.
+    const pr_url_list = StackGroupOrder.base_to_tip(all_pr_groups).map(
+      (g) => pr_url_by_group_id[g.id],
+    );
 
     // update PR body for all pr groups (not just push_group_list)
     const update_pr_tasks = [];

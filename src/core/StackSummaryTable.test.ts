@@ -156,6 +156,40 @@ test("persists removed pr urls from previous stack table", () => {
   expect(rerun_output).toBe(output);
 });
 
+test("appends current stack after submitted rows when rebased to master", () => {
+  const args = {
+    body: [
+      "Summary of problem",
+      "",
+      "#### [git stack](https://github.com/magus/git-stack-cli)",
+      "- ✅ `1` https://github.com/magus/git-multi-diff-playground/pull/43",
+      "- ✅ `2` https://github.com/magus/git-multi-diff-playground/pull/44",
+      "- 👉 `3` https://github.com/magus/git-multi-diff-playground/pull/47",
+    ].join("\n"),
+
+    pr_url_list: [
+      "https://github.com/magus/git-multi-diff-playground/pull/47",
+      "https://github.com/magus/git-multi-diff-playground/pull/54",
+      "https://github.com/magus/git-multi-diff-playground/pull/61",
+    ],
+
+    selected_url: "https://github.com/magus/git-multi-diff-playground/pull/54",
+  };
+
+  const output = StackSummaryTable.write(args);
+
+  expect(output.split("\n")).toEqual([
+    "Summary of problem",
+    "",
+    "#### [git stack](https://github.com/magus/git-stack-cli)",
+    "- ✅ `1` https://github.com/magus/git-multi-diff-playground/pull/43",
+    "- ✅ `2` https://github.com/magus/git-multi-diff-playground/pull/44",
+    "- ⏳ `3` https://github.com/magus/git-multi-diff-playground/pull/47",
+    "- 👉 `4` https://github.com/magus/git-multi-diff-playground/pull/54",
+    "- ⏳ `5` https://github.com/magus/git-multi-diff-playground/pull/61",
+  ]);
+});
+
 test("persist only valid urls, removed broken branch ids from interrupted sync", () => {
   const args = {
     body: [
