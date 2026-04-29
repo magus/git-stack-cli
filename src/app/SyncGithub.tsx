@@ -6,6 +6,7 @@ import last from "lodash/last";
 import { Await } from "~/app/Await";
 import { Store } from "~/app/Store";
 import { maybe_fixup_pre_push_changes } from "~/app/maybe_fixup_pre_push_changes";
+import * as CommitMetadata from "~/core/CommitMetadata";
 import * as StackSummaryTable from "~/core/StackSummaryTable";
 import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
@@ -13,8 +14,6 @@ import * as git from "~/core/git";
 import * as github from "~/core/github";
 import { invariant } from "~/core/invariant";
 import { sleep } from "~/core/sleep";
-
-import type * as CommitMetadata from "~/core/CommitMetadata";
 
 export function SyncGithub() {
   return <Await fallback={<Ink.Text color={colors.yellow}>Syncing…</Ink.Text>} function={run} />;
@@ -138,8 +137,14 @@ async function run() {
     // this step must come after the after_push since that step may create new PRs
     // we need the urls for all prs at this step so we run it after the after_push
     const all_pr_groups: Array<CommitMetadataGroup> = [];
+
+    // Stack tables are rendered directly from this list, so use the canonical
+    // stack presentation order instead of depending on whatever local
+    // iteration order a caller might otherwise use.
+    const stack_group_list = CommitMetadata.stack_order(commit_range);
+
     // collect all groups and existing pr urls
-    for (const group of commit_range.group_list) {
+    for (const group of stack_group_list) {
       if (group.id !== commit_range.UNASSIGNED) {
         // collect all groups
         all_pr_groups.push(group);

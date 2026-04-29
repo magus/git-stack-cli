@@ -6,6 +6,7 @@ import * as github from "~/core/github";
 import { invariant } from "~/core/invariant";
 
 export type CommitRange = Awaited<ReturnType<typeof range>>;
+export type CommitGroupList = CommitRange["group_list"];
 
 type GithubPRStatus = ReturnType<typeof github.pr_status>;
 type PullRequest = NonNullable<Awaited<GithubPRStatus>>;
@@ -320,6 +321,46 @@ export async function range(commit_group_map?: CommitGroupMap) {
   }
 
   return { invalid, group_list, commit_list, pr_lookup, UNASSIGNED };
+}
+
+export function stack_order(commit_range: CommitRange): CommitGroupList {
+  return [...commit_range.group_list];
+}
+
+export function rebase_order(commit_range: CommitRange): CommitGroupList {
+  const state = Store.getState();
+  const actions = state.actions;
+
+  const reversed_group_list = stack_order(commit_range).reverse();
+
+  // order groups with group.master_base first
+  const group_list_master: CommitGroupList = [];
+  const group_list_others: CommitGroupList = [];
+  for (const group of reversed_group_list) {
+    if (group.master_base) {
+      group_list_master.push(group);
+    } else {
+      group_list_others.push(group);
+    }
+  }
+
+  const ordered_group_list = [...group_list_master, ...group_list_others];
+
+  // detect if group list order differs
+  for (let i = 0; i < reversed_group_list.length; i++) {
+    const original_group = reversed_group_list[i];
+    const ordered_group = ordered_group_list[i];
+    if (original_group.id !== ordered_group.id) {
+      ordered_group.dirty = true;
+
+      const debug = JSON.stringify({ original_group, ordered_group });
+      actions.debug(`rebase_order ${debug}`);
+
+      break;
+    }
+  }
+
+  return ordered_group_list;
 }
 
 export const UNASSIGNED = "unassigned";
