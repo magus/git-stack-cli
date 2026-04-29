@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 
 import * as CommitMetadata from "~/core/CommitMetadata";
+import { invariant } from "~/core/invariant";
 
 test("stack_order preserves stack group order", () => {
   const commit_range = range(["A", "B", "C"]);
@@ -23,7 +24,7 @@ test("rebase_order moves master_base groups to the front", () => {
   expect(ids(actual)).toEqual(["B", "C", "A"]);
 
   const [first_group] = actual;
-  expect(first_group).toBeDefined();
+  invariant(first_group, "first_group must exist");
   expect(first_group.dirty).toBe(true);
 });
 

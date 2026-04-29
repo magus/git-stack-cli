@@ -64,6 +64,7 @@ async function run() {
 
     for (const commit of commit_range.commit_list) {
       const group_from_map = commit_map[commit.sha];
+      invariant(group_from_map, "group_from_map must exist");
       commit.branch_id = group_from_map.id;
       commit.title = group_from_map.title;
       commit.master_base = group_from_map.master_base;
@@ -188,6 +189,7 @@ async function run() {
 function find_first_dirty_group(commit_range: CommitMetadata.CommitRange) {
   for (let i = 0; i < commit_range.group_list.length; i++) {
     const group = commit_range.group_list[i];
+    invariant(group, "group must exist");
 
     if (!group.dirty) {
       continue;
@@ -195,7 +197,9 @@ function find_first_dirty_group(commit_range: CommitMetadata.CommitRange) {
 
     if (i > 0) {
       const prev_group = commit_range.group_list[i - 1];
+      invariant(prev_group, "prev_group must exist");
       const prev_commit = prev_group.commits[prev_group.commits.length - 1];
+      invariant(prev_commit, "prev_commit must exist");
       const sha = prev_commit.sha;
       const index = i;
       return { sha, index };

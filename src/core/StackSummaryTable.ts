@@ -1,3 +1,5 @@
+import { invariant } from "~/core/invariant";
+
 type WriteArgs = {
   body: string;
   pr_url_list: Array<string>;
@@ -46,6 +48,7 @@ export function table(args: WriteArgs) {
 
   for (let i = 0; i < stack_pr_url_list.length; i++) {
     const pr_url = stack_pr_url_list[i];
+    invariant(pr_url, "pr_url must exist");
 
     const selected = args.selected_url === pr_url;
 
@@ -82,6 +85,7 @@ export function parse(body: string): Map<string, StackTableRow> {
   }
 
   const rows_string = stack_table_match.groups["rows"];
+  invariant(rows_string, "rows must exist");
   const row_list = rows_string.split("\n");
 
   const result = new Map<string, StackTableRow>();

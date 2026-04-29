@@ -127,6 +127,7 @@ export async function range(commit_group_map?: CommitGroupMap) {
 
   for (let i = 0; i < group_value_list.length; i++) {
     const group = group_value_list[i];
+    invariant(group, "group must exist");
     const previous_group: undefined | CommitGroup = group_value_list[i - 1];
 
     // actions.json({ group });
@@ -158,6 +159,8 @@ export async function range(commit_group_map?: CommitGroupMap) {
     if (i === 0) {
       group.base = master_branch_name;
     } else {
+      invariant(previous_group, "previous_group must exist");
+
       // console.debug("  ", "previous_group", previous_group.pr?.title.substring(0, 40));
       // console.debug("  ", "previous_group.id", previous_group.id);
 
@@ -284,6 +287,8 @@ export async function range(commit_group_map?: CommitGroupMap) {
           for (let i = 0; i < group.pr.commits.length; i++) {
             const pr_commit = group.pr.commits[i];
             const local_commit = all_commits[i];
+            invariant(pr_commit, "pr_commit must exist");
+            invariant(local_commit, "local_commit must exist");
 
             if (pr_commit.oid !== local_commit.sha) {
               actions.debug("  BOUNDARY_COMMIT_SHA_MISMATCH");
@@ -300,6 +305,8 @@ export async function range(commit_group_map?: CommitGroupMap) {
         for (let i = 0; i < group.pr.commits.length; i++) {
           const pr_commit = group.pr.commits[i];
           const local_commit = group.commits[i];
+          invariant(pr_commit, "pr_commit must exist");
+          invariant(local_commit, "local_commit must exist");
 
           if (pr_commit.oid !== local_commit.sha) {
             actions.debug("  COMMIT_SHA_MISMATCH");
@@ -350,6 +357,8 @@ export function rebase_order(commit_range: CommitRange): CommitGroupList {
   for (let i = 0; i < reversed_group_list.length; i++) {
     const original_group = reversed_group_list[i];
     const ordered_group = ordered_group_list[i];
+    invariant(original_group, "original_group must exist");
+    invariant(ordered_group, "ordered_group must exist");
     if (original_group.id !== ordered_group.id) {
       ordered_group.dirty = true;
 

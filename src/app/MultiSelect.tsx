@@ -4,6 +4,7 @@ import * as Ink from "ink-cjs";
 
 import { clamp } from "~/core/clamp";
 import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
 import { is_finite_value } from "~/core/is_finite_value";
 import { wrap_index } from "~/core/wrap_index";
 
@@ -68,6 +69,7 @@ export function MultiSelect<T>(props: Props<T>) {
 
       for (let i = props.items.length - 1; i >= 0; i--) {
         const item = props.items[i];
+        invariant(item, "item must exist");
 
         if (item.disabled) {
           continue;
@@ -101,6 +103,7 @@ export function MultiSelect<T>(props: Props<T>) {
       // search items backwards
       const index = props.items.length - 1 - i;
       const item = props.items[index];
+      invariant(item, "item must exist");
       if (!item.disabled) {
         set_index(index);
         break;
@@ -121,10 +124,16 @@ export function MultiSelect<T>(props: Props<T>) {
       return;
     }
 
-    const item = props.items[index].value;
+    const index_item = props.items[index];
+    invariant(index_item, "index_item must exist");
+    const item = index_item.value;
     const selected_list = Array.from(selected_set);
     const selected = selected_set.has(index);
-    const state = selected_list.map((index) => props.items[index].value);
+    const state = selected_list.map((index) => {
+      const index_item = props.items[index];
+      invariant(index_item, "index_item must exist");
+      return index_item.value;
+    });
 
     // console.debug("onSelect", { item, selected, state });
     props.onSelect({ item, selected, state });
@@ -136,10 +145,16 @@ export function MultiSelect<T>(props: Props<T>) {
       return;
     }
 
-    const item = props.items[index].value;
+    const focused_item = props.items[index];
+    invariant(focused_item, "focused_item must exist");
+    const item = focused_item.value;
     const selected_list = Array.from(selected_set);
     const selected = selected_set.has(index);
-    const state = selected_list.map((index) => props.items[index].value);
+    const state = selected_list.map((index) => {
+      const index_item = props.items[index];
+      invariant(index_item, "index_item must exist");
+      return index_item.value;
+    });
 
     // console.debug("onFocus", { item, selected, state });
     props.onFocus?.({ item, selected, state });
@@ -157,6 +172,7 @@ export function MultiSelect<T>(props: Props<T>) {
       if (key.return || space) {
         selectRef.current = true;
         const item = props.items[index];
+        invariant(item, "item must exist");
         if (!item.disabled) {
           return select(index);
         }
@@ -170,6 +186,7 @@ export function MultiSelect<T>(props: Props<T>) {
         // console.debug("up", { check, i, index });
 
         const item = props.items[check];
+        invariant(item, "item must exist");
         if (!item.disabled) {
           return set_index(check);
         }
@@ -183,6 +200,7 @@ export function MultiSelect<T>(props: Props<T>) {
         // console.debug("down", { check, i, index });
 
         const item = props.items[check];
+        invariant(item, "item must exist");
         if (!item.disabled) {
           return set_index(check);
         }

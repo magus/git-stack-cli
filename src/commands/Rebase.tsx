@@ -155,6 +155,7 @@ Rebase.run = async function run(props: Props) {
 
     for (let i = 0; i < commit_range.commit_list.length; i++) {
       const commit = commit_range.commit_list[i];
+      invariant(commit, "commit must exist");
       const commit_pr = commit_range.pr_lookup[commit.branch_id || ""];
 
       // drop commits that are in groups of merged PRs

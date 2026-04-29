@@ -333,8 +333,9 @@ async function gh(command: string, gh_options?: GhCmdOptions): Promise<string | 
     let cache: undefined | CacheEntryByHeadRefName = undefined;
 
     if (branch) {
-      if (state.cache_gh_cli_by_branch[branch]) {
-        cache = state.cache_gh_cli_by_branch[branch][command];
+      const branch_cache = state.cache_gh_cli_by_branch[branch];
+      if (branch_cache) {
+        cache = branch_cache[command];
       }
     }
 
@@ -386,7 +387,9 @@ async function gh(command: string, gh_options?: GhCmdOptions): Promise<string | 
       if (!state.cache_gh_cli_by_branch[branch]) {
         state.cache_gh_cli_by_branch[branch] = {};
       }
-      state.cache_gh_cli_by_branch[branch][command] = content;
+      const branch_cache = state.cache_gh_cli_by_branch[branch];
+      invariant(branch_cache, "branch_cache must exist");
+      branch_cache[command] = content;
     });
   }
 

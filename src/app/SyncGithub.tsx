@@ -88,6 +88,7 @@ async function run() {
 
     for (let i = 0; i < push_group_list.length; i++) {
       const group = push_group_list[i];
+      invariant(group, "group must exist");
       const last_commit = last(group.commits);
       invariant(last_commit, "last_commit must exist");
 
@@ -156,14 +157,19 @@ async function run() {
     }
 
     // get pr url list for all pr groups
-    const pr_url_list = all_pr_groups.map((g) => pr_url_by_group_id[g.id]);
+    const pr_url_list = all_pr_groups.map((group) => {
+      const pr_url = pr_url_by_group_id[group.id];
+      invariant(pr_url, "pr_url must exist");
+      return pr_url;
+    });
 
     // update PR body for all pr groups (not just push_group_list)
     const update_pr_tasks = [];
     for (let i = 0; i < all_pr_groups.length; i++) {
       const group = all_pr_groups[i];
-
+      invariant(group, "group must exist");
       const selected_url = pr_url_by_group_id[group.id];
+      invariant(selected_url, "selected_url must exist");
 
       const task = update_pr({ group, selected_url, pr_url_list, labels });
       update_pr_tasks.push(task);

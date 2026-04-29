@@ -32,6 +32,8 @@ export async function get_commits(dot_range: string) {
     if (!record) continue;
 
     const [sha, full_message] = record.split(SEP.field);
+    invariant(sha, "commit sha must exist");
+    invariant(full_message, "commit full_message must exist");
 
     // ensure sha is a hex string, otherwise we should throw an error
     if (!RE.git_sha.test(sha)) {

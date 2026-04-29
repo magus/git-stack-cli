@@ -9,6 +9,7 @@ import { immer } from "zustand/middleware/immer";
 import { DebugOutput } from "~/app/DebugOutput";
 import { Exit } from "~/app/Exit";
 import { colors } from "~/core/colors";
+import { invariant } from "~/core/invariant";
 import { pretty_json } from "~/core/pretty_json";
 
 import type { Instance as InkInstance } from "ink-cjs";
@@ -230,7 +231,9 @@ const BaseStore = createStore<State>()(
               state.pending_output[id] = [];
             }
 
-            state.pending_output[id].push(content);
+            const pending_output = state.pending_output[id];
+            invariant(pending_output, "pending_output must exist");
+            pending_output.push(content);
           });
         }
       },

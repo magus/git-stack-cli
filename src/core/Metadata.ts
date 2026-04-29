@@ -45,27 +45,33 @@ export function read(message: string): OutputMetadataValues {
   const match_subject = message.match(RE.subject_line);
 
   if (match_subject?.groups) {
-    values.subject = match_subject.groups["subject"];
-    invariant(values.subject, "subject must exist");
+    const subject = match_subject.groups["subject"];
+    invariant(subject, "subject must exist");
+    values.subject = subject;
   }
 
   const match_id = message.match(RE.stack_id);
 
   if (match_id?.groups) {
-    values.id = match_id.groups["id"];
-    invariant(values.id, "id must exist");
+    const id = match_id.groups["id"];
+    invariant(id, "id must exist");
+    values.id = id;
   }
 
   const match_title = message.match(RE.group_title);
 
   if (match_title?.groups) {
-    values.title = match_title.groups["title"];
+    const title = match_title.groups["title"];
+    invariant(title, "title must exist");
+    values.title = title;
   }
 
   const match_base = message.match(RE.base);
 
   if (match_base?.groups) {
-    values.base = match_base.groups["ref"];
+    const base = match_base.groups["ref"];
+    invariant(base, "base must exist");
+    values.base = base;
   }
 
   return values;

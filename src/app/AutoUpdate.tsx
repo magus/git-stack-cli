@@ -12,6 +12,7 @@ import { cli } from "~/core/cli";
 import { colors } from "~/core/colors";
 import { fetch_json } from "~/core/fetch_json";
 import { get_timeout_fn } from "~/core/get_timeout_fn";
+import { invariant } from "~/core/invariant";
 import { is_finite_value } from "~/core/is_finite_value";
 import { semver_compare } from "~/core/semver_compare";
 
@@ -191,6 +192,7 @@ export function AutoUpdate(props: Props) {
 
     function get_is_brew_bun_standalone() {
       const binary_path = process.argv[1];
+      invariant(binary_path, "binary_path must exist");
       debug(<Ink.Text dimColor>{JSON.stringify({ binary_path })}</Ink.Text>);
 
       const is_bunfs_path = binary_path.startsWith("/$bunfs");

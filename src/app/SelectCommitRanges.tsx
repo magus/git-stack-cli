@@ -169,8 +169,8 @@ export function SelectCommitRanges() {
     }
 
     // only allow setting base branch when on a created group
+    invariant(group, "group must exist");
     if (group.id !== commit_range.UNASSIGNED && input_lower === SYMBOL.m) {
-      const group = group_list[current_index];
       set_group_master_base(group.id);
       return;
     }
@@ -178,12 +178,14 @@ export function SelectCommitRanges() {
     if (key.leftArrow) {
       const new_index = wrap_index(current_index - 1, group_list);
       const next_group = group_list[new_index];
+      invariant(next_group, "next_group must exist");
       return set_selected_group_id(next_group.id);
     }
 
     if (key.rightArrow) {
       const new_index = wrap_index(current_index + 1, group_list);
       const next_group = group_list[new_index];
+      invariant(next_group, "next_group must exist");
       return set_selected_group_id(next_group.id);
     }
   });
@@ -209,6 +211,7 @@ export function SelectCommitRanges() {
   for (let i = 0; i < commit_range.group_list.length; i++) {
     const index = commit_range.group_list.length - i - 1;
     const group = commit_range.group_list[index];
+    invariant(group, "group must exist");
 
     if (group.pr?.state === "MERGED") continue;
 
@@ -244,6 +247,7 @@ export function SelectCommitRanges() {
   // console.debug({ sync_status });
 
   const group = group_list[current_index];
+  invariant(group, "group must exist");
   const is_master_base = group_master_base.has(group.id);
 
   const multiselect_disabled = is_input_mode;
@@ -675,6 +679,7 @@ export function SelectCommitRanges() {
 
     for (let i = 0; i < commit_range.commit_list.length; i++) {
       const commit = commit_range.commit_list[i];
+      invariant(commit, "commit must exist");
       const group_id = commit_map.get(commit.sha);
       // console.debug(commit.sha, group_id);
 

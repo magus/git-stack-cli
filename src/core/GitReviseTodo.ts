@@ -61,6 +61,7 @@ export function GitReviseTodo(args: Args): string {
 
   for (let i = args.rebase_group_index; i < group_list.length; i++) {
     const group = group_list[i];
+    invariant(group, "group must exist");
 
     for (const commit of group.commits) {
       commit_list.push(commit);
