@@ -166,10 +166,36 @@ node --enable-source-maps ./dist/js/index.js
 
 ## Build single-file executable
 
-```bash
-pnpm run compile
+Test local source before publishing by compiling to same single-file executable
+the release flow publishes. Create `git-stack` symlink and prepend to `PATH` so
+`git stack` finds it first, even over any existing installation, e.g. Homebrew.
 
-./dist/js/with-sourcemaps/git-stack-bun-darwin-arm64 --no-sync
+> https://bun.com/docs/bundler/executables#supported-targets
+
+```bash
+# mac arm
+pnpm run compile -- --target=bun-darwin-arm64
+ln -sf "$PWD/dist/bin/git-stack-bun-darwin-arm64" "$PWD/dist/bin/git-stack"
+export PATH="$PWD/dist/bin:$PATH"
+rehash
+```
+
+```bash
+
+```
+
+Verify the local binary is first on `PATH`
+
+```bash
+command -v git-stack  # should print `dist/bin/git-stack` path
+type -a git-stack     # should list path above first before any others
+git stack --version   # should print local version
+```
+
+To persist local override, prepend to `PATH` in your shell rc
+
+```bash
+export PATH="/Users/noah/code/git-stack-cli/dist/bin:$PATH"
 ```
 
 ## Publishing
