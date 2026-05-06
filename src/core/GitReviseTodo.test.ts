@@ -75,6 +75,19 @@ test("git-revise-todo handles double quotes in commit message", () => {
   );
 });
 
+test("git-revise-todo removes metadata from unassigned commits", () => {
+  const git_revise_todo = GitReviseTodo({
+    rebase_group_index: 0,
+    commit_range: UNASSIGNED_WITH_METADATA,
+  });
+
+  const expected = ["++ pick 90667fe97e05", "head~1", "", "- keep the actual commit body"].join(
+    "\n",
+  );
+
+  expect(git_revise_todo).toBe(expected);
+});
+
 test("git-revise-todo from commit range with single new commit", () => {
   const rebase_group_index = 0;
   const commit_range = SYNC_WITH_UNASSIGNED;
@@ -729,6 +742,58 @@ const COMMIT_MESSAGE_WITH_QUOTES: CommitMetadata.CommitRange = {
       subject_line: '[new] invalid "by me" quotes',
       branch_id: "6Ak-qn+5Z",
       title: '[new] invalid "by me" quotes',
+      master_base: false,
+    },
+  ],
+  pr_lookup: {},
+  UNASSIGNED: "unassigned",
+};
+
+const UNASSIGNED_WITH_METADATA: CommitMetadata.CommitRange = {
+  invalid: false,
+  group_list: [
+    {
+      id: "unassigned",
+      title: "allow_unassigned",
+      pr: null,
+      base: null,
+      dirty: true,
+      commits: [
+        {
+          sha: "90667fe97e059e8285e070d6268f2b4035b2ebd4",
+          full_message: [
+            "head~1",
+            "",
+            "- keep the actual commit body",
+            "",
+            "git-stack-id: old-pr-group",
+            "git-stack-title: old PR title",
+            "git-stack-base: master",
+          ].join("\n"),
+          subject_line: "head~1",
+          branch_id: "unassigned",
+          title: "allow_unassigned",
+          master_base: false,
+        },
+      ],
+      master_base: false,
+    },
+  ],
+  commit_list: [
+    {
+      sha: "90667fe97e059e8285e070d6268f2b4035b2ebd4",
+      full_message: [
+        "head~1",
+        "",
+        "- keep the actual commit body",
+        "",
+        "git-stack-id: old-pr-group",
+        "git-stack-title: old PR title",
+        "git-stack-base: master",
+      ].join("\n"),
+      subject_line: "head~1",
+      branch_id: "unassigned",
+      title: "allow_unassigned",
       master_base: false,
     },
   ],

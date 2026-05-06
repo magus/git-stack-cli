@@ -92,7 +92,7 @@ GitReviseTodo.todo = function todo(args: CommitListArgs) {
     // update git commit message with stack id
     const id = commit.branch_id;
     if (id == null || id === CommitMetadata.UNASSIGNED) {
-      entry_lines.push(commit.full_message);
+      entry_lines.push(Metadata.remove(commit.full_message));
     } else {
       // console.debug({ commit });
       const title = commit.title;
