@@ -34,6 +34,47 @@ test("stack table rows follow the base chain even when group_list is reversed", 
   ]);
 });
 
+test("stack table preserves stale rows without reversing current stack", () => {
+  const urls = {
+    stale: "https://example.test/pr/100",
+    base: "https://example.test/pr/101",
+    tip: "https://example.test/pr/102",
+  };
+  const pr_url_by_group_id = {
+    base: urls.base,
+    tip: urls.tip,
+  };
+  const commit_range = range(["base", "tip"], pr_url_by_group_id);
+
+  // This is the shape returned by CommitMetadata.range() after pre-push
+  // fixup: display/git-log order, tip before base.
+  commit_range.group_list.reverse();
+
+  const { pr_url_list } = stack_table_data({
+    commit_range,
+    pr_url_by_group_id: {},
+  });
+
+  const output = StackSummaryTable.write({
+    body: [
+      "Summary of problem",
+      "",
+      "#### [git stack](https://github.com/magus/git-stack-cli)",
+      `- ✅ \`1\` ${urls.stale}`,
+      `- ⏳ \`2\` ${urls.base}`,
+      `- 👉 \`3\` ${urls.tip}`,
+    ].join("\n"),
+    pr_url_list,
+    selected_url: urls.tip,
+  });
+
+  expect(Array.from(StackSummaryTable.parse(output).keys())).toEqual([
+    urls.stale,
+    urls.base,
+    urls.tip,
+  ]);
+});
+
 function range(group_id_list: Array<string>, pr_url_by_group_id: Record<string, string>) {
   return {
     invalid: false,
