@@ -56,11 +56,10 @@ async function run() {
     let commit_range = await CommitMetadata.range(commit_map);
 
     // The first revise pass rewrites commits from the merge base upward, so it
-    // must walk groups in commit application order rather than stack display
-    // order. We intentionally do not apply the master_base-first reshuffle
-    // here; that only matters for the follow-up pass that chooses a restart
-    // point for dirty groups.
-    commit_range.group_list = CommitMetadata.stack_order(commit_range).reverse();
+    // must walk groups in commit application order. We intentionally do not
+    // apply the master_base-first reshuffle here; that only matters for the
+    // follow-up pass that chooses a restart point for dirty groups.
+    commit_range.group_list = CommitMetadata.stack_order(commit_range);
 
     for (const commit of commit_range.commit_list) {
       const group_from_map = commit_map[commit.sha];

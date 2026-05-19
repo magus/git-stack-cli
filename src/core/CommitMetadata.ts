@@ -331,19 +331,58 @@ export async function range(commit_group_map?: CommitGroupMap) {
 }
 
 export function stack_order(commit_range: CommitRange): CommitGroupList {
-  return [...commit_range.group_list];
+  const group_by_id = new Map(commit_range.group_list.map((group) => [group.id, group]));
+  const children_by_base = new Map<string, CommitGroupList>();
+
+  for (const group of commit_range.group_list) {
+    if (!group.base || !group_by_id.has(group.base)) {
+      continue;
+    }
+
+    const children = children_by_base.get(group.base) || [];
+    children.push(group);
+    children_by_base.set(group.base, children);
+  }
+
+  const ordered_group_list: CommitGroupList = [];
+  const visited = new Set<string>();
+
+  function visit(group: CommitGroupList[number]) {
+    if (visited.has(group.id)) {
+      return;
+    }
+
+    visited.add(group.id);
+    ordered_group_list.push(group);
+
+    for (const child of children_by_base.get(group.id) || []) {
+      visit(child);
+    }
+  }
+
+  for (const group of commit_range.group_list) {
+    if (!group.base || !group_by_id.has(group.base)) {
+      visit(group);
+    }
+  }
+
+  for (const group of commit_range.group_list) {
+    visit(group);
+  }
+
+  return ordered_group_list;
 }
 
 export function rebase_order(commit_range: CommitRange): CommitGroupList {
   const state = Store.getState();
   const actions = state.actions;
 
-  const reversed_group_list = stack_order(commit_range).reverse();
+  const stack_group_list = stack_order(commit_range);
 
   // order groups with group.master_base first
   const group_list_master: CommitGroupList = [];
   const group_list_others: CommitGroupList = [];
-  for (const group of reversed_group_list) {
+  for (const group of stack_group_list) {
     if (group.master_base) {
       group_list_master.push(group);
     } else {
@@ -354,8 +393,8 @@ export function rebase_order(commit_range: CommitRange): CommitGroupList {
   const ordered_group_list = [...group_list_master, ...group_list_others];
 
   // detect if group list order differs
-  for (let i = 0; i < reversed_group_list.length; i++) {
-    const original_group = reversed_group_list[i];
+  for (let i = 0; i < stack_group_list.length; i++) {
+    const original_group = stack_group_list[i];
     const ordered_group = ordered_group_list[i];
     invariant(original_group, "original_group must exist");
     invariant(ordered_group, "ordered_group must exist");

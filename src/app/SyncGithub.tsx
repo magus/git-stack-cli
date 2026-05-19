@@ -137,30 +137,9 @@ async function run() {
     // finally, ensure all prs have the updated stack table from updated pr_url_by_group_id
     // this step must come after the after_push since that step may create new PRs
     // we need the urls for all prs at this step so we run it after the after_push
-    const all_pr_groups: Array<CommitMetadataGroup> = [];
-
-    // Stack tables are rendered directly from this list, so use the canonical
-    // stack presentation order instead of depending on whatever local
-    // iteration order a caller might otherwise use.
-    const stack_group_list = CommitMetadata.stack_order(commit_range);
-
-    // collect all groups and existing pr urls
-    for (const group of stack_group_list) {
-      if (group.id !== commit_range.UNASSIGNED) {
-        // collect all groups
-        all_pr_groups.push(group);
-
-        if (group.pr) {
-          pr_url_by_group_id[group.id] = group.pr.url;
-        }
-      }
-    }
-
-    // get pr url list for all pr groups
-    const pr_url_list = all_pr_groups.map((group) => {
-      const pr_url = pr_url_by_group_id[group.id];
-      invariant(pr_url, "pr_url must exist");
-      return pr_url;
+    const { all_pr_groups, pr_url_list } = stack_table_data({
+      commit_range,
+      pr_url_by_group_id,
     });
 
     // update PR body for all pr groups (not just push_group_list)
@@ -367,3 +346,35 @@ async function run() {
 }
 
 type CommitMetadataGroup = CommitMetadata.CommitRange["group_list"][number];
+
+export function stack_table_data(args: {
+  commit_range: CommitMetadata.CommitRange;
+  pr_url_by_group_id: Record<string, string>;
+}) {
+  const all_pr_groups: Array<CommitMetadataGroup> = [];
+
+  // Stack tables are rendered directly from this list, so use the canonical
+  // stack presentation order instead of depending on whatever local
+  // iteration order a caller might otherwise use.
+  const stack_group_list = CommitMetadata.stack_order(args.commit_range);
+
+  for (const group of stack_group_list) {
+    if (group.id === args.commit_range.UNASSIGNED) {
+      continue;
+    }
+
+    all_pr_groups.push(group);
+
+    if (group.pr) {
+      args.pr_url_by_group_id[group.id] = group.pr.url;
+    }
+  }
+
+  const pr_url_list = all_pr_groups.map((group) => {
+    const pr_url = args.pr_url_by_group_id[group.id];
+    invariant(pr_url, "pr_url must exist");
+    return pr_url;
+  });
+
+  return { all_pr_groups, pr_url_list };
+}

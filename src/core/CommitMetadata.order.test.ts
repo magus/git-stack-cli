@@ -10,18 +10,36 @@ test("stack_order preserves stack group order", () => {
   expect(ids(actual)).toEqual(["A", "B", "C"]);
 });
 
-test("rebase_order reverses stack order", () => {
+test("stack_order derives stack group order from base chain", () => {
+  const commit_range = range(["A", "B", "C"]);
+  commit_range.group_list.reverse();
+
+  const actual = CommitMetadata.stack_order(commit_range);
+
+  expect(ids(actual)).toEqual(["A", "B", "C"]);
+});
+
+test("stack_order does not drop groups with incomplete base links", () => {
+  const commit_range = range(["A", "B", "C"]);
+  commit_range.group_list[1]!.base = "missing";
+
+  const actual = CommitMetadata.stack_order(commit_range);
+
+  expect(ids(actual)).toEqual(["A", "B", "C"]);
+});
+
+test("rebase_order preserves stack group order", () => {
   const commit_range = range(["A", "B", "C"]);
   const actual = CommitMetadata.rebase_order(commit_range);
 
-  expect(ids(actual)).toEqual(["C", "B", "A"]);
+  expect(ids(actual)).toEqual(["A", "B", "C"]);
 });
 
 test("rebase_order moves master_base groups to the front", () => {
   const commit_range = range(["A", { id: "B", master_base: true }, "C"]);
 
   const actual = CommitMetadata.rebase_order(commit_range);
-  expect(ids(actual)).toEqual(["B", "C", "A"]);
+  expect(ids(actual)).toEqual(["B", "A", "C"]);
 
   const [first_group] = actual;
   invariant(first_group, "first_group must exist");
